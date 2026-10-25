@@ -27,7 +27,7 @@ backend/harness/verify.sh --c backend/harness/build/cjson_driver \
   [--timeout 5] [--max-bytes 1048576] [--out runs/<name>.json] [--jobs N]
 ```
 
-Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and exit codes are compared, never re-parsed as JSON. Classes: `match`, `divergence`, `safety_improvement` (C crashed or a sanitizer fired, Rust exited cleanly, not counted as a mismatch), `rust_crash` (signal, sanitizer or panic), `both_crash`, `timeout`.
+Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and exit codes are compared, never re-parsed as JSON. Classes: `match`, `divergence`, `safety_improvement` (C crashed or a sanitizer fired, Rust exited cleanly, not counted as a mismatch), `rust_crash` (signal, sanitizer or panic), `both_crash`, `timeout`. A side that printed a sanitizer report and only then hit `--timeout` (macOS symbolization can take seconds) counts as crashed, not timed out; its crash entry has `timed_out_after_report: true`.
 
 `match_rate = match / (match + divergence + rust_crash + both_crash + timeout)`. `--max-bytes` skips input files larger than the limit (listed under `skipped_inputs`). Commands are split with shell quoting rules, not run through a shell.
 
