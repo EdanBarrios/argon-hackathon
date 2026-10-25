@@ -44,10 +44,10 @@ function range(vals: (number | null)[], fmt: (x: number) => string, unit = "") {
 }
 
 function Row({ label, value, good, bad }: { label: string; value: string; good?: boolean; bad?: boolean }) {
-  const tone = bad ? "text-red-400" : good ? "text-green-400" : "text-white";
+  const tone = bad ? "text-div" : good ? "text-match" : "text-paper";
   return (
-    <div className="flex items-baseline justify-between gap-3 border-t border-neutral-800 py-2">
-      <span className="text-base text-neutral-400">{label}</span>
+    <div className="flex items-baseline justify-between gap-3 border-t border-line py-2">
+      <span className="text-base text-dim">{label}</span>
       <span className={`text-right text-xl font-bold tabular-nums ${tone}`}>{value}</span>
     </div>
   );
@@ -64,10 +64,10 @@ function Column({ m }: { m: ModelResult }) {
   const working = m.runs.filter((r) => r.match !== null);
   const verified = working.map((r) => `${n(r.match!)}/${n(r.of!)}`);
   return (
-    <div className="flex flex-col rounded-lg border border-neutral-700 p-4">
+    <div className="flex flex-col rounded-lg border border-line p-4">
       <div className="flex items-baseline justify-between">
         <span className="text-2xl font-black">{m.name}</span>
-        <span className="font-mono text-sm text-neutral-500">{m.model}</span>
+        <span className="font-mono text-sm text-dim">{m.model}</span>
       </div>
       <Row
         label="Finished first try, high thinking"
@@ -75,7 +75,7 @@ function Column({ m }: { m: ModelResult }) {
         good={finishedHigh === m.runs.length}
       />
       {finishedHigh < m.runs.length && (
-        <div className="text-right text-sm text-amber-300">hit 64K output cap</div>
+        <div className="text-right text-sm text-crash">hit 64K output cap</div>
       )}
       <Row
         label="2,000-input verifier"
@@ -87,8 +87,8 @@ function Column({ m }: { m: ModelResult }) {
       <Row label="Thinking tokens" value={range(working.map((r) => r.thought_tokens), k)} />
       <ScoreRow label="Targeted edge inputs" s={m.adversarial.targeted} />
       <ScoreRow label="Argon-written inputs" s={m.adversarial.argon_written} />
-      {m.divergence_note && <p className="mt-2 text-sm leading-snug text-red-200">{m.divergence_note}</p>}
-      {m.footnote && <p className="mt-2 text-sm leading-snug text-neutral-400">{m.footnote}</p>}
+      {m.divergence_note && <p className="mt-2 text-sm leading-snug text-div/90">{m.divergence_note}</p>}
+      {m.footnote && <p className="mt-2 text-sm leading-snug text-dim">{m.footnote}</p>}
     </div>
   );
 }
@@ -97,7 +97,7 @@ export function BaselineCompare() {
   const models = baseline.models as ModelResult[];
   return (
     <div>
-      <p className="mb-3 text-neutral-400">
+      <p className="mb-3 text-dim">
         {baseline.library}. {baseline.note}
       </p>
       <div className="grid grid-cols-2 gap-3">

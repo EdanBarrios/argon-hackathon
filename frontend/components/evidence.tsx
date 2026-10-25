@@ -41,15 +41,15 @@ export function Evidence({
         <ul className="flex flex-col gap-2">
           {checks.map((c, i) => (
             <li key={i} className="rise flex items-start gap-3 text-lg" style={{ animationDelay: `${i * 120}ms` }}>
-              <span className={`font-mono font-bold ${c.ok ? "text-match" : "text-div"}`}>{c.ok ? "[✓]" : "[✗]"}</span>
-              <span className="text-neutral-100">{c.text}</span>
+              <span className={`font-mono font-bold ${c.ok ? "text-match" : "text-div"}`}>{c.ok ? "✓" : "✗"}</span>
+              <span className="text-paper">{c.text}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-lg text-neutral-500">Evidence appears as the verifier reports.</p>
+        <p className="text-lg text-dim">Evidence appears as the verifier reports.</p>
       )}
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-dim">
+      <p className="text-sm text-dim">
         A human approves before anything is pushed. The model never grades its own work.
       </p>
       <div className="mt-auto">

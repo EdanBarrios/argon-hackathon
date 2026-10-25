@@ -27,27 +27,27 @@ function summary(e: JobEvent): string {
 }
 
 const TONE: Partial<Record<JobEvent["type"], string>> = {
-  divergence: "text-red-400",
-  crash: "text-amber-400",
-  approved: "text-green-400",
+  divergence: "text-div",
+  crash: "text-crash",
+  approved: "text-match",
 };
 
 export function EventLog({ events }: { events: JobEvent[] }) {
   return (
-    <details className="rounded-xl border border-neutral-800 bg-neutral-900 p-5">
-      <summary className="cursor-pointer text-sm font-bold uppercase tracking-[0.2em] text-neutral-400 hover:text-white">
+    <details className="rounded-xl border border-line bg-panel p-5">
+      <summary className="cursor-pointer text-base font-bold text-dim hover:text-paper">
         Event log ({events.length})
       </summary>
       {events.length === 0 ? (
-        <p className="mt-3 text-neutral-500">No events.</p>
+        <p className="mt-3 text-dim">No events.</p>
       ) : (
         <ol className="mt-3 max-h-80 overflow-auto font-mono text-sm leading-relaxed">
           {[...events].reverse().map((e) => (
-            <li key={e.seq} className="grid grid-cols-[3rem_6rem_9rem_1fr] gap-3 border-b border-neutral-800/60 py-1">
-              <span className="text-neutral-600">#{e.seq}</span>
-              <span className="text-neutral-500">{clock(e.at)}</span>
-              <span className="truncate text-neutral-500">{e.agent_id ?? "job"}</span>
-              <span className={TONE[e.type] ?? "text-neutral-200"}>{summary(e)}</span>
+            <li key={e.seq} className="grid grid-cols-[3rem_6rem_9rem_1fr] gap-3 border-b border-line/60 py-1">
+              <span className="text-dim">#{e.seq}</span>
+              <span className="text-dim">{clock(e.at)}</span>
+              <span className="truncate text-dim">{e.agent_id ?? "job"}</span>
+              <span className={TONE[e.type] ?? "text-paper"}>{summary(e)}</span>
             </li>
           ))}
         </ol>

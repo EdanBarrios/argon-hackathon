@@ -38,8 +38,8 @@ export function VerifierWall({ wall, holdout }: { wall: WallState; holdout: { ma
   if (!round) {
     return (
       <div className="flex flex-col gap-4">
-        <div className="font-mono text-2xl text-neutral-300">
-          Verifier running<span className="cursor text-match">▌</span>
+        <div className="font-mono text-2xl text-paper/80">
+          Verifier running…
         </div>
         <Grid states={Array.from({ length: 300 }, () => "scan" as CellState)} size={12} revealed />
       </div>
@@ -56,11 +56,11 @@ export function VerifierWall({ wall, holdout }: { wall: WallState; holdout: { ma
     <div className="flex h-full flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className={`font-mono text-6xl font-black tabular-nums ${full ? "text-match glow-match" : "text-white"}`}>
+          <div className={`text-6xl font-extrabold tracking-[-0.03em] tabular-nums ${full ? "text-match" : "text-paper"}`}>
             <CountUp value={round.match} />
             <span className="text-3xl text-dim"> / {round.total.toLocaleString("en-US")}</span>
           </div>
-          <div className="mt-1 text-base text-neutral-400">
+          <div className="mt-1 text-base text-dim">
             inputs where C and Rust print byte-identical output
             {round.iteration !== null && (
               <span className="font-mono text-dim">
@@ -82,14 +82,14 @@ export function VerifierWall({ wall, holdout }: { wall: WallState; holdout: { ma
 
       {!onLatest && round.div > 0 && (
         <div className="rise font-mono text-sm text-div">
-          {round.div} divergences sent to Argon for repair<span className="cursor">▌</span>
+          {round.div} divergences sent to Argon for repair
         </div>
       )}
 
       {showHoldout && (
         <div className="rise mt-auto border-t border-line pt-3">
           <div className="mb-2 flex items-baseline justify-between font-mono text-sm">
-            <span className="uppercase tracking-[0.2em] text-dim">Held-out: inputs the model never saw</span>
+            <span className="text-dim">Held-out: inputs the model never saw</span>
             <span className={holdout.match === holdout.total ? "text-match" : "text-div"}>
               {holdout.match}/{holdout.total}
             </span>
@@ -127,7 +127,7 @@ function Grid({ states, size, revealed }: { states: CellState[]; size: number; r
 
 function Legend({ cls, label, n }: { cls: string; label: string; n: number }) {
   return (
-    <span className="flex items-center gap-1.5 text-neutral-300">
+    <span className="flex items-center gap-1.5 text-paper/80">
       <span className={`h-2.5 w-2.5 rounded-sm ${cls}`} />
       <CountUp value={n} /> {label}
     </span>
