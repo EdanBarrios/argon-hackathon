@@ -6,25 +6,24 @@ import type { Status } from "@/lib/api";
 // Color is semantic only: green = match/done, red = divergence/failure, amber = crash.
 // C is blue, Rust is orange. Everything else stays neutral.
 const PILL: Record<Status, string> = {
-  queued: "border-line text-neutral-300",
+  queued: "border-line text-paper/80",
   running: "border-match/60 text-match",
   verifying: "border-match/60 text-match",
   completed: "border-match/60 bg-match/10 text-match",
   failed: "border-div/70 bg-div/10 text-div",
-  cancelled: "border-line text-neutral-400",
+  cancelled: "border-line text-dim",
 };
 
 export function StatusPill({ status, size = "md" }: { status: Status; size?: "md" | "lg" }) {
   const active = status === "running" || status === "verifying";
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded border font-mono font-semibold uppercase tracking-widest ${PILL[status]} ${
+      className={`inline-flex items-center gap-2 rounded border font-semibold ${PILL[status]} ${
         size === "lg" ? "px-3 py-1 text-base" : "px-2 py-0.5 text-xs"
       }`}
     >
       {active && <span className="live-dot h-2 w-2 rounded-full bg-match" />}
-      {active ? "live" : status}
-      {active && <span className="text-neutral-400">· {status}</span>}
+      {active ? `live · ${status}` : status}
     </span>
   );
 }
@@ -33,7 +32,7 @@ export function SampleBadge({ notice }: { notice: string | null }) {
   return (
     <span
       title={notice ?? undefined}
-      className="rounded border border-dashed border-neutral-500 px-2 py-0.5 font-mono text-xs uppercase tracking-wider text-neutral-300"
+      className="rounded border border-dashed border-dim px-2 py-0.5 text-xs text-paper/80"
     >
       recorded run{notice ? ` (${notice})` : ""}
     </span>
@@ -54,9 +53,7 @@ export function Card({
   return (
     <section className={`panel rise p-5 ${className}`}>
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="font-mono text-sm font-bold uppercase tracking-[0.25em] text-dim">
-          <span className="text-match">▸</span> {title}
-        </h2>
+        <h2 className="text-base font-bold">{title}</h2>
         {right}
       </div>
       {children}
