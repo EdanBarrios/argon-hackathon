@@ -1,98 +1,65 @@
-# Session handoff (11:50 AM PT, Oct 25)
+# Session handoff (2:40 PM PT, Oct 25)
 
-For a fresh Claude session (Edan's, role C) or any teammate. Read this, then `docs/PITCH.md`, `docs/DECISIONS.md`, `docs/FRICTION-LOG.md`. `docs/PLAN.md` is the original pre-event plan; where it conflicts with this file or DECISIONS.md, those win.
+For a fresh Claude session (Edan's, role C = systems, merge owner). Read this first, then `docs/PITCH.md` (script + Q&A) and the team brief: https://claude.ai/artifact/PT4JyioLP6iVd4NENGQzDw (shared by link). `docs/DECISIONS.md` has the history. The previous handoff (11:50) is in git history; this one supersedes it.
 
-## Deadlines
+## Clock
 
-- **Submit by 4:45** (hard deadline 5:00 PM). Submission form needs a 1-minute video of only today's work, public repo, all members added.
-- Judging round 1: 5:00-7:00 PM, ~3 min live demo + 1-2 min Q&A. Top 6 go on stage 7:00-8:00 (equal weights).
-- Feature freeze 3:30. Video at 4:00 (Keon).
+- **Video at 4:00** (Keon records; 1 minute, only today's work, real footage, royalty-free music; CapCut and OBS are installed; shot list was sent to Keon).
+- **Submit by 4:45**, hard limit 5:00: video, public repo, all members added. Everything the judges should see must be merged to main before submitting.
+- Judging 5:00-7:00 (~3 min live demo + Q&A), top 6 on stage 7:00-8:00.
+- Edan removed internal hard stops ("I say when we're done"). Feature freeze for the demo path is still wise: don't change backend/api or the live run after rehearsal.
 
-## Rubric (official)
+## Team
 
-| Criterion | Weight | What it means for us |
-|---|---|---|
-| Working live demo | 50% | Runs live with **real inputs**; effective use of Argon / Managed Agents / companion models; **real verification loop** |
-| Problem and usefulness | 25% | A **specific person** (libexpat / cJSON maintainers); could become a real open-source tool |
-| Originality | 15% | **Only possible with Argon's 1M context / long decode**: libexpat in one pass, Flash as baseline |
-| Clarity of pitch | 10% | Who the user is, working product, 3 min, no slides |
-
-- Prize: Best use of Managed Agents, $5,000 (plus 1st/2nd/3rd).
-- **Banned: "any project where a dashboard is the main feature."** Pitch Theseus as a migration tool with proof, never a dashboard.
-- **DQ risk:** judges must see what we built today. README has a "Built today vs. used" table; say it on stage too.
-- Never commit venue details (address, Wi-Fi) from the participant guide.
-
-## Product in one line
-
-Theseus rewrites C into memory-safe Rust with Gemini 4 Argon and proves it behaves the same: a deterministic differential verifier runs the C (under ASan) and the Rust on thousands of identical inputs and compares bytes. Divergences go back to Argon. Argon never grades its own homework. A human approves before a PR opens.
-
-Capability ladder for the pitch: cJSON (~3K lines, works) → Flash vs Argon baseline → libexpat (~20K+ lines, one long-context pass, the Argon-only claim). Only claim "smaller models can't" if the data shows it.
-
-## Team and rules
-
-| Who | Role | GitHub | Owns |
+| Who | Role | Owns | Now |
 |---|---|---|---|
-| Edan | C, systems, merges | EdanBarrios | `backend/api/`, `backend/harness/`, `scripts/`, shared files |
-| Brendan | A, AI | Keanooo7 | `backend/ai/` |
-| Keon | B, frontend | Keon-Amid | `frontend/` |
+| Edan | C, systems, merges, **presenter** | `backend/api/`, `backend/harness/`, `scripts/`, shared files | Should be rehearsing |
+| Brendan (Keanooo7) | A, AI | `backend/ai/` | Second libexpat translation (n=2) started 14:31, ~18 min per round; parallel workstreams handoff given (W2 n=2, W3 Flash with continuation, W4 Argon writes its own harness for a new library, W5 port anatomy) |
+| Keon (Keon-Amid) | B, frontend | `frontend/` | Built an editorial "story page" home + restyled run view on `feat/ui-keon` (6 commits, **NOT merged**). Needed for the demo: XML toggle on the Try panel and the claim-vs-check tick; unconfirmed |
 
-- Brendan is online and active: he merged PR #1 (held-out verification, managed-agent sandbox pre-run in `backend/ai/`) and PR #2 (harness: mutation check `mutants.py`, -O0 cross-check, `coverage.sh`, provenance in verify report) at 11:47. **He self-merged into harness files (C's area).** Agree with him that merges go through Edan, or at least get a heads-up.
-- Keon status unknown (Wi-Fi). Frontend was built by an agent and merged; he takes over on return.
-- Teammates work on `feat/<name>-*` branches. Never force-push.
+Rules: merges go through Edan; `git pull --no-rebase` before push (`--rebase` flattens merges); never force-push; never print `.env`; no em-dashes; `.role` is gitignored, so worktrees need `echo <role> > .role`.
 
-## Proven so far (numbers you can quote)
+## The idea (one sentence)
 
-- **Verifier self-test:** C vs C 2,000/2,000 plus 12,000 mutated, all 1.0, with a canary. Our first driver passed C-vs-C while broken, which is why the canary exists (friction log #1, best Q&A story).
-- **Argon on cJSON:** first translation, no repairs, **2,000/2,000** (735 lines of Rust, no unsafe, compiled first try). One call took **355 s** at thinking "high" (34K in, 7K out, 31K thinking). Files: `runs/ai/argon-1/`.
-- **Real CVE:** CVE-2023-53154 (heap over-read, cJSON v1.7.17, fixed 1.7.18). Input `{"1":1,` crashes v1.7.17 under ASan (`heap-buffer-overflow cJSON.c:786 in parse_string`); **Argon's Rust returns `PARSE_ERROR at 7`**; verifier labels it `safety_improvement`. `backend/harness/oldcve/`. Use `--timeout 20` (macOS ASan symbolization is slow).
-- **Sandbox (managed agents):** works with apt mirrors allowlisted (`scripts/sandbox_smoke.py --apt`): clang 18 + ASan + Rust + harness, ~46 s setup per new sandbox, files persist across turns via previous_interaction_id + environment_id.
-- **Gemini key works:** Argon ~14 s minimum latency, Flash ~2 s. Key in `.env` (gitignored). Billing shows no balance (internal account); track cost via `GET /jobs/{id}/cost`.
+AI can rewrite old C into safe Rust, but nobody can trust the rewrite. Theseus runs old and new code side by side on thousands of inputs, catches every difference, has Argon fix it, re-checks (Argon never grades its own homework), and hands a human a PR with evidence.
 
-## Decisions (full list in DECISIONS.md)
+Three proofs: (1) it works on something big (libexpat), (2) it catches what tests miss (Flash's cJSON port passes 2,000 tests, wrong on a 9-byte input, caught and repaired live), (3) nothing is trusted blindly (sandbox does the work, host re-checks, human approves, PR carries evidence).
 
-Target cJSON v1.7.19 core parse+print · runner **hybrid** (live demo local, pre-runs and PR step in sandboxes) · repair thinking medium, planner high · demo crash = CVE-2023-53154 · Edan temporarily covered A and B while they were offline.
+## Measured results (all on main; say only these)
 
-## In flight when this was written (background agents from the previous session)
+- **libexpat (parser Python and Firefox use), Argon:** one reply, ~18,500 lines of C (18,494) to 6,554 lines of safe Rust (1,089 s). Two compile-only fixes, 3 lines, no behavior fixes. Matched C on every input tried: 747 loop inputs (W3C suite + edge cases, 285 well-formed) and 1,253 unseen mutations, of which **only 52 are well-formed** (compared event by event); the other 1,201 match on exact error code, line, column. Host re-check (seed 4242) and a managed-sandbox re-check from scratch (seed 7777, sandbox claim 1.0 = host 1.0) agree. Flash at thinking high hit its 65,536 cap after 2,620 output tokens; retry DEADLINE_EXCEEDED (maybe infra). n=1 translation (fresh-a and fresh-b repaired the same translation). `results/libexpat-host-reverify/`, `results/libexpat-sandbox-verify/`, `backend/ai/results/`.
+- **Coverage:** seed-4242 inputs run 52.2% of parser lines, 44.3% of branches; ~74.7% of lines reachable in our configuration. `results/libexpat-coverage/`.
+- **Provenance:** Argon's port shares 7% of 8-token sequences / 3.6% of lines with the published `expat` crate (published 2026-10-18), mostly from the shared C; a real copy scores 99.8%. Rules out copying, not training exposure. `results/libexpat-provenance/`.
+- **Real Python on Argon's Rust:** CPython 3.13.5's unmodified pyexpat + _elementtree pass **646/780** Python XML tests (stock 768, C control 768, parse-nothing stub floor 392, so 254 from real parsing). Failures: namespaces 71 (by design, clean error), streaming 32, DTD 14, non-UTF-8 encodings 12. Shim `ffi.rs` written by Argon in one call, compiled first try. **Q&A only, not on stage**: the unsafe FFI layer has a known aliasing issue; namespaced XML fails. `results/pyexpat-on-argon/`, `contracts/pyexpat-shim.md`, `backend/ai/shim/`.
+- **cJSON:** Argon first-try port 4/4 runs; Flash 0/4 first try (cap). Live repair from Flash's port: round 1 ~96%, 19 divergences all from `"\uZ\t\\"`, Argon repairs (~90 s), round 2 100%, held-out passes; total 146-174 s (last run 174 s). Targeted split 980 vs 961 is one sample (Argon also misses the same 19 in 3/4 ports): never present as Argon beating Flash.
+- **CVE-2023-53154:** `{"1":1,` crashes cJSON 1.7.17 under ASan; Rust returns PARSE_ERROR at 7.
+- **Managed Agents:** Argon repair inside a sandbox (517 s, 0.9933 then 1.0, host re-verified); proxy-injected GitHub token (fake-token test: sandbox never sees it); real PR #3 (from an earlier run); certificate PR format (EVIDENCE.md, certificate.json, reproduce.sh tested from a fresh clone); preflight gate before any sandbox model call.
+- **Quality gate (Brendan):** cJSON 0 clippy / 0 panic lints. libexpat "153 -> 0 panic lints" is partly metric gaming (18 `unwrap_or(0)` fallbacks); don't sell it as a safety win.
 
-Their results land as commits on main and files under `runs/`. Check `git log` and these paths instead of waiting on notifications.
+## Never say
 
-| Work | Output to look for |
-|---|---|
-| Real pipeline (`THESEUS_MODE=real`), `POST /try` "Try any input" endpoint + UI panel, home page reframed around the action | commits touching `backend/api/`, `frontend/`, `contracts/README.md` |
-| Managed Agents in product: parallel Argon vs Flash sandbox runs, local re-verify, human-approved PR step (`--dry-run` until a token exists) | `backend/harness/remote/`, `scripts/run_remote.py`, `runs/remote/`, `backend/harness/remote/README-SECTION.md` |
-| Adversarial inputs (targeted + Argon-written) vs Argon and Flash Rust | `backend/harness/adversarial/`, `runs/adversarial/` (partial results already there) |
-| libexpat harness (driver, Rust template, inputs, self-test, size in lines/tokens) | `backend/harness/expat/`, `scripts/*expat*` |
-| AI loop second Argon run + Flash baseline on cJSON | `runs/ai/argon-2`, `runs/ai/flash-1`, `runs/ai/flash-2` |
+"proves", "equivalent", "mathematically", "cryptographic", "one shot", "2,000 fresh inputs", "we rewrote the parser inside Python", "Flash can't", "we found a bug in cJSON" (already documented), the 815K input-token figure, "libexpat was translated in a sandbox" (only the re-check ran there), "Python runs on Argon's expat" on stage.
 
-## Next steps, in priority order
+## Known gaps (admit first; answers are in PITCH.md Q&A)
 
-1. **Live demo (50%):** confirm the real pipeline + Try panel work end to end; rehearse the 3-minute flow in `docs/PITCH.md`.
-2. **libexpat long-context run** with Flash attempting the same, as soon as the expat harness lands (Brendan should kick it off; long decode, `background=True`, `max_output_tokens` > 65536). Record lines, tokens, match rates.
-3. **Baseline numbers:** Flash vs Argon on cJSON (and libexpat), ideally 3 runs each. Fill `[numbers]` in PITCH.md and the README Results section.
-4. **Managed Agents:** pre-runs in sandboxes; PR step live once the token exists; fill the README "How Theseus uses Managed Agents" section from `backend/harness/remote/README-SECTION.md`.
-5. **Q&A readiness:** Brendan and Keon do the drills page and read their code. Fact-check every `[verify]` line in PITCH.md (Codex was asked to).
-6. Merge any `feat/*` branches, then feature freeze at 3:30, video at 4:00, submit by 4:45.
+No planner (one-file translation; Track 1 says "plan the migration"). Repair has no edit tool (each fix regenerates 6.5K lines). Held-out is mostly error-position tests (52 well-formed). No mutation testing on libexpat. Hash-flooding untested (fixed salt). Banned-API guard is a text scan. Parsers are the easiest domain. n=1.
 
-## Waiting on Edan (human-only)
+## Live state
 
-- **Create a fine-grained GitHub token** for the PR step: repo `argon-hackathon` only, Contents read/write + Pull requests read/write. Put it in `.env` as `GITHUB_TOKEN=` (sent to the sandbox via the Credentials API, never in prompts).
-- Paste Codex's fact-check / red-team / Q&A results into the session.
-- Get Keon online (hotspot) and onboarded: `docs/ROLE-BRIEFS.md`, drills page.
+- API: real mode on :8000, pid 11891, started from `backend/` with `THESEUS_MODE=real uv run uvicorn api.main:app --port 8000` (log in the earlier session's scratchpad). In-memory job history; restarting wipes "Load pre-run". A finished live job `job_be9796` exists. Endpoints: `/try` (cjson + expat), `/try/presets?library=expat` (rich, billion_laughs), `/results/libexpat`, `/remote-runs`, `/jobs`.
+- Frontend: Next dev on :3000 from `frontend/` (pid 46786), serving main's frontend (not Keon's unmerged story page).
+- `runs/shim/libtheseus_expat.dylib` built on this Mac (x86_64). Argon libexpat binary: `runs/build-expat/edan-reverify-a/`.
+- Backend tests: 63 pass (`cd backend && uv run pytest -q`).
 
-## Links and local state
+## Open items, in order
 
-- Team learning page (product explainer + 6 verifier drills, shared by link): https://claude.ai/artifact/VDZ7twqnjoaK9GmgkQX2Rg. Its source is in the previous session's scratchpad. To edit it from a new session, use the Artifact tool with this URL (read first, then publish with `url`).
-- Servers running on Edan's laptop: mock API on :8000 (`THESEUS_MODE=mock`, from `backend/`) and Next.js on :3000, **started from an old agent worktree** (`.claude/worktrees/agent-a4d1f0163b1163b8b/frontend`). Restart the frontend from `~/dev/argon-hackathon/frontend` now that it's merged.
-- `.claude/worktrees/` is excluded locally via `.git/info/exclude`; never commit it.
-- Old pre-event folder `~/dev/argon-hackathon-pre-event` must never be read or copied from (compliance).
-
-## Gotchas
-
-- Verifying 2,000 inputs takes ~3.5 min (ASan startup on macOS); repair loops use ~300.
-- `build_rust.sh` rejects the word `unsafe` anywhere (comments too); the crate also has `#![forbid(unsafe_code)]`.
-- cJSON prints non-finite numbers as `null`; `[9007199254740993]` prints `[9.00719925474099e+15]` (a good Q&A example).
-- Several agents commit to main concurrently: stage explicit paths, `git pull --rebase --autostash` before push.
+1. **Keon's `feat/ui-keon`** (story page home + restyle, 29 files): review before merging. It must still have the Try panel with XML toggle, the live run view and the claim-vs-check tick, all real data, not dashboard-like. Merge only if the demo flow in PITCH.md still works end to end.
+2. **Brendan's branches** as they land: n=2 translation, Flash-with-continuation, Argon-writes-harness, anatomy. Merge results; update README/PITCH numbers only from measured files.
+3. **Brendan's lane fix:** restate the polish result honestly and drop "How to say it" blocks in `backend/ai/results/`.
+4. **Rehearsal:** Edan, stopwatch, script in PITCH.md; practise the 174 s fallback line.
+5. **Video at 4:00**, then merge everything, final README pass, submit by 4:30.
+6. Leftovers: PR #3 is open (do not merge; it's the demo PR). `feat/ai-main` has one stale decisions commit.
 
 ## How Edan wants to work
 
-Long builds run in background agents so chat stays open. Before starting, say in simple bullets what will be built and what human steps he should take meanwhile. Short prose, no em-dashes. Interrupt him when a decision is needed or the next dev step is ready.
+Short prose, no em-dashes, plain language. Long work goes to background agents; say what's being built and what he should do meanwhile. Be brutally honest when asked. He decides when work stops.
