@@ -12,13 +12,21 @@ Copied from `runs/` (gitignored) so the whole team can read them. Same prompts, 
 | Total tokens | 66K, 71K | 189K (both attempts billed) |
 | Thinking tokens | 26K, 31K | 112K |
 | Rust lines (`cjson.rs`) | 735, 714 | 734 |
-| Targeted adversarial inputs | 958/958 | 958/958 |
+| Targeted adversarial inputs | 980/980 | **961/980 (98.06%), 19 divergences** |
 | Argon-written adversarial inputs | 225/225 | 225/225 |
-| Divergences | 0 | 0 |
+| Divergences | 0 | 19, one root cause (below) |
+
+## Flash's divergence (the only real one we have)
+
+Input `"\uZ\t\\"` (9 bytes). C prints `OK\t""`, Flash's Rust prints `PARSE_ERROR at 7`. In an array, `["\uZ\t\\",1]`: C `OK\t["",1]`, Flash `PARSE_ERROR at 8`.
+
+Why: C's `parse_string` (vendored v1.7.19 `cJSON.c` line 877) reads a string in two passes. Pass one finds the end by pairing escapes. Pass two decodes: `\u` eats six bytes and invalid hex becomes U+0000, which leaves a lone backslash before the closing quote. C only checks `< 1` byte remaining, so it accepts. Flash checks `< 2` (its `cjson.rs` line 175): stricter, but not what C does. C is the reference, so Flash is wrong. Argon matched this quirk.
+
+Numbers from 12:09 re-run; an earlier 958-input run had 32 inputs silently overwritten by macOS case-insensitive filenames, now fixed. Argon also matched 20,000 extra fuzz inputs.
 
 ## How to say it
 
-- On cJSON both models reach the same correctness. Do not claim Flash "can't".
+- On the 2,000 generated inputs both models score 100%. On targeted edge inputs, Argon is 980/980 and Flash 961/980. One real behavior difference, n=1 port each. Do not claim Flash "can't".
 - The difference: Argon did it in one pass at full thinking, about 2.5x faster end to end with about 2.7x fewer tokens. Flash hit its 64K output ceiling at high thinking and only finished by thinking less.
 - Calling flash-1 a "failure" invites "just give it more room". It hit a token cap, not a translation mistake.
 - The originality claim (bigger libraries need Argon) is a prediction until the libexpat runs exist.
