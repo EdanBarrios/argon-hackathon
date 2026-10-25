@@ -21,7 +21,7 @@ typography:
     letterSpacing: "-0.035em"
   figure:
     fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "54px"
+    fontSize: "clamp(40px, 6vw, 88px)"
     fontWeight: 800
     lineHeight: 1
     letterSpacing: "-0.03em"
@@ -106,17 +106,17 @@ A warm two-ink press palette: five neutrals, two plate inks, three verdicts; eve
 
 **Character:** A heavy, tight grotesk that reads from the back of a room, against a plain monospace for anything the verifier printed. Sentence case throughout: no uppercase labels, no tracked-out kickers.
 ### Hierarchy
-Two ladders. The home page is fluid: display sizes are `clamp()` tied to viewport width. The run view is fixed: a rem ladder with one 54px figure, so the projected frame and a laptop read the same rows.
+Two ladders. The home page is fluid: display sizes are `clamp()` tied to viewport width. The run view is a fixed rem ladder with one fluid figure (the totals, clamp 40–88px), so the projected frame and a laptop read the same rows.
 - **Display** (800, `clamp(44px, 7vw, 112px)`, 0.94, −0.035em, `text-wrap: balance`): the hero. The counter is `clamp(64px, 8vw, 132px)` tabular; the footer line `clamp(34px, 5vw, 80px)`.
 - **Headline** (800, `clamp(34px, 4.4vw, 68px)`, 0.94, −0.035em): section heads; heads inside the pinned overlays are `clamp(28px, 3.4vw, 52px)`.
-- **Figure** (800, 54px, 1, −0.03em): run-view totals, C left and Rust right. The wall count is 3.75rem over a 1.875rem dim denominator; comparison values 1.25rem/700, tabular.
+- **Figure** (800, clamp(40px, 6vw, 88px), 1, −0.035em, tabular): run-view totals, C left and Rust right. Comparison values are Fragment Mono 1.25rem, tabular.
 - **Body** (400, 1.125rem, 1.375, max 42–52ch, paper at 85%): explanatory prose. The hero lede is 1.3rem/1.4 at 40ch; captions are 1rem dim.
 - **Title and Label** (700, 1rem): panel heads such as "Evidence report"; the wordmark is 1.125rem/800 at −0.02em. Labels are 0.875rem dim; plate heads 0.875rem/700 in their plate colour; pipeline detail 0.75rem mono.
 - **Data** (mono, 1.25rem): an output in a row. Inputs on the spine are 0.875rem mono dim; code is 0.88rem/1.5 with 3.2ch dim line numbers; sanitizer reports 0.75rem/1.625.
 
 **The Mono Evidence Rule.** Inputs, outputs, ids, patterns, offsets and reports are Fragment Mono; the argument around them is the grotesk. Numbers that change are `tabular-nums`.
 ## Layout
-Home: full-bleed sections with a 24/48/80px gutter (base/768/1024px), 128px vertical rhythm and a 5fr/7fr split at 1024px and up (argument left, evidence right; the rewrite is 1fr/1fr), two of them pinned for the scroll story. Run view: one column, max 1440px, 24/48px gutter, 20px between blocks, 20px inside panels. The evidence section is a three-column grid `1fr 11rem 1fr`: C output left, the registration spine (mark over input) centred, Rust output right-aligned; rows are hairline-separated with 16px vertical padding and expand in place on click. Pipeline steps share the width equally with 8px gaps. Spacing is the 4px scale; steps in use: 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64, 80, 128. Breakpoints 640, 768, 1024.
+Home: full-bleed sections with a 24/48/80px gutter (base/768/1024px), 128px vertical rhythm and a 5fr/7fr split at 1024px and up (argument left, evidence right; the rewrite is 1fr/1fr), two of them pinned for the scroll story. Run view: one column, max 1440px, 16/48px gutter, 24px between blocks; sections are separated by a top hairline and a heading, never boxed. Flash vs Argon uses the same spine (Argon left, Flash right, metric centred, 7rem/16rem). The evidence section is a three-column grid `minmax(0,1fr) 11rem minmax(0,1fr)` (spine 5.5rem below 768px): C output left, the registration spine (mark over input) centred, Rust output right-aligned; rows are hairline-separated with 16px vertical padding and expand in place on click. Pipeline steps share the width equally with 8px gaps. Spacing is the 4px scale; steps in use: 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64, 80, 128. Breakpoints 640, 768, 1024.
 **The Spine Rule.** An evidence row puts C on the left plate, Rust on the right and the verdict mark on the spine between them; totals come first at figure scale, never a card per stat.
 ## Elevation & Depth
 Flat. No `box-shadow`, no glow (the `.glow-*` classes resolve to `text-shadow: none`). Depth is one tonal step, ink to raised sheet, for a selected row, the repair row and the event log, plus 1px hairlines; the home nav floats on ink at 90%.
