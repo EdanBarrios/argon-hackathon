@@ -88,6 +88,21 @@ n = 1, run 2026-10-25 13:58-14:13 PT. The start file was `argon-fresh-b/round_4`
 
 Prompt rule 7 was not in the expat system instruction; the polish turn's own message carried the lint report. `expat-quality/recheck.txt`: all 11 claims hold. Details and caveats are in `expat-quality/README.md`.
 
+## libexpat: a second, independent translation also passes (`expat-long-decode/argon-translate-2/`)
+
+n = 2 translations now; before this, n = 2 was two repair runs from one translation. Run 2026-10-25 14:31-14:58 PT, same prompts, seeds and thinking levels as the first; repairs sent as fresh calls (`--fresh-repair`).
+
+| | Translation 1 (`gemini-4-argon` + `argon-fresh-a/b`) | Translation 2 (`argon-translate-2`) |
+|---|---|---|
+| Round 1 | one reply, 6,554 lines, 1,089 s | one reply, **6,518 lines**, 1,019 s, 73,794 output + 52,509 thought tokens |
+| Compile errors | 1 (E0282) + 1 (E0505) after the first fix | **1** (E0308: `NAMING_BITMAP` declared `[u32; 288]`, 320 values) |
+| Change to pass | 3 lines | **1 line** (`round1_to_round2.diff`: 288 → 320) |
+| Loop inputs | 747/747 | **747/747** |
+| Held-out (seed 1001) | 1,253/1,253 | **1,253/1,253**, 0 crashes |
+| Cost | | $3.68, 1,587 model seconds (`summary.json`) |
+
+The repair round's reply was the whole file again (73,794 output tokens); it changed only that line. Not yet through the quality gate (round 2: clippy 8, panic lints 180).
+
 ## Files
 
 - `<run>/summary.json`: per-round results, seconds, token usage, held-out block.
