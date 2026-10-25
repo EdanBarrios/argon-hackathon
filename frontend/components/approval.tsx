@@ -4,6 +4,9 @@ import { useState } from "react";
 import { approve, type Job, type Source } from "@/lib/api";
 
 const APPROVER = process.env.NEXT_PUBLIC_APPROVER || "maintainer";
+// The mock pipeline (THESEUS_MODE=mock) answers approve with this made-up URL; no PR exists behind it.
+const PLACEHOLDER = /^https:\/\/github\.com\/theseus-demo\//;
+export const isPlaceholderPr = (url: string | null | undefined) => !!url && PLACEHOLDER.test(url);
 
 export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source; onJob: (j: Job) => void }) {
   const [busy, setBusy] = useState(false);
@@ -33,7 +36,12 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
 
   return (
     <div className="flex flex-col gap-4">
-      {approval.pr_url ? (
+      {approval.pr_url && PLACEHOLDER.test(approval.pr_url) ? (
+        <div className="flex flex-col gap-1">
+          <div className="text-lg text-paper">Approved by {approval.approved_by}.</div>
+          <p className="text-dim">Practice mode: the backend replays a recorded run, so no pull request was opened.</p>
+        </div>
+      ) : approval.pr_url ? (
         <div className="flex flex-col gap-1">
           <div className="text-lg text-match">Approved by {approval.approved_by}. PR opened with the evidence report:</div>
           <a href={approval.pr_url} target="_blank" rel="noreferrer" className="break-all font-mono text-xl text-paper underline">
