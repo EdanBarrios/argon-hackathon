@@ -1,0 +1,107 @@
+{
+  "certificate_version": 1,
+  "scope": "cJSON v1.7.19 parse+print through our driver",
+  "claim": "agreement on 578 tested inputs (seed 1) and None held-out inputs; not a proof of equivalence",
+  "source": {
+    "repo": "EdanBarrios/argon-hackathon",
+    "harness_commit": "5848d5a9b25501bc63f16dd15d0eb0130a63d5d9",
+    "harness_dirty": false,
+    "c_library": "cJSON",
+    "c_tag": "v1.7.19",
+    "c_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "model": {
+    "model": "gemini-3.8-flash, repaired by gemini-4-argon",
+    "agent": null,
+    "interaction_id": null,
+    "environment_id": null,
+    "rounds_used": null,
+    "seconds": null,
+    "usage": {
+      "total_input_tokens": 90163,
+      "total_output_tokens": 7372,
+      "total_thought_tokens": 4401,
+      "total_cached_tokens": 1310
+    },
+    "cost_usd_estimate": 0.295567
+  },
+  "rust": {
+    "cjson_rs_sha256": "5b8c3fa03b36b6a15dd9354bdc54faefb450163892ca2ec80609f2075277e861",
+    "lines": 826,
+    "unsafe_keyword_present": false
+  },
+  "verification": {
+    "same_seed": {
+      "match_rate": 1.0,
+      "attempted": 578,
+      "scored": 578,
+      "matched": 578,
+      "skipped": 0,
+      "safety_improvements": 0,
+      "infra_failures": 0,
+      "summary_source": "runs/ai/live-20261025-155633-job_29a12b/round_2/verify.json",
+      "timeout_seconds": 20.0,
+      "seed": 1,
+      "generated_count": null,
+      "inputs_sha256": null
+    },
+    "held_out": {
+      "match_rate": 1.0,
+      "attempted": null,
+      "scored": null,
+      "matched": null,
+      "skipped": null,
+      "safety_improvements": null,
+      "infra_failures": null,
+      "summary_source": "not available (report has no summary object)",
+      "timeout_seconds": null,
+      "seed": 1001,
+      "overlap_removed": 236,
+      "rule": "generated with seed + 1000, minus any input whose bytes the repair loop saw",
+      "inputs_sha256": null
+    },
+    "sandbox_claimed_match_rate": null,
+    "host_reverified_match_rate": 1.0,
+    "claim_matches_host": "n/a (verified on the host; no sandbox claim)",
+    "verifier": "backend/harness/verify.sh (raw stdout bytes and exit codes compared, C side under ASan+UBSan)"
+  },
+  "preflight": {
+    "ok": true,
+    "checks": {
+      "canary": {
+        "ok": true
+      },
+      "c_vs_c": {
+        "ok": true,
+        "match_rate": 1.0,
+        "scored": 256
+      },
+      "stub": {
+        "ok": true,
+        "match_rate": 0.0,
+        "scored": 256
+      },
+      "mutants": {
+        "ok": true,
+        "skipped": true
+      }
+    },
+    "seconds": 117.3,
+    "work_dir": "runs/preflight/cjson-20261025-160436-95737"
+  },
+  "known_limitations": [
+    "Covers parse+print only (cJSON_ParseWithLengthOpts and cJSON_PrintUnformatted through our driver), not the full cJSON API or its C ABI.",
+    "Output after an embedded NUL byte is not compared: the C driver prints with fputs, so both sides are compared only up to the first NUL.",
+    "The banned-API guard (no std::process, std::fs, std::net, Command, include!, ...) is a text scan of cjson.rs, not a sandbox.",
+    "Agreement on the tested inputs is not a proof of equivalence: inputs nobody generated can still diverge.",
+    "Experimental: produced by a model and checked by our differential verifier; it needs maintainer review before anyone relies on it."
+  ],
+  "approval": {
+    "approved_by": "maintainer",
+    "at": "2026-10-25T16:06:33",
+    "branch": "theseus/live-20261025-155633-job_29a12b-release"
+  },
+  "status": "experimental; needs maintainer review",
+  "reproduce": null,
+  "reproduce_unavailable": "spec.json has no seed/inputs: cannot write a reproduce script with the same inputs"
+}
