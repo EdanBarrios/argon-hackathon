@@ -3,3 +3,5 @@ vendor/
 build/
 inputs/
 rust_crate/target/
+# CVE replay: fetched old sources and per-version ASan build output.
+cve-replay/build-*/
