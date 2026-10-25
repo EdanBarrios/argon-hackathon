@@ -35,6 +35,16 @@ Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and 
 
 Speed: each ASan process costs about 0.2 s to start on macOS, so 2000 inputs take about 3 to 4 minutes on 8 cores. Use `--count 300` for repair loops.
 
+## Preflight gate (required before any model call)
+
+```bash
+scripts/preflight.sh cjson            # ~40 s: canary, C vs C == 1.0, reject-everything stub <= 0.05
+scripts/preflight.sh expat            # ~2 min, same checks for libexpat
+scripts/preflight.sh cjson --mutants  # adds the mutant kill check (75 to 400 s)
+```
+
+200 generated inputs (seed 0) in a private dir under `runs/preflight/`, plus `adversarial/corpus/mutant_gaps/` for cjson. Prints one JSON line, exits nonzero on any failure. `backend/harness/remote/` and `scripts/run_remote.py` run it before any model call unless `--skip-preflight` / `skip_preflight=True` is passed.
+
 ## Mutation sensitivity check
 
 The self-test shows the verifier reports no false divergences. `mutants.py` shows the other direction: that the verifier plus the generated inputs catch a real bug in C.
