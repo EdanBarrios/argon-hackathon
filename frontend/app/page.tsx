@@ -54,7 +54,12 @@ export default function Home() {
   const [startFrom, setStartFrom] = useState<StartFrom>("flash-2");
   const [model, setModel] = useState(MODELS[0].value);
 
-  const body: CreateJobBody = { library: "cjson", model, start_from: startFrom, thinking: "medium", rounds: 4, inputs: 300 };
+  // targeted:str_ adds the 278 string-escape adversarial inputs; they are what expose Flash's real
+  // divergence ("\uZ\t\\"), so a run from flash-2 shows a live Argon repair.
+  const body: CreateJobBody = {
+    library: "cjson", model, start_from: startFrom, thinking: "medium", rounds: 4, inputs: 300,
+    extra_inputs: ["targeted:str_"],
+  };
 
   const start = async () => {
     setBusy(true);

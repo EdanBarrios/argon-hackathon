@@ -146,6 +146,8 @@ export interface CreateJobBody {
   start_from?: StartFrom | string;
   holdout?: boolean;
   cve_check?: boolean;
+  // Adversarial corpora added to the verify set, e.g. ["targeted:str_"] (contracts/README.md).
+  extra_inputs?: string[];
 }
 
 // ---------- POST /try ----------
