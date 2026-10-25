@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 2000,
+  "counts": {
+    "match": 2000,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 2000,
+    "attempted": 2000,
+    "scored": 2000,
+    "matched": 2000,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "backend/harness/expat/build/expat_driver",
+    "rust": "/work/theseus/runs/build-expat/sandbox/target/release/theseus_expat",
+    "inputs": "/work/inputs",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "/work/theseus/backend/harness/expat/build/expat_driver",
+      "sha256": "7b25413797a260ad8721c62a5f75217e525103858cc4352bb6913f5fe71c9a93"
+    },
+    "rust": {
+      "executable": "/work/theseus/runs/build-expat/sandbox/target/release/theseus_expat",
+      "sha256": "105646ed10eefb1cafc5b22a0302bdb34fe96576c0a52a8acaf4e04ad7a202df"
+    },
+    "platform": "Linux-4.19.0-gvisor-x86_64-with-glibc2.39",
+    "cjson_commit": null
+  },
+  "elapsed_seconds": 24.33
+}

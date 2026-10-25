@@ -1,0 +1,140 @@
+{
+  "library": "expat",
+  "mode": "verify_only",
+  "model": "gemini-4-argon",
+  "rust_file": "backend/ai/results/expat-long-decode/argon-fresh-a/round_3/expat.rs",
+  "seed": 7777,
+  "count": 2000,
+  "job_dir": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-134625-expat-verify",
+  "timings": {
+    "preflight": 112.7,
+    "sandbox": 634.5,
+    "host": 114.1
+  },
+  "notes": [
+    "steps: {'code_execution_call': 12, 'code_execution_result': 12, 'model_output': 1}",
+    "pulled ['stages.txt', 'commit.txt', 'build.json', 'expat_rs.sha256', 'inputs_digest.txt', 'nproc.txt', 'verify.json'] from sandbox /work/out"
+  ],
+  "preflight": {
+    "preflight": "expat",
+    "ok": true,
+    "seed": 0,
+    "generated_inputs": 200,
+    "inputs": 747,
+    "extra_corpus_inputs": 0,
+    "checks": {
+      "canary": {
+        "ok": true,
+        "cases": 2
+      },
+      "c_vs_c": {
+        "ok": true,
+        "match_rate": 1.0,
+        "scored": 747,
+        "matched": 747,
+        "infra_failures": 0
+      },
+      "stub": {
+        "ok": true,
+        "match_rate": 0.0013386880856760374,
+        "scored": 747,
+        "matched": 1,
+        "infra_failures": 0,
+        "max": 0.05
+      },
+      "mutants": {
+        "ok": true,
+        "skipped": true,
+        "reason": "no mutants for expat"
+      }
+    },
+    "failed": [],
+    "seconds": 112.6,
+    "work_dir": "runs/preflight/expat-20261025-134625-17299"
+  },
+  "xmlts_mounted": true,
+  "interaction_id": "v1_ChdHV3ZlYXJIUkpLbWkxTWtQejlfSjhBbxIXR1d2ZWFySFJKS21pMU1rUHo5X0o4QW8",
+  "created_at": "2026-10-25T13:48:28.193485",
+  "status": "completed",
+  "environment_id": "4929dbd432dcf405e0d0803b2e3c5929",
+  "usage": {
+    "total_input_tokens": 194338,
+    "total_output_tokens": 1772,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 154522,
+    "total_tool_use_tokens": 0,
+    "total_tokens": 196110
+  },
+  "cost_usd": 0.1128,
+  "sandbox_claim": {
+    "verify": {
+      "match_rate": 1.0,
+      "behaviors_tested": 2000,
+      "counts": {
+        "match": 2000,
+        "divergence": 0,
+        "safety_improvement": 0,
+        "rust_crash": 0,
+        "both_crash": 0,
+        "timeout": 0,
+        "infra_failure": 0
+      },
+      "divergences": [],
+      "crashes": []
+    },
+    "expat_rs_sha256": "418570361191d0019294b981d80e3185c7a732e0d4c02a627107f60b5af72c0d",
+    "inputs_digest": "0b75225e853471deef5ba2072322515e09f620459bd50c17d30ffb18cd788037",
+    "inputs_count": 2000,
+    "xmlts_source": "w3.org",
+    "commit": "9355bebbeaca456a102835457c00c47cee0cc6b6",
+    "match_rate": 1.0
+  },
+  "sandbox_files": [
+    "stages.txt",
+    "commit.txt",
+    "build.json",
+    "expat_rs.sha256",
+    "inputs_digest.txt",
+    "nproc.txt",
+    "verify.json"
+  ],
+  "sandbox_verify_file": {
+    "match_rate": 1.0,
+    "counts": {
+      "match": 2000,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "behaviors_tested": 2000
+  },
+  "host": {
+    "expat_rs_sha256": "418570361191d0019294b981d80e3185c7a732e0d4c02a627107f60b5af72c0d",
+    "seed": 7777,
+    "count": 2000,
+    "binary": "../runs/build-expat/edan-reverify-a/target/release/theseus_expat",
+    "inputs_digest": "0b75225e853471deef5ba2072322515e09f620459bd50c17d30ffb18cd788037",
+    "inputs_count": 2000,
+    "gen_seconds": 1.5,
+    "verify_seconds": 112.6,
+    "match_rate": 1.0,
+    "behaviors_tested": 2000,
+    "counts": {
+      "match": 2000,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "seconds": 114.1
+  },
+  "match_rates_agree": true,
+  "inputs_digest_agree": true,
+  "expat_rs_sha256_agree": true,
+  "counts_agree": true
+}
