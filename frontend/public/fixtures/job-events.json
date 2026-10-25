@@ -5,7 +5,9 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "queued" }
+    "data": {
+      "status": "queued"
+    }
   },
   {
     "seq": 2,
@@ -13,7 +15,14 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "running", "plan": ["lexer", "parser", "printer"] }
+    "data": {
+      "status": "running",
+      "plan": [
+        "lexer",
+        "parser",
+        "printer"
+      ]
+    }
   },
   {
     "seq": 3,
@@ -21,7 +30,15 @@
     "job_id": "job_7f3a2c",
     "agent_id": "agent_printer",
     "type": "translate",
-    "data": { "module": "printer", "iteration": 1, "functions": ["print_number", "print_string_ptr", "print_value"] }
+    "data": {
+      "module": "printer",
+      "iteration": 1,
+      "functions": [
+        "print_number",
+        "print_string_ptr",
+        "print_value"
+      ]
+    }
   },
   {
     "seq": 4,
@@ -29,7 +46,9 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "verifying" }
+    "data": {
+      "status": "verifying"
+    }
   },
   {
     "seq": 5,
@@ -37,7 +56,13 @@
     "job_id": "job_7f3a2c",
     "agent_id": "agent_printer",
     "type": "verify",
-    "data": { "iteration": 1, "match_rate": 0.64, "behaviors_tested": 512, "divergences": 184, "crashes": 0 }
+    "data": {
+      "iteration": 1,
+      "match_rate": 0.64,
+      "behaviors_tested": 512,
+      "divergences": 184,
+      "crashes": 0
+    }
   },
   {
     "seq": 6,
@@ -47,8 +72,8 @@
     "type": "divergence",
     "data": {
       "input": "[1e999]",
-      "c_output": "[inf]",
-      "rust_output": "[Infinity]",
+      "c_output": "OK\t[null]",
+      "rust_output": "OK\t[inf]",
       "function": "print_number"
     }
   },
@@ -58,7 +83,9 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "running" }
+    "data": {
+      "status": "running"
+    }
   },
   {
     "seq": 8,
@@ -69,7 +96,7 @@
     "data": {
       "iteration": 2,
       "function": "print_number",
-      "summary": "Non-finite doubles now print via the same branch as C (\"inf\"/\"-inf\"/\"nan\") instead of Rust's Display impl."
+      "summary": "Non-finite doubles now print as null, matching C's print_number, instead of Rust's Display impl (\"inf\")."
     }
   },
   {
@@ -78,7 +105,9 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "verifying" }
+    "data": {
+      "status": "verifying"
+    }
   },
   {
     "seq": 10,
@@ -86,7 +115,13 @@
     "job_id": "job_7f3a2c",
     "agent_id": "agent_printer",
     "type": "verify",
-    "data": { "iteration": 2, "match_rate": 1.0, "behaviors_tested": 512, "divergences": 0, "crashes": 0 }
+    "data": {
+      "iteration": 2,
+      "match_rate": 1.0,
+      "behaviors_tested": 512,
+      "divergences": 0,
+      "crashes": 0
+    }
   },
   {
     "seq": 11,
@@ -95,10 +130,10 @@
     "agent_id": null,
     "type": "crash",
     "data": {
-      "input": "[[[[...]]]] (nesting depth 100000)",
+      "input": "{\"1\":1,",
       "side": "c",
-      "sanitizer": "AddressSanitizer: stack-overflow",
-      "rust_behavior": "Err(DepthLimit)"
+      "sanitizer": "AddressSanitizer: heap-buffer-overflow (cJSON v1.7.17, CVE-2023-53154)",
+      "rust_behavior": "clean error: PARSE_ERROR at 7"
     }
   },
   {
@@ -107,7 +142,11 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "job_status",
-    "data": { "status": "completed", "final_match_rate": 1.0, "behaviors_tested": 2048 }
+    "data": {
+      "status": "completed",
+      "final_match_rate": 1.0,
+      "behaviors_tested": 2048
+    }
   },
   {
     "seq": 13,
@@ -115,6 +154,9 @@
     "job_id": "job_7f3a2c",
     "agent_id": null,
     "type": "approval_required",
-    "data": { "action": "open_pr", "evidence": "/jobs/job_7f3a2c/result" }
+    "data": {
+      "action": "open_pr",
+      "evidence": "/jobs/job_7f3a2c/result"
+    }
   }
 ]
