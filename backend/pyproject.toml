@@ -10,3 +10,8 @@ dependencies = [
     "google-genai>=2.3.0",
     "httpx",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
