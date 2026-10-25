@@ -61,3 +61,21 @@ Things that surprised us, in plain language. Newest at the bottom. Use these for
 3. **A BOM needs at least one byte after it.** `skip_utf8_bom` requires `can_access_at_index(buffer, 4)`, so a BOM followed by one byte is skipped, but a bare BOM is not. Argon guessed this would trip a port; both ports match C on it.
 
 **Harness gotcha.** macOS is case-insensitive, so `str_ctrl_u_0a` and `str_ctrl_U_0a` silently became one file and 32 inputs vanished. The generator now asserts names are unique ignoring case. Also, `verify.py` feeds every non-dot file to both sides, so `adversarial/run.sh` stages only real inputs, never READMEs.
+
+## 12:25: Managed-agent runs: what broke and what we learned
+
+**First real sandbox run.** `scripts/run_remote.py --models gemini-4-argon,gemini-3.8-flash --rounds 4`. Argon, inside one antigravity sandbox, installed clang and Rust, built the ASan driver, translated cJSON, ran verify.sh, fixed 2 divergences (`"\uZZZZ"` should parse as `""`, Argon rejected it), and reached match_rate 1.0 on 300 inputs in round 2: 517 s, 350K input tokens (275K cached), 26K output, about $0.49. The host rebuilt the returned `cjson.rs` and got the same 1.0 on the same 300 inputs, 1.0 on the held-out set, and 1.0 on the 2000-input seed-0 set. Claim and host agree.
+
+**Flash in a parallel sandbox: same score, 3.5x slower, 11x the input tokens.** gemini-3.8-flash ran in a second sandbox at the same time and also ended at 1.0 (sandbox, host same seed, host held-out), but took 1827 s and 4.0M input tokens (3.86M cached) against Argon's 517 s and 350K. Flash reported a single round, yet its transcript has 49 shell calls and 37 thought steps: it kept editing and re-running inside "round 1", overwriting `/work/verify_1.json`. So the round count is a claim too; the transcript (`transcript.jsonl`) is the real record of how much repair happened.
+
+**The held-out set was only 64 inputs.** Brendan's held-out rule removes every input the loop already saw. At `--count 300`, 236 of 300 inputs are cJSON's own test files and our fixed edge cases, identical for every seed, so only the 64 mutations are new. Quote the held-out count with the rate, or raise `--count`.
+
+**Two runs raced on a shared folder.** The local re-verify first failed with `FileNotFoundError ... runs/ai/holdout-c300-s1001-minus-inputs-c300-s1/mut_00015`. `ai.loop.holdout_inputs` deletes and rebuilds that fixed path, so another run with the same seed wiped it mid-copy. Fix: each job generates its same-seed and held-out inputs in its own job directory. `reverify_job(job_dir)` re-ran only the local step without paying for a new sandbox.
+
+**Credentials API gotchas.** The SDK overload names the field `type_`, but passing `type_="bearer_token"` fails validation; the body key must be `type`. Worse, the pydantic error echoes the request body, which contains the token, so we catch it and re-raise only the exception class name. For git over HTTPS, GitHub wants `Basic base64("x-oauth-basic:<token>")`, so the github.com credential is a `bearer_token` with `prefix="Basic"`; api.github.com gets a normal `Bearer` credential.
+
+**Proving the proxy injects the token, without a real token.** We registered a dummy credential and asked a sandbox to `curl https://api.github.com/user`. GitHub answered `401 Bad credentials` (a header arrived) instead of `Requires authentication`, and `env | grep -c dummy` printed 0: the value reached GitHub but never entered the sandbox.
+
+**Inline sources are not secret.** `environments.list()` returns each inline source's full content (base64). Fine for the PR payload (crate and evidence), never for anything sensitive; secrets only go through credentials.
+
+**The files API path is absolute.** `client.environments.files.download(environment=..., path="/work")` returns `/work` as a tar, so the host reads the sandbox's own `verify_<N>.json` files instead of trusting the pasted summary. It also works while the agent is still running, which is how we watched Flash's progress mid-run.

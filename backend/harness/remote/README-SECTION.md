@@ -16,8 +16,9 @@ verify reports through the Environments files API, rebuilds the returned `cjson.
 re-runs `verify.sh` locally on the same inputs and on held-out inputs the agent never saw. The
 sandbox claim and the local number are stored side by side, and any disagreement is flagged.
 In our first real run, Argon reached match rate 1.0 on 300 inputs in 2 rounds and 517 seconds
-inside the sandbox, and the host re-verify reproduced 1.0 on the same 300 inputs and on 64 unseen
-ones.
+inside the sandbox, and the host re-verify reproduced 1.0 on the same 300 inputs, on 64 unseen
+ones, and on our 2000-input set. A Flash baseline ran at the same time in a second sandbox and also
+reached 1.0, but took 1827 seconds and 4.0M input tokens against Argon's 517 seconds and 350K.
 
 Opening a pull request is the only step that touches a credential, and it needs a human. After
 someone clicks "Open PR", a second managed agent clones the repo, commits `migrated/cjson/` (the
