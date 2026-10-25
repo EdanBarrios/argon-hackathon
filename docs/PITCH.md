@@ -11,7 +11,7 @@ Lines marked **[verify]** must be checked right before we go on stage.
 - Theseus is a migration tool with evidence. Never call it a dashboard (banned project type).
 - Say out loud what we built today and what we used: cJSON and libexpat are third-party inputs, not our code.
 - One memorable moment per beat, not five stats.
-- libexpat model results are pending. Never fill them in by estimate.
+- libexpat facts we may say: 18,494 lines of C, 6,555 lines of Rust, one 18-minute reply (1,089 s), two compile fixes changing 3 lines, 747/747 loop + 1,253/1,253 held-out + 2,000/2,000 host re-verify on a fresh seed (341 inputs compared event for event, 1,659 on exact error code and position). Flash: no file (hit its cap, retry timed out). Never quote the 815K input tokens. Never say libexpat ran in a sandbox (it ran locally). Say "one reply plus two compile fixes", not "one shot".
 - Never say "any reviewer would approve it"; say "your CI would merge it" (provable: it passes all the tests).
 - The cJSON `\uZZZZ` behavior is already publicly documented (independent cJSON analysis, RFC 8259 requires four hex digits). Never claim we discovered it. Say "differential testing surfaced it".
 - Never say "proves", "mathematically", "audited" or "equivalence", even if a reviewer suggests it.
@@ -26,7 +26,10 @@ Timing is built around measured numbers: the live run takes ~146 s (round 1 veri
 
 **Before 0:00.** Run view open with "Start live run" (from Flash's port) ready. Try panel one click away. The PR tab open in the background. A finished recorded run loaded as backup.
 
-**0:00 The villain (click Start as you speak).**
+**0:00 The headline (click Start on the live run as you speak).**
+"Today, Gemini Argon rewrote the XML parser inside Python and Firefox. libexpat: 18,500 lines of C, into 6,500 lines of memory-safe Rust, in one 18-minute reply. Flash couldn't produce a file. The question is: how would you ever trust that? That's what we built."
+
+**0:10 The villain.**
 "This Rust port of cJSON compiles. It's memory-safe. It passes all 2,000 of our standard tests. Your CI would merge it. Watch."
 Round 1 lands at ~0:25: 96%, 19 divergences. Click the `"\uZ\t\\"` divergence.
 "It's wrong. Nine bytes: the original C says one thing, this rewrite says another. That's the bug that breaks someone downstream six months from now."
@@ -40,9 +43,8 @@ Round 1 lands at ~0:25: 96%, 19 divergences. Click the `"\uZ\t\\"` divergence.
 **1:05 CVE preset.**
 Click `{"1":1,`. "A published CVE in cJSON 1.7.17, fixed upstream since. The old C reads past its buffer, there's AddressSanitizer catching it. The Rust rejects it. That whole class of bug can't be written in safe Rust."
 
-**1:25 Why Argon (15 s, measured facts only).**
-If libexpat cleared the bar (compiles, no unsafe, stated agreement on stated inputs): say that one result and where Flash's single pass stopped.
-Otherwise: "Argon wrote this library's port right the first time in both runs, about 2.5x faster than Flash. Flash's single pass ran out of output room. The next target is libexpat, the XML parser inside Python, 18,000 lines."
+**1:25 Try any XML: the headline, live.**
+Switch the Try panel to XML. "Give me some XML." Run it: the real libexpat and Argon's Rust, event by event, identical. Then the billion-laughs preset: "A famous attack: one kilobyte that expands to gigabytes. Argon's Rust stops it with the exact same error as hardened libexpat, same line, same column. It kept the security protections, not just the parsing." Then one line: "On 2,000 tested behaviors, including the official W3C conformance suite and inputs it never saw, it matches. We re-checked it ourselves on a fresh seed."
 
 **1:40 Managed Agents (recorded run, say so).**
 Show the sandbox run's claim-vs-check: "Bigger runs happen in Google's managed sandboxes. The agent compiles, tests and repairs on its own, but its report is only a claim, so our host rebuilds and re-runs it: the sandbox said 1.0, we got 1.0, including inputs it never saw."
