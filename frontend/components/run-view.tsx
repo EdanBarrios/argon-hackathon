@@ -106,7 +106,11 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
             </span>
           </div>
         </div>
-        <Stat label="Behaviors tested" value={stats.behaviors === null ? "n/a" : stats.behaviors.toLocaleString("en-US")} />
+        <Stat
+          label={stats.final && stats.current !== null && stats.current >= 1 ? "Tested behaviors preserved" : "Behaviors tested"}
+          value={stats.behaviors === null ? "n/a" : stats.behaviors.toLocaleString("en-US")}
+          tone={stats.final && stats.current !== null && stats.current >= 1 ? "text-green-400" : "text-white"}
+        />
         <Stat label="Crashes caught" value={String(stats.crashes)} tone={stats.crashes ? "text-amber-400" : "text-white"} />
         {cost && <Stat label="Live cost" value={`$${cost.total_usd.toFixed(cost.total_usd < 1 ? 3 : 2)}`} />}
       </div>

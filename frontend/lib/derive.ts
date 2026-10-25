@@ -9,6 +9,25 @@ export interface DivergenceRow {
   function: string;
   resolved: boolean;
   agent_id: string | null;
+  repair: RepairView | null;
+}
+
+export interface RepairView {
+  iteration: number | null;
+  summary: string;
+}
+
+/** The first `repair` event after `afterSeq` that touched `fn` (any agent when `agentId` is null). */
+function findRepair(events: JobEvent[], fn: string, agentId: string | null, afterSeq = 0): RepairView | null {
+  const e = events.find(
+    (r) =>
+      r.type === "repair" &&
+      r.seq > afterSeq &&
+      r.data.function === fn &&
+      (agentId === null || r.agent_id === agentId) &&
+      typeof r.data.summary === "string",
+  );
+  return e ? { iteration: e.data.iteration ?? null, summary: e.data.summary as string } : null;
 }
 
 /**
@@ -18,12 +37,18 @@ export interface DivergenceRow {
  */
 export function divergenceRows(job: Job, events: JobEvent[]): DivergenceRow[] {
   if (job.result) {
-    return job.result.divergences.map((d, i) => ({ ...d, key: `r${i}`, agent_id: null }));
+    return job.result.divergences.map((d, i) => ({
+      ...d,
+      key: `r${i}`,
+      agent_id: null,
+      repair: findRepair(events, d.function, null),
+    }));
   }
   return events
     .filter((e) => e.type === "divergence")
     .map((e) => {
       const fn = e.data.function ?? "?";
+      const repair = findRepair(events, fn, e.agent_id, e.seq);
       const resolved = events.some(
         (later) =>
           later.seq > e.seq &&
@@ -39,6 +64,7 @@ export function divergenceRows(job: Job, events: JobEvent[]): DivergenceRow[] {
         function: fn,
         resolved,
         agent_id: e.agent_id,
+        repair,
       };
     });
 }
