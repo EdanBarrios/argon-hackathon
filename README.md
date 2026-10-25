@@ -47,7 +47,7 @@ All numbers come from `results/cjson-flash-vs-argon/README.md`, `results/libexpa
 
 ### libexpat: Argon's port, independently re-verified
 
-In one reply, Argon translated libexpat's parser core, about 18,500 lines of C, into 6,554 lines of safe Rust. After two compile-only fixes (3 lines changed, no behavior fixes), independent host testing found agreement on all 2,000 fresh XML inputs: 341 compared event by event, including 215 valid W3C conformance documents, and 1,659 on exact error code, line and column. Flash produced no file in our tested configuration.
+In one reply, Argon translated libexpat's parser core, about 18,500 lines of C, into 6,554 lines of safe Rust. After two compile-only fixes (3 lines changed, no behavior fixes), it matched the C on every input we tried: the 747 inputs the repair loop used (W3C conformance suite plus edge cases; 285 well-formed, compared event by event) and 1,253 unseen mutated inputs (only 52 of them well-formed and compared event by event; the other 1,201 match on exact error code, line and column). Host and sandbox re-checks on two more mutation seeds agreed. Flash produced no file in our tested configuration.
 
 | | Gemini 4 Argon | Gemini 3.8 Flash |
 |---|---|---|
@@ -55,7 +55,7 @@ In one reply, Argon translated libexpat's parser core, about 18,500 lines of C, 
 | After translation | Two fresh repair calls, each fixing one compile error (E0282 type annotation, E0505 borrow); 3 lines changed, no behavior repaired | Retry at thinking medium ended `DEADLINE_EXCEEDED`, which may be infrastructure, so we don't count it as a capability result |
 | Repair loop inputs (seed 1) | 747/747: 599 W3C conformance documents + 148 edge cases (deep nesting, billion laughs, UTF-16, invalid UTF-8) | no file |
 | Held-out inputs (seed 1001, minus every input the loop saw) | 1,253/1,253 | no file |
-| Host re-verify on a fresh seed (4242) | 2,000/2,000: 0 divergences, 0 crashes, 0 timeouts, 0 infra failures | no file |
+| Host re-verify, seed 4242 (the 747 loop inputs + 1,253 new mutations) | 2,000/2,000: 0 divergences, 0 crashes, 0 timeouts, 0 infra failures | no file |
 
 n = 1 per model. libexpat ran on a local runner, not in a managed sandbox. The C side is libexpat R_2_9_0 under ASan + UBSan. libexpat is the XML parser Python and Firefox use; our port covers its parser core under one configuration, not the full library. Details: `backend/ai/results/README.md` and `results/libexpat-host-reverify/README.md`.
 
