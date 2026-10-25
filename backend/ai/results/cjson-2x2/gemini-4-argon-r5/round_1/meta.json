@@ -1,0 +1,24 @@
+{
+  "round": 1,
+  "kind": "translate",
+  "interaction_id": "v1_ChdNMUxlYXR2Z0E3T2FfdU1QNHJqWHlBWRIXTTFMZWF0dmdBN09hX3VNUDRyalh5QVk",
+  "seconds": 270.1,
+  "usage": {
+    "total_input_tokens": 33733,
+    "total_output_tokens": 6661,
+    "total_thought_tokens": 20505,
+    "total_cached_tokens": 0,
+    "total_tokens": 60899
+  },
+  "thinking_level": "high",
+  "notes": [],
+  "rust_lines": 683,
+  "compile_ok": true,
+  "build_seconds": 2,
+  "match_rate": 1.0,
+  "divergences": 0,
+  "crashes": 0,
+  "timeouts": 0,
+  "safety_improvements": 0,
+  "behaviors_tested": 300
+}

@@ -1,0 +1,7 @@
+{
+  "compile_errors": "could not copy crate template",
+  "divergences": [],
+  "divergence_total": 0,
+  "crashes": [],
+  "timeouts": []
+}

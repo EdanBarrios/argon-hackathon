@@ -1,0 +1,23 @@
+{
+  "model": "gemini-3.8-flash",
+  "rounds_budget": 1,
+  "rounds_run": 1,
+  "inputs": "<repo>/runs/ai/inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": null,
+  "rounds_to_100": null,
+  "total_model_seconds": 0,
+  "total_tokens": {
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 0
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "translate",
+      "error": "interaction v1_ChdCVlRlYXF2NUNzT0xqckVQdE5QWmtRaxIXQlZUZWFxdjVDc09ManJFUHROUFprUWs ended with status 'incomplete' after 917.0s, usage {'total_input_tokens': 67562, 'total_output_tokens': 9035, 'total_thought_tokens': 122029, 'total_cached_tokens': 1213, 'total_tokens': 198626}"
+    }
+  ]
+}

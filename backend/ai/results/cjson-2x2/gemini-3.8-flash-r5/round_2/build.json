@@ -1,0 +1,5 @@
+{
+  "ok": true,
+  "binary": "<repo>/runs/build/ai-20261025-120209-gemini-3.8-flash-r2/target/release/theseus_cjson",
+  "build_seconds": 2
+}

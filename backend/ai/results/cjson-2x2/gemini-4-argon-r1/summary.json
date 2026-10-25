@@ -1,0 +1,57 @@
+{
+  "model": "gemini-4-argon",
+  "rounds_budget": 1,
+  "rounds_run": 1,
+  "inputs": "<repo>/runs/ai/inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": 1.0,
+  "rounds_to_100": 1,
+  "total_model_seconds": 364.0,
+  "total_tokens": {
+    "total_input_tokens": 33733,
+    "total_output_tokens": 6963,
+    "total_thought_tokens": 30501,
+    "total_cached_tokens": 0
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "translate",
+      "interaction_id": "v1_ChdNMUxlYXRxV0JkSFUtc0FQdk5hOWlRTRIXTTFMZWF0cVdCZEhVLXNBUHZOYTlpUU0",
+      "seconds": 364.0,
+      "usage": {
+        "total_input_tokens": 33733,
+        "total_output_tokens": 6963,
+        "total_thought_tokens": 30501,
+        "total_cached_tokens": 0,
+        "total_tokens": 71197
+      },
+      "thinking_level": "high",
+      "notes": [],
+      "rust_lines": 710,
+      "compile_ok": true,
+      "build_seconds": 1,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 300
+    }
+  ],
+  "holdout": {
+    "seed": 1001,
+    "inputs": "<repo>/runs/ai/holdout-c1000-s1001-minus-inputs-c300-s1",
+    "overlap_removed": 237,
+    "behaviors_tested": 763,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 763,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0
+    }
+  }
+}

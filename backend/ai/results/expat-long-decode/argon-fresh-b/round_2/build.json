@@ -1,0 +1,5 @@
+{
+  "ok": false,
+  "errors": "error[E0282]: type annotations needed\n    --> src/expat.rs:5967:21\n     |\n5967 |                     self.dtd.attribute_ids[idx].mark = 0;\n     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot infer type\n\nFor more information about this error, try `rustc --explain E0282`.\nerror: could not compile `theseus_expat` (bin \"theseus_expat\") due to 1 previous error",
+  "build_seconds": 1
+}
