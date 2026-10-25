@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
 import { crashViews, divergenceRows, heroStats, pct, verifySeries } from "@/lib/derive";
+import baseline from "@/data/baseline.json";
 import { ApprovalPanel } from "./approval";
 import { MatchChart } from "./chart";
 import { CrashCard } from "./crash-card";
@@ -20,20 +21,66 @@ function Stat({ label, value, tone = "text-white" }: { label: string; value: str
   );
 }
 
+// Flash vs Argon results come from data/baseline.json (Brendan's runs), not the API.
+interface BaselineRun {
+  model: string;
+  mode: string;
+  match_rate: number | null;
+  behaviors_tested: number | null;
+  rounds: number | null;
+  crashes: number | null;
+  seconds: number | null;
+  usd: number | null;
+}
+
+const CELLS = [
+  { model: "flash", mode: "single", label: "Flash, single pass" },
+  { model: "flash", mode: "repair", label: "Flash + repair loop" },
+  { model: "argon", mode: "single", label: "Argon, single pass" },
+  { model: "argon", mode: "repair", label: "Argon + repair loop" },
+];
+
+function roundsText(r: BaselineRun) {
+  if (r.rounds === null || r.mode === "single") return null;
+  return r.match_rate !== null && r.match_rate >= 1 ? `100% in ${r.rounds} rounds` : `${r.rounds} rounds, not 100%`;
+}
+
 function BaselineGrid() {
-  const cells = ["Flash, single pass", "Flash + repair loop", "Argon, single pass", "Argon + repair loop"];
+  const runs = baseline.runs as unknown as BaselineRun[];
   return (
     <div>
       <p className="mb-3 text-neutral-400">
-        Same harness, prompts and repair budget. Metrics: match rate, behaviors tested, rounds to 100%, crashes, time, cost.
+        {baseline.module} module. {baseline.note.split(";")[0]}.
       </p>
       <div className="grid grid-cols-2 gap-3">
-        {cells.map((c) => (
-          <div key={c} className="rounded-lg border border-dashed border-neutral-700 p-4">
-            <div className="text-lg font-semibold">{c}</div>
-            <div className="mt-1 font-mono text-sm uppercase tracking-widest text-neutral-500">pending baseline runs</div>
-          </div>
-        ))}
+        {CELLS.map((c) => {
+          const r = runs.find((x) => x.model === c.model && x.mode === c.mode);
+          if (!r || r.match_rate === null) {
+            return (
+              <div key={c.label} className="rounded-lg border border-dashed border-neutral-700 p-4">
+                <div className="text-lg font-semibold">{c.label}</div>
+                <div className="mt-1 font-mono text-sm uppercase tracking-widest text-neutral-500">pending baseline runs</div>
+              </div>
+            );
+          }
+          const full = r.match_rate >= 1;
+          const details = [
+            r.behaviors_tested !== null && `${r.behaviors_tested.toLocaleString("en-US")} behaviors`,
+            roundsText(r),
+            r.crashes !== null && `${r.crashes} crashes`,
+            r.seconds !== null && `${Math.round(r.seconds)}s`,
+            r.usd !== null && `$${r.usd.toFixed(r.usd < 1 ? 3 : 2)}`,
+          ].filter(Boolean);
+          return (
+            <div key={c.label} className={`rounded-lg border p-4 ${full ? "border-green-500/60" : "border-neutral-700"}`}>
+              <div className="text-lg font-semibold">{c.label}</div>
+              <div className={`mt-1 text-4xl font-black tabular-nums ${full ? "text-green-400" : "text-white"}`}>
+                {pct(r.match_rate)}
+              </div>
+              <div className="mt-1 text-base text-neutral-400">{details.join(" · ")}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

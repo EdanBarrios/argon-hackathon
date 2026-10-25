@@ -1,0 +1,10 @@
+{
+  "module": "printer",
+  "note": "Same harness, prompts and repair budget (5 rounds). Fill in from real runs only; null shows as pending.",
+  "runs": [
+    { "model": "flash", "mode": "single", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
+    { "model": "flash", "mode": "repair", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
+    { "model": "argon", "mode": "single", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
+    { "model": "argon", "mode": "repair", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null }
+  ]
+}
