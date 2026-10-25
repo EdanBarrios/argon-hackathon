@@ -32,3 +32,8 @@ target/
 *.log
 tmp/
 runs/
+
+# Harness (fetched sources, build output, generated inputs)
+backend/harness/vendor/
+backend/harness/build/
+backend/harness/inputs/
