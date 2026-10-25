@@ -13,7 +13,7 @@ libexpat translation. Two sides:
 |---|---|
 | Path (main checkout) | `runs/shim/libtheseus_expat.dylib` (gitignored) |
 | Install name | `@rpath/libtheseus_expat.dylib` (`-C link-arg=-Wl,-install_name,@rpath/libtheseus_expat.dylib`) |
-| Arch | x86_64 macOS, matching `/opt/anaconda3` Python 3.13.5 |
+| Arch | host default arch of the demo machine (x86_64 macOS, `/opt/anaconda3` Python 3.13.5). Brendan delivers source + `build.sh`; the dylib is built on the demo machine, not copied in. |
 | ABI headers | libexpat 2.9.0 `expat.h` / `expat_external.h` from `backend/harness/expat/vendor/libexpat/expat/lib/` |
 | Build flags assumed | `XML_DTD`, `XML_NS`, `XML_GE=1`; `XML_Char` = `char` (UTF-8); `XML_Size`/`XML_Index` = `long` |
 | Build | `backend/ai/shim/build.sh` (branch `feat/ai-pyexpat-shim`) |
@@ -50,9 +50,22 @@ XML_StopParser XML_UseForeignDTD
 
 Notes that matter for pyexpat behaviour:
 
-- `XML_ParserCreate_MM(encoding, memsuite, nsSep)`: pyexpat passes its own memsuite;
-  the shim may ignore it. If `nsSep` is non-NULL (namespace mode) the shim may return a
-  normal parser (namespaces unsupported, see below).
+- **Namespace parsers come through `XML_ParserCreate_MM`, not `XML_ParserCreateNS`.**
+  Verified: `XML_ParserCreateNS` is not referenced by pyexpat.c or _elementtree.c in
+  v3.13.5. `pyexpat.ParserCreate(namespace_separator=...)` and minidom/expatbuilder pass
+  the separator as `XML_ParserCreate_MM`'s third arg; `_elementtree.c:3673` calls
+  `ParserCreate_MM(encoding, &ExpatMemoryHandler, "}")` through the capsule, so
+  **every ElementTree parser is a namespace parser**. Agreed behavior (option c): when
+  `nsSep != NULL`, the parser returns a clean `XML_STATUS_ERROR` as soon as the document
+  has an `xmlns`/`xmlns:*` attribute or a prefixed element/attribute name; namespace-free
+  documents parse normally and names are passed through unchanged. Exporting
+  `XML_ParserCreateNS` as well is harmless (other consumers may want it) but not required.
+- The memsuite argument may be ignored.
+- **Replay discipline**: re-read the handler pointer from the parser struct before every
+  event (pyexpat clears/swaps handlers mid-parse), and check a stopped flag after every
+  callback. pyexpat calls `XML_StopParser` when a Python handler raises; the shim must
+  then stop delivering events and return `XML_STATUS_ERROR` with
+  `XML_GetErrorCode == XML_ERROR_ABORTED`.
 - Handlers receive the `userData` set by `XML_SetUserData`. Attribute arrays passed to
   start-element are NULL-terminated `name, value, name, value, ..., NULL`.
 - `XML_ExpatVersion()` must return a string that identifies the shim (e.g.
@@ -72,8 +85,10 @@ Notes that matter for pyexpat behaviour:
 ## Rules
 
 1. **Argon's core `expat.rs` stays byte-identical** to the Argon-produced artifact it
-   was copied from. Record its source path and sha256 in the shim's README. No edits,
-   not even formatting.
+   was copied from, checked by sha256 in `build.sh`. Source: the final passing round of
+   `backend/ai/results/expat-long-decode/argon-fresh-b/` (the one that replaces an
+   `unwrap` with an error return). If that file is not on main yet, fall back to
+   `argon-fresh-a/round_3/expat.rs` and say so. No edits, not even formatting.
 2. **`unsafe` lives only in the FFI layer** (the shim crate's `ffi.rs` or equivalent):
    raw pointer conversion, `CStr`, callbacks into C, the `#[no_mangle]` exports. The
    core parser stays `#![forbid(unsafe_code)]`-clean.
@@ -81,9 +96,26 @@ Notes that matter for pyexpat behaviour:
 4. Results are reported as measured: tests run/passed/failed/errored/skipped per suite,
    ours vs the stock pyexpat baseline. No inflation.
 
+## Symbols checked against 2.9.0's expat.h
+
+Present in 2.9.0 but **not** referenced by v3.13.5 pyexpat.c, so not required:
+`XML_ParserCreateNS`, `XML_SetHashSalt16Bytes`,
+`XML_SetBillionLaughsAttackProtectionMaximumAmplification`,
+`XML_SetBillionLaughsAttackProtectionActivationThreshold`,
+`XML_SetAllocTrackerMaximumAmplification`, `XML_SetAllocTrackerActivationThreshold`.
+(Later 3.13.x/3.14 pyexpat references some of these; we pin v3.13.5.)
+
 ## Knowingly unsupported (expected test failures)
 
-- Namespaces (`namespace_separator`, `XML_SetReturnNSTriplet`, ns decl handlers).
+- Namespaced documents in a namespace parser (option c above: clean error). This
+  includes any ElementTree input with `xmlns`.
+- Positions during callbacks: `CurrentLineNumber`/`ColumnNumber`/`ByteIndex` are only
+  meaningful after an error.
+- Incremental output: `iterparse` / `XMLPullParser` yield events only at close.
+- `GetSpecifiedAttributeCount` / `specified_attributes` count defaulted attributes too.
+- Handlers with no corresponding Argon event never fire.
+
+- `XML_SetReturnNSTriplet` and namespace decl handlers.
 - Incremental parsing semantics: the shim may buffer all input until `isFinal` and
   parse once, so handlers fire late and position/`buffer_text` tests may differ.
 - `XML_StopParser` / resume and `XML_SetReparseDeferralEnabled` (stored, ignored).
@@ -112,3 +144,7 @@ backend/harness/pyexpat/run_tests.sh runs/pyexpat/build   # ours + baseline summ
 `_elementtree.c` against the same expat.h, because the stock `_elementtree` rejects
 a pyexpat capsule whose `XML_MINOR_VERSION` differs from its own (2.7 vs 2.9).
 Symbol list regeneration: `build_pyexpat.sh --object-only <dir>; nm -u <dir>/pyexpat.o | grep XML_`.
+
+## Scope claim
+
+"pyexpat and SAX on Argon's libexpat, plus ElementTree on namespace-free XML."
