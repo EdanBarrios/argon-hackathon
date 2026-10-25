@@ -65,6 +65,8 @@ class TranslateResult:
     # Extras with defaults, so the five fields above stay the contract.
     thinking_level: str | None = None
     notes: list[str] = field(default_factory=list)
+    # Follow-up turns used because the first reply hit the output cap (0 = single pass).
+    continuations: int = 0
 
 
 # ---------------------------------------------------------------- client
@@ -182,6 +184,35 @@ def extract_rust(text: str | None, notes: list[str] | None = None) -> str:
     return blocks[0].rstrip() + "\n"
 
 
+_LEADING_FENCE = re.compile(r"\A\s*```[ \t]*(?:rust|rs)?[ \t]*\r?\n", re.IGNORECASE)
+
+
+def _continue(client: genai.Client, kwargs: dict, interaction: Any, level: str | None,
+              notes: list[str], usage: dict, target: Target) -> tuple[Any, str, int]:
+    """Resume a reply cut off at the output cap, on the same conversation.
+
+    Returns (last interaction, joined text, continuation turns used). Raises
+    TranslateError if the reply is still cut off after target.continue_turns turns.
+    """
+    text = getattr(interaction, "output_text", None) or ""
+    for turn in range(1, target.continue_turns + 1):
+        notes.append(f"{kwargs['model']} interaction {interaction.id} hit the output cap "
+                     f"({len(text)} chars so far); continuation turn {turn}")
+        print(f"[ai.translate] {notes[-1]}", file=sys.stderr, flush=True)
+        cont = dict(kwargs, input=prompts.CONTINUE_INPUT, previous_interaction_id=interaction.id)
+        interaction, _ = _create(client, cont, level, notes, target.max_output_tokens)
+        interaction = _wait(client, interaction, target.max_wait_seconds)
+        for k, v in _usage_dict(interaction).items():
+            usage[k] += v
+        text += _LEADING_FENCE.sub("", getattr(interaction, "output_text", None) or "", count=1)
+        status = getattr(interaction, "status", None)
+        if status == "completed":
+            return interaction, text, turn
+        if status != "incomplete":
+            raise TranslateError(f"continuation {interaction.id} ended with status {status!r}, usage {usage}")
+    raise TranslateError(f"reply still cut off after {target.continue_turns} continuation turns, usage {usage}")
+
+
 def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
          target: Target = CJSON) -> TranslateResult:
     """One logical call. If the model runs out of output budget (status "incomplete"),
@@ -201,6 +232,8 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
     started = time.monotonic()
     usage = dict.fromkeys(USAGE_FIELDS, 0)
     level: str | None = thinking
+    text: str | None = None
+    continuations = 0
     for attempt in (1, 2):
         interaction, used_level = _create(client, kwargs, level, notes, target.max_output_tokens)
         interaction = _wait(client, interaction, target.max_wait_seconds)
@@ -208,6 +241,9 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
         for k, v in _usage_dict(interaction).items():
             usage[k] += v
         if status == "completed":
+            break
+        if status == "incomplete" and target.continue_turns:
+            interaction, text, continuations = _continue(client, kwargs, interaction, used_level, notes, usage, target)
             break
         seconds = round(time.monotonic() - started, 1)
         lower = (THINKING_FALLBACK.get(used_level or "") or [None])[0]
@@ -227,7 +263,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
             + (f": {errors}" if errors else "")
         )
     seconds = round(time.monotonic() - started, 1)
-    rust = extract_rust(getattr(interaction, "output_text", None), notes)
+    rust = extract_rust(text if text is not None else getattr(interaction, "output_text", None), notes)
     for note in notes:
         print(f"[ai.translate] {note}", file=sys.stderr)
     return TranslateResult(
@@ -238,6 +274,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
         model=model,
         thinking_level=used_level,
         notes=notes,
+        continuations=continuations,
     )
 
 

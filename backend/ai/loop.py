@@ -21,6 +21,7 @@ so summary.json's "holdout" rate is the number to quote, not the loop's own rate
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import hashlib
 import json
 import os
@@ -161,11 +162,15 @@ def main(argv: list[str] | None = None) -> int:
                          "seeds/edge cases shared by every seed, so 300 would leave only 64 unseen")
     ap.add_argument("--timeout", type=float, default=20.0,
                     help="verify.sh seconds per run (its default 5 s gives false timeouts under ASan on macOS)")
+    ap.add_argument("--continue-turns", type=int,
+                    help="follow-up turns when a reply hits the output cap (default: the target's, 0 for cjson)")
     ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     args = ap.parse_args(argv)
 
     target = TARGETS[args.target]
+    if args.continue_turns is not None:
+        target = dataclasses.replace(target, continue_turns=args.continue_turns)
     root = Path(args.root).resolve() if args.root else find_root()
     build_sh = root / target.build_rust
     verify_sh = root / "backend/harness/verify.sh"
@@ -206,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:
         prev = res
         (rdir / target.rust_file).write_text(res.rust_source, encoding="utf-8")
         rec.update(interaction_id=res.interaction_id, seconds=res.seconds, usage=res.usage,
-                   thinking_level=res.thinking_level, notes=res.notes, rust_lines=res.rust_source.count("\n"))
+                   thinking_level=res.thinking_level, notes=res.notes, continuations=res.continuations, rust_lines=res.rust_source.count("\n"))
 
         build_id = re.sub(r"[^A-Za-z0-9._-]", "_", f"ai-{stamp}-{args.model}-r{n}")
         build, raw = run_json([str(build_sh), str(rdir / target.rust_file), build_id], timeout=600)

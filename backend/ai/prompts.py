@@ -243,6 +243,13 @@ def format_feedback(fb: dict) -> str:
     return "\n\n".join(lines)
 
 
+CONTINUE_INPUT = (
+    "Your reply was cut off by the output limit. Continue the file from the exact "
+    "character where it stopped: do not repeat anything, do not restart the code "
+    "block, and do not add commentary. Close the ```rust block when the file is complete."
+)
+
+
 # ---------------------------------------------------------------- libexpat
 
 EXPAT_DIR = REPO_ROOT / "backend" / "harness" / "expat"

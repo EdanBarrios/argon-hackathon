@@ -126,3 +126,28 @@ def test_first_diff_and_expat_patterns():
     assert pat({"c_output": "START", "rust_output": "START",
                 "first_diff": {"line": 3, "c": "END \"a\"", "rust": "TEXT \"b\""}}) == \
         "both accept, first differing line: C END vs Rust TEXT"
+
+
+def test_continuation_joins_a_cut_off_reply(monkeypatch):
+    import dataclasses
+    import types
+
+    from ai import translate
+    from ai.targets import EXPAT
+
+    replies = iter([
+        types.SimpleNamespace(id="i1", status="incomplete", output_text="```rust\nfn a() {}\nfn b(", usage=None),
+        types.SimpleNamespace(id="i2", status="completed", output_text="```rust\n) {}\n```\n", usage=None),
+    ])
+    sent = []
+
+    def create(**kw):
+        sent.append(kw)
+        return next(replies)
+
+    client = types.SimpleNamespace(interactions=types.SimpleNamespace(create=create, get=None))
+    monkeypatch.setattr(translate, "_get_client", lambda: client)
+    res = translate._run("m", "go", "high", None, target=dataclasses.replace(EXPAT, continue_turns=2))
+    assert res.rust_source == "fn a() {}\nfn b() {}\n"
+    assert res.continuations == 1 and res.interaction_id == "i2"
+    assert sent[1]["previous_interaction_id"] == "i1" and sent[1]["input"] == prompts.CONTINUE_INPUT

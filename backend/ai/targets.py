@@ -41,6 +41,9 @@ class Target:
     inputs_prefix: str = "inputs"
     max_output_tokens: int = 131072
     max_wait_seconds: float = 45 * 60
+    # Follow-up turns allowed when a reply hits the output cap; 0 keeps the old
+    # behaviour (retry once at a lower thinking level).
+    continue_turns: int = 0
 
 
 def _cjson_gen(root: Path, seed: int, count: int, out: Path) -> list[str]:
