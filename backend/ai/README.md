@@ -8,7 +8,8 @@ Owner: **A (ai)**. Lead Argon planner, managed-agent prompts, repair prompts. Se
 | `translate.py` | `translate()` / `repair()` through the Interactions API (background + poll) and feedback trimming |
 | `loop.py` | Local translate → build → verify → repair loop, then a held-out check |
 | `sandbox_run.py` | The same loop run by a managed agent in a remote sandbox, re-verified on the host |
-| `report.py` | One table of every run's `summary.json`: held-out, adversarial, seconds, USD, grouped for repeats |
+| `quality.py` | rustfmt and clippy counts for a generated file (default lints, panic lints, arithmetic), and the host's `clippy --fix` + rustfmt pass |
+| `report.py` | One table of every run's `summary.json`: held-out, adversarial, fmt, clippy, panic lints, crashes, seconds, USD, grouped for repeats |
 
 ```bash
 cd backend
@@ -28,3 +29,15 @@ own claims; `claim_holds` says whether the host reproduced the final one.
 For cJSON, `summary.json` → `adversarial` also has the best build's rate on the committed
 targeted and Argon-written corpora (C's `adversarial/run.sh`). Generated inputs give 1.0
 for every port so far; the targeted corpus is what separates them. Quote both, with n.
+
+**Quality.** `summary.json` → `quality` is the held-out build's tool counts: `fmt_ok`
+(rustfmt on the generated file only), `clippy_warnings` (default lints), `panic_lints`
+(`indexing_slicing`, `unwrap_used`, `expect_used`, `panic`), and `arithmetic_side_effects`
+(reported, not a target). `host_fixed` says the host's `clippy --fix` + rustfmt pass made
+that file, after a rebuild and reverify. `quality_first_build` is the model's first file
+that built, for comparison. `panics` counts Rust crashes of the held-out build on the loop,
+held-out and adversarial inputs. Once the best build matches every loop input, up to
+`--polish-rounds` (3 for cJSON) more rounds run: lint-only polish turns, and a normal repair
+turn after any polish that broke behavior. The best build is still picked by match rate first,
+so a polish that changes behavior is never the one held out.
+

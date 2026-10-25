@@ -1,0 +1,92 @@
+{
+  "match_rate": 0.98,
+  "behaviors_tested": 300,
+  "counts": {
+    "match": 294,
+    "divergence": 6,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0
+  },
+  "divergences": [
+    {
+      "input": "\"a\tb\"",
+      "file": "edge_ctrl_09",
+      "c_output": "OK\t\"a\\tb\"",
+      "rust_output": "OK\t\"a\\\tb\"",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"a\rb\"",
+      "file": "edge_ctrl_0d",
+      "c_output": "OK\t\"a\\rb\"",
+      "rust_output": "OK\t\"a\\\rb\"",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\\b\\f\\n\\r\\t\"",
+      "file": "edge_str_03",
+      "c_output": "OK\t\"\\b\\f\\n\\r\\t\"",
+      "rust_output": "OK\t\"\\b\\f\\n\\\r\\\t\"",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\t\"",
+      "file": "edge_str_26",
+      "c_output": "OK\t\"\\t\"",
+      "rust_output": "OK\t\"\\\t\"",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\b\\f\\n\\r\\t\":1}",
+      "file": "edge_str_key_03",
+      "c_output": "OK\t{\"\\b\\f\\n\\r\\t\":1}",
+      "rust_output": "OK\t{\"\\b\\f\\n\\\r\\\t\":1}",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\t\":1}",
+      "file": "edge_str_key_26",
+      "c_output": "OK\t{\"\\t\":1}",
+      "rust_output": "OK\t{\"\\\t\":1}",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    }
+  ],
+  "crashes": [],
+  "timeouts": [],
+  "truncated_lists": false,
+  "skipped_inputs": [],
+  "config": {
+    "c": "<repo>/backend/harness/build/cjson_driver",
+    "rust": "<repo>/runs/build/ai-20261025-130220-gemini-4-argon-r2h/target/release/theseus_cjson",
+    "inputs": "<repo>/runs/ai/inputs-c300-s1",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "<repo>/backend/harness/build/cjson_driver",
+      "sha256": "caa5285ec6e7cf342c366269190b6be5172017164292dac1a3b245beeda2538e"
+    },
+    "rust": {
+      "executable": "<repo>/runs/build/ai-20261025-130220-gemini-4-argon-r2h/target/release/theseus_cjson",
+      "sha256": "6204a90a25b73b457ea17b4f4a7858147d7c1e5fd7a960bb5e4e2c7ffab687a2"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 2.54
+}

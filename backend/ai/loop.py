@@ -18,6 +18,17 @@ inputs from --holdout-seed (default seed + 1000), minus any input whose bytes al
 appear in the loop's input set. The model never sees these inputs or their results,
 so summary.json's "holdout" rate is the number to quote, not the loop's own rate.
 
+Quality (ai.quality): every round that builds gets rustfmt and clippy counts. The host
+then runs `cargo clippy --fix` and rustfmt on it, rebuilds and reverifies; the fixed
+file replaces the model's as that round's candidate only if its loop match rate is no
+lower, it has no more Rust crashes and its lint counts are no worse. The best build is
+chosen by loop match rate, then lint counts, then the later round. Once the best build
+matches every loop input, leftover rounds (at most --polish-rounds) are polish turns
+fed with the remaining lints. A polish that changes behavior is never chosen; instead
+the next round is a normal repair of that polished file (its divergences or compile
+errors), which counts against the same polish budget. A matching round that is not
+cleaner than the best build ends the loop.
+
 Adversarial check: when the target has committed adversarial corpora (cJSON), the
 same best build also runs through C's adversarial/run.sh, and summary.json gets
 per-corpus rates under "adversarial". Generated inputs alone cannot tell Argon from
@@ -40,9 +51,9 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
-from . import prompts
+from . import prompts, quality
 from .targets import CJSON, TARGETS, Target
-from .translate import TranslateError, TranslateResult, repair, translate, trim_feedback
+from .translate import TranslateError, TranslateResult, polish, repair, translate, trim_feedback
 
 
 def find_root() -> Path:
@@ -171,6 +182,45 @@ def run_adversarial(root: Path, script: str, binary: str, label: str) -> dict:
     return out
 
 
+def candidate(n: int, source: str, binary: str, verify: dict, q: dict, host_fixed: bool = False) -> dict:
+    counts = verify.get("counts") or {}
+    rate = float(verify.get("match_rate") or 0.0)
+    return {"round": n, "source": source, "binary": binary, "rate": rate, "counts": counts,
+            "quality": q, "host_fixed": host_fixed, "key": (rate, *quality.rank(q), n)}
+
+
+def _crashes(counts: dict | None) -> int:
+    counts = counts or {}
+    return int(counts.get("rust_crash") or 0) + int(counts.get("both_crash") or 0)
+
+
+def host_fix(cand: dict, root: Path, target: Target, rdir: Path, build_verify, build_id: str) -> tuple[dict, dict]:
+    """clippy --fix + rustfmt on cand's file, rebuilt and reverified on the loop inputs.
+
+    Returns (the candidate to keep, a record of what happened). The fixed file is kept
+    only if its behavior is no worse (same or higher loop match rate, no more Rust
+    crashes) and its lint counts are no worse.
+    """
+    fixed, info = quality.autofix(root, target, cand["source"])
+    if not info["changed"]:
+        return cand, dict(info, applied=False)
+    hdir = rdir / "host_fix"
+    hdir.mkdir(exist_ok=True)
+    (hdir / target.rust_file).write_text(fixed, encoding="utf-8")
+    build, verify = build_verify(hdir / target.rust_file, build_id)
+    write_json(hdir / "build.json", build)
+    if verify is None or verify.get("verify_error"):
+        return cand, dict(info, applied=False, compile_ok=bool(build.get("ok")))
+    write_json(hdir / "verify.json", verify)
+    q = quality.measure(root, target, fixed)
+    new = candidate(cand["round"], fixed, build["binary"], verify, q, host_fixed=True)
+    ok = (new["rate"] >= cand["rate"] and _crashes(new["counts"]) <= _crashes(cand["counts"])
+          and quality.rank(q) >= quality.rank(cand["quality"]) and (q["fmt_ok"] or not cand["quality"]["fmt_ok"]))
+    info.update(applied=ok, compile_ok=True, match_rate=new["rate"], counts=new["counts"],
+                quality=quality.public(q))
+    return (new if ok else cand), info
+
+
 def usd(usage: dict) -> float:
     """Cost of one call's usage at the prices in api/cost.py (one source for pricing)."""
     from api.cost import usd_for
@@ -211,6 +261,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--start-from", help="existing Rust file to use as round 1 instead of a translate call")
     ap.add_argument("--fresh-repair", action="store_true",
                     help="send each repair as a new conversation (C source + previous file + feedback)")
+    ap.add_argument("--polish-rounds", type=int,
+                    help="max lint-only rounds after the best build matches every loop input (default: the target's)")
+    ap.add_argument("--no-host-fix", action="store_true", help="skip the host's clippy --fix + rustfmt pass")
     ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
     ap.add_argument("--no-adversarial", action="store_true", help="skip the adversarial corpora check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
@@ -239,12 +292,35 @@ def main(argv: list[str] | None = None) -> int:
     rounds: list[dict] = []
     prev: TranslateResult | None = None
     feedback: dict | None = None
-    best: tuple[float, str, int] | None = None  # (loop match rate, binary, round)
+    best: dict | None = None  # candidate(): the build the held-out and adversarial checks use
+    first_quality: dict | None = None  # the first model file that built, before any host fix
     final_rate = None
+    polish_left = args.polish_rounds if args.polish_rounds is not None else target.polish_rounds
+    # "repair" until the best build matches every loop input; then "polish" (lint feedback on
+    # the best build) and, when a polish breaks behavior, "polish_repair" (the usual verifier
+    # feedback on that polished file). Both of the last two spend polish_left.
+    phase = "repair"
+
+    def build_verify(src: Path, build_id: str) -> tuple[dict, dict | None]:
+        build, raw = run_json([str(build_sh), str(src), build_id], timeout=600)
+        if build is None:
+            build = {"ok": False, "errors": f"build_rust.sh produced no JSON: {raw}"}
+        if not build.get("ok"):
+            return build, None
+        verify, raw = run_json(
+            [str(verify_sh), "--c", str(c_driver), "--rust", build["binary"],
+             "--inputs", str(inputs), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
+            timeout=1800,
+        )
+        if verify is None:
+            print(f"verify.sh produced no JSON for {src}: {raw[-500:]}", file=sys.stderr)
+            verify = {"verify_error": raw[-2000:]}
+        return build, verify
+
     for n in range(1, args.rounds + 1):
         rdir = out / f"round_{n}"
         rdir.mkdir(exist_ok=True)
-        rec: dict = {"round": n, "kind": "translate" if prev is None else "repair"}
+        rec: dict = {"round": n, "kind": "translate" if prev is None else phase}
         try:
             if prev is None and args.start_from:
                 rec["kind"] = "start_from"
@@ -253,6 +329,12 @@ def main(argv: list[str] | None = None) -> int:
                                       interaction_id="", usage={}, seconds=0.0, model=args.model)
             elif prev is None:
                 res = translate(c_source, model=args.model, target=target)
+            elif phase == "polish":
+                lint_text = quality.format_lints(best["quality"])
+                (rdir / "lints_sent.md").write_text(lint_text, encoding="utf-8")
+                rec["polish_of_round"] = best["round"]
+                fresh = c_source if (args.fresh_repair or not prev.interaction_id) else None
+                res = polish(prev, best["source"], lint_text, model=args.model, target=target, fresh_source=fresh)
             else:
                 write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}, target.divergence_pattern))
                 res = repair(prev, feedback or {}, model=args.model, target=target,
@@ -268,24 +350,15 @@ def main(argv: list[str] | None = None) -> int:
                    thinking_level=res.thinking_level, notes=res.notes, continuations=res.continuations, rust_lines=res.rust_source.count("\n"))
 
         build_id = re.sub(r"[^A-Za-z0-9._-]", "_", f"ai-{stamp}-{args.model}-r{n}")
-        build, raw = run_json([str(build_sh), str(rdir / target.rust_file), build_id], timeout=600)
-        if build is None:
-            build = {"ok": False, "errors": f"build_rust.sh produced no JSON: {raw}"}
+        build, verify = build_verify(rdir / target.rust_file, build_id)
         write_json(rdir / "build.json", build)
         rec["compile_ok"] = bool(build.get("ok"))
         rec["build_seconds"] = build.get("build_seconds")
 
-        verify = None
-        if build.get("ok"):
-            verify, raw = run_json(
-                [str(verify_sh), "--c", str(c_driver), "--rust", build["binary"],
-                 "--inputs", str(inputs), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
-                timeout=1800,
-            )
-            if verify is None:
-                print(f"round {n}: verify.sh produced no JSON: {raw[-500:]}", file=sys.stderr)
-                rec["verify_error"] = raw[-2000:]
-                verify = {}
+        improved = False
+        if verify is not None:
+            if verify.get("verify_error"):
+                rec["verify_error"] = verify["verify_error"]
             write_json(rdir / "verify.json", verify)
             feedback = dict(verify, compile_errors=None)
             if target.diff_context and verify.get("divergences"):
@@ -297,28 +370,60 @@ def main(argv: list[str] | None = None) -> int:
                        timeouts=counts.get("timeout"), safety_improvements=counts.get("safety_improvement"),
                        behaviors_tested=verify.get("behaviors_tested"))
             final_rate = verify.get("match_rate")
-            # Same rule as api.pipeline: keep the best build, later round wins a tie,
-            # so a repair that regresses never becomes the build we hold out.
-            rate = float(final_rate or 0.0)
-            if best is None or rate >= best[0]:
-                best = (rate, build["binary"], n)
+
+            q = quality.measure(root, target, res.rust_source)
+            first_quality = first_quality or quality.public(q)
+            cand = candidate(n, res.rust_source, build["binary"], verify, q)
+            fix_info = None
+            if not args.no_host_fix:
+                cand, fix_info = host_fix(cand, root, target, rdir, build_verify, f"{build_id}h")
+            rec["quality"] = quality.public(q)
+            if fix_info is not None:
+                rec["host_fix"] = fix_info
+            write_json(rdir / "quality.json", {"model": quality.public(q), "host_fix": fix_info,
+                                               "diagnostics": q["diagnostics"]})
+            # Behavior first, then lint counts, then the later round (as in api.pipeline),
+            # so neither a regressing repair nor a regressing polish becomes the held-out build.
+            improved = best is None or cand["key"][:-1] > best["key"][:-1]
+            if best is None or cand["key"] >= best["key"]:
+                best = cand
         else:
             feedback = {"compile_errors": build.get("errors") or "build failed", "divergences": [], "crashes": []}
             rec.update(match_rate=None, divergences=None, crashes=None)
         write_json(rdir / "meta.json", rec)
         rounds.append(rec)
+        q_line = rec.get("quality") or {}
         print(
-            f"round {n} | compile {'ok' if rec['compile_ok'] else 'FAIL'} | match_rate "
+            f"round {n} ({rec['kind']}) | compile {'ok' if rec['compile_ok'] else 'FAIL'} | match_rate "
             f"{rec['match_rate'] if rec['match_rate'] is not None else '-'} | divergences {rec['divergences'] if rec['divergences'] is not None else '-'} "
-            f"| crashes {rec['crashes'] if rec['crashes'] is not None else '-'} | {res.seconds}s | tokens {tokens(res.usage)} "
+            f"| crashes {rec['crashes'] if rec['crashes'] is not None else '-'} "
+            f"| clippy {q_line.get('clippy_warnings', '-')} panic_lints {q_line.get('panic_lints', '-')} "
+            f"host_fix {'applied' if (rec.get('host_fix') or {}).get('applied') else '-'} | {res.seconds}s | tokens {tokens(res.usage)} "
             f"(in {res.usage.get('total_input_tokens')}, out {res.usage.get('total_output_tokens')}, "
             f"thought {res.usage.get('total_thought_tokens')}, cached {res.usage.get('total_cached_tokens')})",
             flush=True,
         )
-        if verify and verify.get("match_rate") == 1.0:
+        if phase == "repair":
+            if best and best["rate"] == 1.0:
+                if quality.clean(best["quality"]) or polish_left <= 0:
+                    break
+                phase = "polish"
+            continue
+        polish_left -= 1
+        broke = rec.get("match_rate") != 1.0  # did not build, or changed behavior on a loop input
+        if not broke and not improved:
+            print(f"[loop] round {n} matches but is not cleaner than round {best['round']}; stopping", flush=True)
             break
+        if quality.clean(best["quality"]) or polish_left <= 0:
+            break
+        phase = "polish_repair" if broke else "polish"
 
-    best_binary = best[1] if best else None
+    best_binary = best["binary"] if best else None
+    best_file = None
+    if best:
+        best_file = out / "best" / target.rust_file
+        best_file.parent.mkdir(exist_ok=True)
+        best_file.write_text(best["source"], encoding="utf-8")
     summary: dict = {
         "model": args.model,
         "target": target.name,
@@ -329,9 +434,15 @@ def main(argv: list[str] | None = None) -> int:
         "inputs": str(inputs),
         "verify_timeout": args.timeout,
         "final_match_rate": final_rate,
-        "best_round": best[2] if best else None,
-        "best_match_rate": best[0] if best else None,
+        "best_round": best["round"] if best else None,
+        "best_match_rate": best["rate"] if best else None,
+        "best_host_fixed": best["host_fixed"] if best else None,
+        "best_file": str(best_file) if best_file else None,
         "rounds_to_100": next((r["round"] for r in rounds if r.get("match_rate") == 1.0), None),
+        "polish_rounds_run": sum(1 for r in rounds if r.get("kind") == "polish"),
+        "quality": dict(quality.public(best["quality"]), host_fixed=best["host_fixed"],
+                        clean=quality.clean(best["quality"])) if best else None,
+        "quality_first_build": first_quality,
         "total_model_seconds": round(sum(r.get("seconds") or 0 for r in rounds), 1),
         "total_tokens": {k: sum(int((r.get("usage") or {}).get(k) or 0) for r in rounds)
                          for k in ("total_input_tokens", "total_output_tokens", "total_thought_tokens", "total_cached_tokens")},
@@ -375,6 +486,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[loop] adversarial: " + ", ".join(
             f"{k} {v.get('counts', {}).get('match')}/{v.get('behaviors_tested')}"
             for k, v in summary["adversarial"].items() if isinstance(v, dict)), flush=True)
+    # Any Rust crash (panic, abort, stack overflow) on any input set the best build ran.
+    if best:
+        sets = {"loop": best["counts"], "holdout": (summary.get("holdout") or {}).get("counts"),
+                **{k: v.get("counts") for k, v in (summary.get("adversarial") or {}).items() if isinstance(v, dict)}}
+        summary["panics"] = {**{k: _crashes(v) for k, v in sets.items() if v is not None},
+                             "total": sum(_crashes(v) for v in sets.values() if v is not None)}
     write_json(out / "summary.json", summary)
     print(f"[loop] summary: {out / 'summary.json'}", flush=True)
     return 0

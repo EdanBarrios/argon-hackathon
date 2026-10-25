@@ -1,0 +1,301 @@
+{
+  "model": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 0,
+    "panic_lints": 0,
+    "arithmetic_side_effects": 40,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 40
+    }
+  },
+  "host_fix": {
+    "clippy_fix_ok": true,
+    "fmt_ok": true,
+    "changed": false,
+    "applied": false
+  },
+  "diagnostics": [
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 75,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:75:13\n   |\n75 |             self.offset += 3;\n   |             ^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n   = note: requested on the command line with `-W clippy::arithmetic-side-effects`\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 85,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:85:17\n   |\n85 |                 self.offset += 1;\n   |                 ^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 115,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:115:13\n    |\n115 |             h += u32::from(b - b'0');\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 117,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:117:13\n    |\n117 |             h += 10 + u32::from(b - b'A');\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 119,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:119:13\n    |\n119 |             h += 10 + u32::from(b - b'a');\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 166,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:166:18\n    |\n166 |         let cp = 0x10000 + (((first_code & 0x3FF) << 10) | (second_code & 0x3FF));\n    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 191,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:191:9\n    |\n191 |         utf8_position -= 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 301,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:301:9\n    |\n301 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 305,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:305:9\n    |\n305 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 306,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:306:9\n    |\n306 |         digits += 1;\n    |         ^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 309,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:309:9\n    |\n309 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 311,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:311:13\n    |\n311 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 312,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:312:13\n    |\n312 |             digits += 1;\n    |             ^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 320,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:320:9\n    |\n320 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 322,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:322:13\n    |\n322 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 326,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:326:13\n    |\n326 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 327,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:327:13\n    |\n327 |             exp_digits += 1;\n    |             ^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 341,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:341:17\n    |\n341 |                 number_string_length += 1;\n    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 365,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:365:5\n    |\n365 |     buffer.depth += 1;\n    |     ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 371,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:371:5\n    |\n371 |     buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 374,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:374:9\n    |\n374 |         buffer.depth -= 1;\n    |         ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 375,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:375:9\n    |\n375 |         buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 387,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:387:9\n    |\n387 |         buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 401,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:401:5\n    |\n401 |     buffer.depth -= 1;\n    |     ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 402,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:402:5\n    |\n402 |     buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 410,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:410:5\n    |\n410 |     buffer.depth += 1;\n    |     ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 416,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:416:5\n    |\n416 |     buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 419,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:419:9\n    |\n419 |         buffer.depth -= 1;\n    |         ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 420,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:420:9\n    |\n420 |         buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 436,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:436:9\n    |\n436 |         buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 445,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:445:9\n    |\n445 |         buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 460,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:460:5\n    |\n460 |     buffer.depth -= 1;\n    |     ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 461,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:461:5\n    |\n461 |     buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 467,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:467:9\n    |\n467 |         buffer.offset += 4;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 471,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:471:9\n    |\n471 |         buffer.offset += 5;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 475,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:475:9\n    |\n475 |         buffer.offset += 4;\n    |         ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 571,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:571:21\n    |\n571 |         let zeros = (-exp - 1) as usize;\n    |                     ^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 575,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:575:26\n    |\n575 |         let int_digits = (exp + 1) as usize;\n    |                          ^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 669,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:669:20\n    |\n669 |                 if idx + 1 < len {\n    |                    ^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 682,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:682:20\n    |\n682 |                 if idx + 1 < len {\n    |                    ^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    }
+  ]
+}

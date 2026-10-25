@@ -51,6 +51,28 @@ Open questions, recorded as reported:
 - Usage for Argon's round 1 reports **815,566 input tokens** for a prompt of about 204K tokens. We have not explained the 4x.
 - The repair turn failed at 65,416 output tokens, close to 65,536. Suspected: a follow-up turn (`previous_interaction_id`) has a lower output cap than a fresh call. Not confirmed.
 
+## cJSON v1.7.19: quality gate (`cjson-quality/`)
+
+n = 1, run 2026-10-25 ~12:55-13:10 PT with `ai.loop` from `feat/ai-quality` (rustfmt, clippy, panic lints, host fix, polish rounds). Same seeds as the 2x2: loop seed 1 / 300 inputs, held-out 763 unseen.
+
+| | Argon 2x2 port, re-measured (`argon-polish-old-port` round 1, no model call) | Fresh Argon run, prompt rule 7 + polish (`argon-full`) |
+|---|---|---|
+| Held-out | 763/763 | 763/763 |
+| Targeted corpus | 961/980 | **980/980** |
+| Argon corpus | 225/225 | 225/225 |
+| rustfmt (generated file) | clean | clean |
+| Default clippy warnings | 3 | **0** (`cargo clippy -- -D warnings` exits 0) |
+| Panic lints (indexing_slicing, unwrap_used, expect_used, panic) | 41 | **0** (already 0 in round 1) |
+| arithmetic_side_effects (reported only) | 62 | 40 |
+| Rust crashes, all input sets | 0 | 0 |
+| Rounds, cost | | translate 352 s + polish 55 s, $0.67 |
+
+`argon-full.recheck.txt` is `recheck.py`, which imports nothing from `backend/ai`: it rebuilds the best file from scratch, reruns verify.sh on the held-out set and run.sh on the corpora, and recounts lints from plain cargo output. All 13 claims hold.
+
+`argon-polish-old-port` is the gate working: a polish of the 2x2 port cleared every lint but broke print escapes for `\t` and `\r` on 6/300 loop inputs (`round_2/verify.json`), so it was never held out; the held-out build stayed the original. Since then a broken polish gets a normal repair turn instead of ending the loop.
+
+How to say it: "With the lint rules in the prompt and one polish round, Argon's cJSON port is clippy clean with zero panic-prone index or unwrap sites, and still matches C on 763 unseen inputs and all 980 targeted ones." One run; 980/980 targeted was 1 of 4 before, so repeat before quoting it as typical.
+
 ## Files
 
 - `<run>/summary.json`: per-round results, seconds, token usage, held-out block.

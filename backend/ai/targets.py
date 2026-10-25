@@ -33,6 +33,7 @@ class Target:
     c_driver: str
     build_c: str
     build_rust: str
+    crate_template: str  # crate the build copies main.rs/Cargo.toml from (ai.quality reuses it)
     gen_inputs: Callable[[Path, int, int, Path], list[str]]  # (root, seed, count, out) -> argv
     divergence_pattern: Callable[[dict], str] = divergence_pattern
     # Rerun both drivers on listed divergences to find the first differing output
@@ -47,6 +48,9 @@ class Target:
     # Script that runs the committed adversarial corpora against one Rust binary
     # (C's harness); None when the target has none yet.
     adversarial_run: str | None = None
+    # Rounds allowed after the best build matches every loop input: lint-only polish turns
+    # and repairs of a polish that broke behavior (ai.loop).
+    polish_rounds: int = 0
 
 
 def _cjson_gen(root: Path, seed: int, count: int, out: Path) -> list[str]:
@@ -67,8 +71,10 @@ CJSON = Target(
     c_driver="backend/harness/build/cjson_driver",
     build_c="backend/harness/build_cjson.sh",
     build_rust="scripts/build_rust.sh",
+    crate_template="backend/harness/rust_crate",
     gen_inputs=_cjson_gen,
     adversarial_run="backend/harness/adversarial/run.sh",
+    polish_rounds=3,
 )
 
 
@@ -91,6 +97,7 @@ EXPAT = Target(
     c_driver="backend/harness/expat/build/expat_driver",
     build_c="backend/harness/expat/build_expat.sh",
     build_rust="scripts/build_rust_expat.sh",
+    crate_template="backend/harness/expat/rust_crate",
     gen_inputs=_expat_gen,
     divergence_pattern=expat_divergence_pattern,
     diff_context=True,

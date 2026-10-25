@@ -346,3 +346,18 @@ def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
                                              prev.rust_source, text)
         return _run(model, message, "medium", previous_id=None, target=target)
     return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)
+
+
+def polish(prev: TranslateResult, current_source: str, lint_text: str, model: str = DEFAULT_MODEL,
+           target: Target = CJSON, *, fresh_source: str | None = None) -> TranslateResult:
+    """A lint-only repair turn for a build that already matches (thinking medium).
+
+    current_source is the file the lints were measured on (possibly host-fixed), sent in
+    full. Continues prev's conversation, or with fresh_source starts a new one that
+    resends the translate message first.
+    """
+    message = prompts.polish_input(target.rust_file, current_source, lint_text)
+    if fresh_source is not None:
+        return _run(model, target.translate_input(fresh_source) + "\n\n" + message, "medium",
+                    previous_id=None, target=target)
+    return _run(model, message, "medium", previous_id=prev.interaction_id, target=target)
