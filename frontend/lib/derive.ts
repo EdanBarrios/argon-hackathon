@@ -73,18 +73,32 @@ export function divergenceRows(job: Job, events: JobEvent[]): DivergenceRow[] {
       function_guessed: guessed(events, d.input),
     }));
   }
+  // A repair counts only once the model has returned a file: the functions a
+  // round was sent (its "started" event) become repaired at its "done" event.
+  const repairedAt = new Map<string, number>();
+  for (const done of events) {
+    if (done.type !== "repair" || done.data.phase === "started") continue;
+    const started = events.find((s) => s.type === "repair" && s.data.phase === "started" && s.data.iteration === done.data.iteration);
+    const fns = Array.isArray(started?.data.functions) ? (started.data.functions as string[]) : [];
+    for (const f of [...fns, done.data.function].filter((x): x is string => typeof x === "string")) {
+      if (!repairedAt.has(f)) repairedAt.set(f, done.seq);
+    }
+  }
   return events
     .filter((e) => e.type === "divergence")
     .map((e) => {
       const fn = e.data.function ?? "?";
       const repair = findRepair(events, fn, e.agent_id, e.seq);
-      const resolved = events.some(
-        (later) =>
-          later.seq > e.seq &&
-          later.agent_id === e.agent_id &&
-          ((later.type === "repair" && later.data.function === fn) ||
-            (later.type === "verify" && (later.data.match_rate === 1 || later.data.divergences === 0))),
-      );
+      const resolved =
+        (repairedAt.get(fn) ?? -1) > e.seq ||
+        events.some(
+          (later) =>
+            later.seq > e.seq &&
+            later.agent_id === e.agent_id &&
+            later.type === "verify" &&
+            later.data.compile_ok !== false &&
+            (later.data.match_rate === 1 || later.data.divergences === 0),
+        );
       return {
         key: `e${e.seq}`,
         input: e.data.input ?? "",
@@ -356,4 +370,118 @@ export function holdoutResult(events: JobEvent[]): { match: number; total: numbe
 export function latestSummary(events: JobEvent[]): string | null {
   const e = [...events].reverse().find((x) => typeof x.data.summary === "string");
   return e ? (e.data.summary as string) : null;
+}
+
+// ---------------------------------------------------------------------------
+// Repair timeline and activity feed: what the pipeline is doing, from real events.
+
+export interface RepairRound {
+  iteration: number;
+  model: string;
+  /** "divergences": the verifier's deduped patterns; "compile": the compiler's errors. */
+  kind: "divergences" | "compile";
+  patterns: string[];
+  functions: string[];
+  startedAt: string;
+  seconds: number | null;
+  done: boolean;
+  /** First lines of the compiler output when this round's file did not build. */
+  buildError: string | null;
+  buildErrorCount: number;
+  /** The verify that followed this round, when it built. */
+  verified: { match: number; total: number } | null;
+}
+
+export function repairRounds(events: JobEvent[]): RepairRound[] {
+  const rounds: RepairRound[] = [];
+  for (const e of events) {
+    const d = e.data;
+    if (e.type === "repair" && d.phase === "started") {
+      const fns = Array.isArray(d.functions) ? (d.functions as string[]) : [];
+      const compile = fns.some((f) => /compile/i.test(f)) || /compiler/i.test(String(d.summary ?? ""));
+      rounds.push({
+        iteration: d.iteration ?? rounds.length + 2,
+        model: typeof d.model === "string" ? d.model : "the model",
+        kind: compile ? "compile" : "divergences",
+        patterns: Array.isArray(d.patterns) ? (d.patterns as string[]) : [],
+        functions: compile ? [] : fns,
+        startedAt: e.at,
+        seconds: null,
+        done: false,
+        buildError: null,
+        buildErrorCount: 0,
+        verified: null,
+      });
+    } else if (e.type === "repair" && (d.phase === "done" || d.phase === undefined)) {
+      const r = rounds.find((x) => x.iteration === d.iteration) ?? rounds[rounds.length - 1];
+      if (r) {
+        r.done = true;
+        r.seconds = typeof d.seconds === "number" ? d.seconds : null;
+      }
+    } else if (e.type === "verify" && !d.holdout) {
+      const r = rounds.find((x) => x.iteration === d.iteration);
+      if (!r) continue;
+      if (d.compile_ok === false) {
+        const errs = typeof d.errors === "string" ? d.errors : "";
+        const lines = errs.split("\n").filter((l) => l.trim());
+        r.buildError = lines.slice(0, 2).join("\n") || "cargo build failed";
+        r.buildErrorCount = lines.filter((l) => /^error/.test(l.trim())).length;
+      } else if (typeof d.match_rate === "number") {
+        const total = d.behaviors_tested ?? 0;
+        r.verified = { match: Math.round(d.match_rate * total), total };
+      }
+    }
+  }
+  return rounds;
+}
+
+export interface ActivityLine {
+  seq: number;
+  at: string;
+  text: string;
+  tone: StepTone;
+}
+
+/** Plain-English lines for the activity feed, oldest first. */
+export function activityLines(events: JobEvent[]): ActivityLine[] {
+  const out: ActivityLine[] = [];
+  const push = (e: JobEvent, text: string, tone: StepTone = "neutral") => out.push({ seq: e.seq, at: e.at, text, tone });
+  for (const e of events) {
+    const d = e.data;
+    switch (e.type) {
+      case "job_status":
+        if (d.status === "running" && Array.isArray(d.plan)) push(e, "Run started");
+        else if (d.status === "completed") push(e, "Run complete", "match");
+        else if (d.status === "failed") push(e, "Run failed", "div");
+        break;
+      case "translate":
+        if (d.phase === "loaded" && typeof d.source_label === "string")
+          push(e, `Loaded ${d.source_label}: ${d.rust_lines ?? "?"} lines of Rust by ${d.source_model ?? "a model"}`);
+        else if (typeof d.summary === "string") push(e, d.summary);
+        break;
+      case "verify":
+        if (d.compile_ok === false) push(e, "The repaired file did not compile; the compiler errors go back to the model", "div");
+        else if (typeof d.summary === "string") push(e, d.summary.replace(/^verify\.sh: /, "Verifier: "), d.match_rate === 1 ? "match" : "div");
+        break;
+      case "divergence":
+        push(e, `Divergence on ${d.input ?? "an input"}: C ${String(d.c_output ?? "").replace(/\t/g, " ")}, Rust ${d.rust_output ?? ""}`, "div");
+        break;
+      case "repair":
+        if (d.phase === "started") {
+          const n = Array.isArray(d.patterns) ? d.patterns.length : 0;
+          push(e, n ? `Sent ${n} divergence patterns to ${d.model ?? "the model"}` : `Sent the compiler errors to ${d.model ?? "the model"}`);
+        } else if (typeof d.summary === "string") push(e, d.summary, "match");
+        break;
+      case "crash":
+        push(e, `${d.cve ?? "Crash input"}: old C crashes under AddressSanitizer; the Rust returns a clean error`, "crash");
+        break;
+      case "approval_required":
+        push(e, "Waiting for a person to approve the pull request");
+        break;
+      case "approved":
+        push(e, `Approved by ${d.approved_by ?? "a reviewer"}`, "match");
+        break;
+    }
+  }
+  return out;
 }

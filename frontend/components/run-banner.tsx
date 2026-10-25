@@ -17,7 +17,7 @@ function clockText(ms: number) {
  * the visit, they snap into register once. Loading an already finished run shows
  * the finished state without the snap.
  */
-export function RunBanner({ job, steps, round }: { job: Job; steps: PipelineStep[]; round: WallRound | null }) {
+export function RunBanner({ job, steps, round, stepStartedAt }: { job: Job; steps: PipelineStep[]; round: WallRound | null; stepStartedAt: string | null }) {
   const working = WORKING.has(job.status);
   const [now, setNow] = useState(() => Date.now());
   const wasWorking = useRef(working);
@@ -48,7 +48,10 @@ export function RunBanner({ job, steps, round }: { job: Job; steps: PipelineStep
             <span className="font-semibold">{current ? current.label : "starting"}</span>
             {current?.detail && <span className="text-lg font-normal text-dim"> · {current.detail}</span>}
           </p>
-          <p className="font-mono text-lg tabular-nums text-dim">{elapsed ?? ""} elapsed</p>
+          <p className="font-mono text-lg tabular-nums text-dim">
+            {stepStartedAt && Number.isFinite(Date.parse(stepStartedAt)) && <span className="text-paper">this step {clockText(now - Date.parse(stepStartedAt))} · </span>}
+            {elapsed ?? ""} elapsed
+          </p>
         </div>
         <div className="run-track" aria-hidden="true" />
       </div>

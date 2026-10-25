@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
-import { crashViews, divergenceRows, holdoutResult, latestSummary, pipelineSteps, wallState } from "@/lib/derive";
+import { activityLines, crashViews, divergenceRows, holdoutResult, pipelineSteps, repairRounds, wallState } from "@/lib/derive";
 import { isPlaceholderPr } from "./approval";
 import { EventLog } from "./event-log";
 import { Evidence } from "./evidence";
 import { Lanes } from "./lanes";
 import { Pipeline } from "./pipeline";
 import { RunBanner } from "./run-banner";
-import { CrashRow, DivergenceRows, HoldoutRow, PlateHeads, RepairRow, TotalsRow } from "./plates";
-import { Ticker } from "./ticker";
+import { CrashRow, DivergenceRows, HoldoutRow, PlateHeads, TotalsRow } from "./plates";
+import { Activity } from "./activity";
+import { RepairTimeline } from "./repair-timeline";
 import { TryPanel } from "./try-panel";
 import { SampleBadge, StatusPill } from "./ui";
 import { VerifierWall } from "./verifier-wall";
@@ -53,11 +54,11 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
   const wall = wallState(job, events);
   const holdout = holdoutResult(events);
   const steps = pipelineSteps(job, events);
+  const rounds = repairRounds(events);
+  const activeRound = rounds.find((r) => !r.done) ?? null;
   const roundLast = wall?.rounds[wall.rounds.length - 1] ?? null;
   const roundFirst = wall?.rounds[0] ?? null;
-  const repair = rows.find((r) => r.repair)?.repair ?? null;
   const openCount = rows.filter((r) => !r.resolved).length;
-  const repairFunctions = [...new Set(rows.filter((r) => r.repair).map((r) => r.function))];
   const working = job.status === "running" || job.status === "verifying" || job.status === "queued";
 
   return (
@@ -86,9 +87,13 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
         </div>
       )}
 
-      <RunBanner job={job} steps={steps} round={roundLast} />
+      <RunBanner job={job} steps={steps} round={roundLast} stepStartedAt={working && events.length ? events[events.length - 1].at : null} />
       <Pipeline steps={steps} />
-      <Ticker text={latestSummary(events)} />
+      <Activity
+        lines={activityLines(events)}
+        working={working}
+        waitingOn={activeRound ? `${activeRound.model} is ${activeRound.kind === "compile" ? "fixing the build" : "repairing the divergences"}` : null}
+      />
 
       {job.agents.length > 1 && <Lanes agents={job.agents} />}
 
@@ -105,7 +110,11 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           </div>
         )}
         <DivergenceRows rows={rows} confirmed={!!roundLast && roundLast.div === 0 && !(wall?.scanning ?? false)} />
-        {repair && <RepairRow repair={repair} functions={repairFunctions} guessed={rows.some((r) => r.function_guessed)} />}
+        {rounds.length > 0 && (
+          <div className="px-1">
+            <RepairTimeline rounds={rounds} />
+          </div>
+        )}
         {holdout && <HoldoutRow match={holdout.match} total={holdout.total} />}
         {crashes.map((c, i) => (
           <CrashRow key={i} crash={c} />
