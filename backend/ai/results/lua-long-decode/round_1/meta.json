@@ -1,0 +1,28 @@
+{
+  "model": "gemini-4-argon",
+  "interaction_id": "v1_ChdGSWJlYXRHeEpzT0xqckVQdE5QWmtRaxIXRkliZWF0R3hKc09ManJFUHROUFprUWs",
+  "thinking_level": "high",
+  "started": "15:43:31",
+  "seconds": 1854.1,
+  "usage": {
+    "total_input_tokens": 1501147,
+    "total_output_tokens": 191440,
+    "total_thought_tokens": 29888,
+    "total_cached_tokens": 278955,
+    "total_tokens": 1722475
+  },
+  "usd": 4.68556,
+  "notes": [],
+  "continuations": 0,
+  "rust_lines": 17430,
+  "has_unsafe_word": false,
+  "build": {
+    "ok": false,
+    "seconds": 1.3,
+    "errors": 2,
+    "codes": [
+      "E0499",
+      "E0503"
+    ]
+  }
+}

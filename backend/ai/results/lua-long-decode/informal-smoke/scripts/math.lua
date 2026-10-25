@@ -1,0 +1,1 @@
+print(math.floor(3.7), math.ceil(3.2), math.abs(-4), math.max(1,5,3), math.min(2,0), math.fmod(7,3), math.fmod(-7,3), math.tointeger(3.0), math.type(1), math.type(1.0), math.type("1"), math.ult(1,-1), math.huge, math.pi) print(math.random(1,100), math.random(1,100), math.random())

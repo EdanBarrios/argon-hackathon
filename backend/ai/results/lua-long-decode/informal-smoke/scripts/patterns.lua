@@ -1,0 +1,1 @@
+print(("key=val; a=b"):gsub("(%w+)=(%w+)", "%2=%1")) for w in ("one two  three"):gmatch("%a+") do io = nil print(w) end print(("  trim  "):match("^%s*(.-)%s*$"), ("f(a(b)c)"):match("%b()"), ("THE (quick) fox"):find("%f[%a]%a+", 5))

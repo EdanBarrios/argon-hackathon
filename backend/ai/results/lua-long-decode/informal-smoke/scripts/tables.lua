@@ -1,0 +1,1 @@
+local t={} for i=1,10 do t[i]=i*i end print(#t, table.concat(t, ","), select("#", table.unpack(t))) table.insert(t, 1, 0) table.remove(t) print(table.concat(t, " ")) table.sort(t, function(a,b) return a>b end) print(table.concat(t, " "))

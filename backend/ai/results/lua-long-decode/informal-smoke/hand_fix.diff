@@ -1,0 +1,26 @@
+--- a/lua.rs	2026-10-25 16:14:25
++++ src/lua.rs	2026-10-25 16:16:15
+@@ -925,10 +925,10 @@
+         if idx >= self.ci_vec.len() {
+             self.ci_vec.resize(idx + 1, CallInfo::new_base());
+         }
+-        match self.ci_vec.get_mut(idx) {
+-            Some(c) => c,
+-            None => unreachable_fallback(&mut self.ci_vec),
++        if idx < self.ci_vec.len() {
++            return &mut self.ci_vec[idx];
+         }
++        unreachable_fallback(&mut self.ci_vec)
+     }
+     pub fn yieldable(&self) -> bool {
+         (self.nCcalls & 0xffff0000) == 0
+@@ -9795,7 +9795,8 @@
+     fn negatecondition(&mut self, ls: &LexState, e: &ExpDesc) {
+         let ctrl_pc = self.getjumpcontrol_pc(ls, e.info);
+         let mut pc_inst = self.get_inst(ls, ctrl_pc);
+-        SETARG_k(&mut pc_inst, GETARG_k(pc_inst) ^ 1);
++        let k = GETARG_k(pc_inst) ^ 1;
++        SETARG_k(&mut pc_inst, k);
+         self.set_inst(ls, ctrl_pc, pc_inst);
+     }
+ 

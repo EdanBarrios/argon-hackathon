@@ -1,0 +1,1 @@
+local V={} V.__index=V V.__add=function(a,b) return setmetatable({x=a.x+b.x},V) end V.__tostring=function(v) return "V("..v.x..")" end V.__eq=function(a,b) return a.x==b.x end V.__len=function() return 99 end local a,b=setmetatable({x=1},V),setmetatable({x=2},V) print(tostring(a+b), a==b, #a, rawequal(a,a))
