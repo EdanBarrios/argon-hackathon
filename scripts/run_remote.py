@@ -2,6 +2,8 @@
 
 Usage:
   cd backend && uv run python ../scripts/run_remote.py --library cjson --models gemini-4-argon,gemini-3.8-flash --rounds 4
+  cd backend && uv run python ../scripts/run_remote.py --library expat --verify-only <expat.rs> --seed 7777 --inputs 2000 \
+      [--host-binary <prebuilt theseus_expat>]   (no model writes code: sandbox claim, then host check)
   cd backend && uv run python ../scripts/run_remote.py --resume <interaction_id> --job-dir runs/remote/<stamp>/cjson-gemini-4-argon
 
 One sandbox per (library, model). Everything lands in runs/remote/<timestamp>/:
@@ -62,7 +64,22 @@ def main() -> int:
     ap.add_argument("--job-dir", help="with --resume: the job directory to write into")
     ap.add_argument("--skip-preflight", action="store_true",
                     help="do NOT run scripts/preflight.sh before the model call (not recommended)")
+    ap.add_argument("--verify-only", metavar="RUST_FILE",
+                    help="expat only: sandbox builds and verifies this existing port, then the host checks it")
+    ap.add_argument("--host-binary", help="with --verify-only: host binary already built from RUST_FILE")
     args = ap.parse_args()
+
+    if args.verify_only:
+        from harness.remote.verify_remote import run_verify_remote
+        r = run_verify_remote(args.library, args.verify_only, args.seed, args.inputs, model=args.models.split(",")[0],
+                              host_binary=args.host_binary, on_event=log, max_wait=args.max_wait,
+                              skip_preflight=args.skip_preflight)
+        keys = ("status", "error", "timings", "cost_usd", "match_rates_agree", "inputs_digest_agree",
+                "expat_rs_sha256_agree", "counts_agree", "interaction_id", "environment_id")
+        print(json.dumps({k: r.get(k) for k in keys}, indent=2, default=str))
+        print(f"sandbox claim: {(r.get('sandbox_claim') or {}).get('match_rate')}  host: {(r.get('host') or {}).get('match_rate')}")
+        print(f"saved: {r['job_dir']}/result.json")
+        return 0 if r.get("match_rates_agree") else 1
 
     if not args.resume:
         if args.skip_preflight:

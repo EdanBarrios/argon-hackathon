@@ -8,6 +8,7 @@ See backend/harness/remote/README.md.
 from .run_remote import RemoteResult, RemoteSpec, run_module_remote, run_parallel, resume_remote, reverify_job
 from .open_pr import open_pr_remote
 from ._common import PreflightError, run_preflight
+from .verify_remote import run_verify_remote
 
 __all__ = [
     "RemoteResult",
@@ -19,4 +20,5 @@ __all__ = [
     "open_pr_remote",
     "PreflightError",
     "run_preflight",
+    "run_verify_remote",
 ]

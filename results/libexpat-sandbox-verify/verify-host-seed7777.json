@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 2000,
+  "counts": {
+    "match": 2000,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 2000,
+    "attempted": 2000,
+    "scored": 2000,
+    "matched": 2000,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "/Users/edan/dev/argon-hackathon/backend/harness/expat/build/expat_driver",
+    "rust": "../runs/build-expat/edan-reverify-a/target/release/theseus_expat",
+    "inputs": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-134625-expat-verify/host_inputs",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "/Users/edan/dev/argon-hackathon/backend/harness/expat/build/expat_driver",
+      "sha256": "6092f39470c2368dee5b2988c22b0d7593972985a19bfd48e551fc583d519ace"
+    },
+    "rust": {
+      "executable": "/Users/edan/dev/argon-hackathon/runs/build-expat/edan-reverify-a/target/release/theseus_expat",
+      "sha256": "a845bc79f9e9a7eab286a546b4bbf1ebe33c7d3221b97ca82b68ca1af6ba198a"
+    },
+    "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 112.41
+}

@@ -79,3 +79,20 @@ sandbox's own `verify_<N>.json` and `cjson.rs`), `verify_local.json`, `verify_ho
 Fine-grained personal access token, repository access **only EdanBarrios/argon-hackathon**,
 permissions **Contents: Read and write** and **Pull requests: Read and write** (Metadata: Read is
 added automatically). Put it in `.env` as `GITHUB_TOKEN=...`.
+
+## Verify-only runs (expat)
+
+```python
+from harness.remote import run_verify_remote   # cwd: backend/
+r = run_verify_remote("expat", rust_file="backend/ai/results/.../expat.rs", seed=7777, count=2000,
+                      host_binary=None, on_event=print)
+r["sandbox_claim"]["match_rate"], r["host"]["match_rate"], r["match_rates_agree"], r["inputs_digest_agree"]
+```
+
+No model writes code. The sandbox clones this repo, fetches and builds libexpat with the team
+scripts, builds the given `expat.rs` with `scripts/build_rust_expat.sh`, generates inputs at `seed`,
+runs `verify.sh --timeout 20`, and reports the expat.rs sha256, an inputs digest and the verify
+summary. The host regenerates the same inputs, checks the digest and sha256, and runs the same
+verify locally (in parallel with the sandbox). Output: `runs/remote/<stamp>-expat-verify/`.
+The allowlist adds www.w3.org for the W3C suite; the pinned tarball is also mounted as a fallback.
+Offline test: `cd backend && uv run python -m pytest harness/remote/test_verify_remote.py -q`.

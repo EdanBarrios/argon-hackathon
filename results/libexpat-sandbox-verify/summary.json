@@ -1,0 +1,97 @@
+{
+  "library": "libexpat R_2_9_0",
+  "mode": "verify_only",
+  "rust_file": "backend/ai/results/expat-long-decode/argon-fresh-a/round_3/expat.rs",
+  "expat_rs_sha256": "418570361191d0019294b981d80e3185c7a732e0d4c02a627107f60b5af72c0d",
+  "seed": 7777,
+  "count": 2000,
+  "inputs_digest": "0b75225e853471deef5ba2072322515e09f620459bd50c17d30ffb18cd788037",
+  "repo_commit_cloned_by_sandbox": "9355bebbeaca456a102835457c00c47cee0cc6b6",
+  "xmlts_source_in_sandbox": "w3.org",
+  "sandbox_claim": {
+    "match_rate": 1.0,
+    "counts": {
+      "match": 2000,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "inputs_digest": "0b75225e853471deef5ba2072322515e09f620459bd50c17d30ffb18cd788037",
+    "expat_rs_sha256": "418570361191d0019294b981d80e3185c7a732e0d4c02a627107f60b5af72c0d"
+  },
+  "sandbox_verify_file_match_rate": 1.0,
+  "host": {
+    "match_rate": 1.0,
+    "counts": {
+      "match": 2000,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "binary": "runs/build-expat/edan-reverify-a/target/release/theseus_expat"
+  },
+  "match_rates_agree": true,
+  "inputs_digest_agree": true,
+  "expat_rs_sha256_agree": true,
+  "counts_agree": true,
+  "compared": {
+    "parse_ok_event_compared": 335,
+    "events": 233515,
+    "error_compared": 1665,
+    "by_kind_ok_err": {
+      "w3c": [
+        215,
+        384
+      ],
+      "edge": [
+        70,
+        78
+      ],
+      "mutation": [
+        50,
+        1203
+      ]
+    }
+  },
+  "seconds": {
+    "preflight": 112.7,
+    "sandbox_interaction": 634.5,
+    "sandbox_stages": {
+      "apt clang": 75,
+      "rustup": 41,
+      "git clone": 52,
+      "fetch_expat.sh (libexpat + W3C)": 33,
+      "build_expat.sh": 49,
+      "build_rust_expat.sh": 133,
+      "sha256sum": 37,
+      "gen_inputs_expat.py": 46,
+      "inputs digest": 34,
+      "verify.sh": 53,
+      "print summary": 26
+    },
+    "sandbox_verify_sh_elapsed": 24.33,
+    "sandbox_nproc": 9,
+    "host_inputs_gen": 1.5,
+    "host_verify": 112.6
+  },
+  "usage": {
+    "total_input_tokens": 194338,
+    "total_output_tokens": 1772,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 154522,
+    "total_tool_use_tokens": 0,
+    "total_tokens": 196110
+  },
+  "cost_usd": 0.1128,
+  "model": "gemini-4-argon",
+  "agent": "antigravity-preview-09-2026",
+  "interaction_id": "v1_ChdHV3ZlYXJIUkpLbWkxTWtQejlfSjhBbxIXR1d2ZWFySFJKS21pMU1rUHo5X0o4QW8",
+  "environment_id": "4929dbd432dcf405e0d0803b2e3c5929",
+  "status": "completed"
+}
