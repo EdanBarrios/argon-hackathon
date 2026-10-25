@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
 import { crashViews, divergenceRows, heroStats, pct, verifySeries } from "@/lib/derive";
 import { ApprovalPanel } from "./approval";
+import { BaselineCompare } from "./baseline";
 import { MatchChart } from "./chart";
 import { CrashCard } from "./crash-card";
 import { Divergences } from "./divergences";
@@ -17,25 +18,6 @@ function Stat({ label, value, tone = "text-white" }: { label: string; value: str
     <div className="rounded-xl border border-neutral-800 bg-neutral-900 px-5 py-4">
       <div className="text-sm font-bold uppercase tracking-[0.2em] text-neutral-400">{label}</div>
       <div className={`mt-1 text-5xl font-black tabular-nums ${tone}`}>{value}</div>
-    </div>
-  );
-}
-
-function BaselineGrid() {
-  const cells = ["Flash, single pass", "Flash + repair loop", "Argon, single pass", "Argon + repair loop"];
-  return (
-    <div>
-      <p className="mb-3 text-neutral-400">
-        Same harness, prompts and repair budget. Metrics: match rate, behaviors tested, rounds to 100%, crashes, time, cost.
-      </p>
-      <div className="grid grid-cols-2 gap-3">
-        {cells.map((c) => (
-          <div key={c} className="rounded-lg border border-dashed border-neutral-700 p-4">
-            <div className="text-lg font-semibold">{c}</div>
-            <div className="mt-1 font-mono text-sm uppercase tracking-widest text-neutral-500">pending baseline runs</div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -122,7 +104,11 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
             </span>
           </div>
         </div>
-        <Stat label="Behaviors tested" value={stats.behaviors === null ? "n/a" : stats.behaviors.toLocaleString("en-US")} />
+        <Stat
+          label={stats.final && stats.current !== null && stats.current >= 1 ? "Tested behaviors preserved" : "Behaviors tested"}
+          value={stats.behaviors === null ? "n/a" : stats.behaviors.toLocaleString("en-US")}
+          tone={stats.final && stats.current !== null && stats.current >= 1 ? "text-green-400" : "text-white"}
+        />
         <Stat label="Crashes caught" value={String(stats.crashes)} tone={stats.crashes ? "text-amber-400" : "text-white"} />
         {cost && <Stat label="Live cost" value={`$${cost.total_usd.toFixed(cost.total_usd < 1 ? 3 : 2)}`} />}
       </div>
@@ -158,7 +144,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           <ApprovalPanel job={job} source={source} onJob={setJob} />
         </Card>
         <Card title="Flash vs Argon">
-          <BaselineGrid />
+          <BaselineCompare />
         </Card>
       </div>
 

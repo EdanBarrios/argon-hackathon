@@ -45,6 +45,14 @@ function Detail({ row }: { row: DivergenceRow }) {
           <Highlighted parts={r} tone="rust" />
         </div>
       </div>
+      {row.repair && (
+        <div className="rounded-lg border border-green-500/60 bg-green-500/10 p-4">
+          <div className="mb-1 text-xs font-bold uppercase tracking-widest text-green-300">
+            Argon repair{row.repair.iteration !== null ? `, iteration ${row.repair.iteration}` : ""}
+          </div>
+          <p className="text-xl leading-snug text-neutral-100">{row.repair.summary}</p>
+        </div>
+      )}
     </div>
   );
 }
