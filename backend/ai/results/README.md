@@ -22,20 +22,30 @@ Run 12:15-12:42 PT, local runner. Input: all of `expat/lib` minus the entropy sh
 | Round 1 (translate) | **completed in one reply**: 1,089 s, **6,554 lines** of `expat.rs`, 73,653 output + 57,767 thought tokens | cut off: `incomplete` at thinking high after 62,912 thought / 2,620 output tokens (459 s); retry at medium failed with `DEADLINE_EXCEEDED` (1,065 s total) |
 | Build | **1 compile error**: E0282 "type annotations needed" at `expat.rs:5967` | no file |
 | Round 2 (repair, `previous_interaction_id`) | **failed server-side**: `INVALID_ARGUMENT` after 505 s at 65,416 output tokens, so no repaired file | n/a |
-| Verified match rate | none yet (did not build) | none |
+| Verified match rate | see the headline below: 1.0 after two compile-only repairs | none |
 
 How to say it: "Argon translated the whole of libexpat (18.5K lines of C) into 6.5K lines of safe Rust in one 18-minute reply, with one compile error. Flash could not produce a file." Nothing about behavior is claimed until a build passes verify.sh.
 
-### Repairs as new calls (`argon-fresh-a`, `argon-fresh-b`, started 12:45, in progress)
+## libexpat headline: Argon's port passes 747/747 and 1,253/1,253 held-out (`argon-fresh-a`)
 
-Both start from Argon's round-1 file (`--start-from`, no model call in round 1) and send each repair as a new conversation: the full translate message plus the previous file plus the compiler output (`--fresh-repair`). Identical settings for a and b. Continuation off.
+**Argon's one-pass libexpat translation, after two compile-only repairs, matches the C library on every tested input.**
 
-| Run | Round 2 (repair, thinking medium) |
+| | |
 |---|---|
-| a | completed in 570 s, 73,658 output tokens, 0 thought. Fixed the E0282 type error (one line changed); the build now stops at a borrow error, E0505 at `expat.rs:5969` (rustc reports borrow errors only once type checking passes) |
-| b | completed in 570 s, 73,653 output tokens, 0 thought. **Returned the file unchanged**, so the same E0282 |
+| Loop inputs | **747/747** match: 599 W3C XML conformance documents + 148 edge cases (100,000-deep nesting, billion laughs at 4/5/9 levels incl. the code-43 breach, recursive entities, UTF-16 LE/BE with and without BOM, ISO-8859-1, invalid UTF-8, NUL) |
+| Held-out inputs | **1,253/1,253** match (seed 1001 mutations, minus all 747 the loop saw), 0 divergences, 0 crashes, 0 timeouts |
+| Rust | 6,555 lines of safe Rust, std only, no `unsafe` anywhere (build-script check) |
+| Change after the one-pass translation | **3 lines** (`argon-fresh-a/round1_to_round3.diff`): one type annotation (E0282) and one borrow fix (E0505). No behavior was repaired: the first build already matched every input |
+| Model time | 1,089 s translate + 570 s + 601 s repairs = 37.7 min |
+| Tokens (as reported) | translate: 815,566 in / 73,653 out / 57,767 thought; repairs: 1,251,950 in (554,740 cached) / 147,332 out / 0 thought. One failed repair call (`gemini-4-argon/round_2`, 338K in / 65K out) is not included |
 
-So a new conversation avoids the server failure, but at thinking medium the model may copy the file without reasoning. Rounds 3-4 are running; this table is updated when they land.
+How it ran: round 1 = `gemini-4-argon/round_1/expat.rs` (`--start-from`, no new model call). Each repair is a new conversation (`--fresh-repair`) with the C source, the previous file and the compiler output, thinking medium. Continuation off. Rounds 2 and 3 each fixed one compile error (rustc reports borrow errors only after type checking passes).
+
+Same settings, run `argon-fresh-b`: round 2 returned the file unchanged (0 thought tokens at medium); its later rounds are reported as they land.
+
+Checks before quoting: no `std::process`, `std::fs`, `std::env` or `std::net` in the file; the C side is libexpat R_2_9_0 under ASan + UBSan (`backend/harness/expat`).
+
+How to say it: "Argon read all of libexpat, the XML parser inside Python, 18.5K lines of C, and wrote 6.5K lines of safe Rust in one 18-minute reply. After two one-line compile fixes, it matches the C library on 2,000 tested behaviors, including the W3C conformance suite and 1,253 inputs it never saw. Flash could not produce a file." Say "N tested behaviors preserved", never "equivalent".
 
 Open questions, recorded as reported:
 - Usage for Argon's round 1 reports **815,566 input tokens** for a prompt of about 204K tokens. We have not explained the 4x.

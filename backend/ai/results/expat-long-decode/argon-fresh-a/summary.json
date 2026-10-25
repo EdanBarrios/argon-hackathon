@@ -1,0 +1,104 @@
+{
+  "model": "gemini-4-argon",
+  "target": "expat",
+  "rounds_budget": 4,
+  "start_from": "../backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs",
+  "fresh_repair": true,
+  "rounds_run": 3,
+  "inputs": "<repo>/runs/ai/expat-inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": 1.0,
+  "best_round": 3,
+  "best_match_rate": 1.0,
+  "rounds_to_100": 3,
+  "total_model_seconds": 1170.7,
+  "total_tokens": {
+    "total_input_tokens": 1251950,
+    "total_output_tokens": 147332,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 554740
+  },
+  "usd": 2.9232,
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "start_from",
+      "start_from": "<repo>/backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs",
+      "interaction_id": "",
+      "seconds": 0.0,
+      "usage": {},
+      "thinking_level": null,
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 1,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 2,
+      "kind": "repair",
+      "interaction_id": "v1_ChdNVnplYW9XdEVQUEstOFlQbThtNWdBVRIXTVZ6ZWFvV3RFUFBLLThZUG04bTVnQVU",
+      "seconds": 570.2,
+      "usage": {
+        "total_input_tokens": 625800,
+        "total_output_tokens": 73658,
+        "total_thought_tokens": 0,
+        "total_cached_tokens": 0,
+        "total_tokens": 699458
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 0,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 3,
+      "kind": "repair",
+      "interaction_id": "v1_ChdhMTdlYXRTTEVOM0lfdU1QaTdlX2dRMBIXYTE3ZWF0U0xFTjNJX3VNUGk3ZV9nUTA",
+      "seconds": 600.5,
+      "usage": {
+        "total_input_tokens": 626150,
+        "total_output_tokens": 73674,
+        "total_thought_tokens": 0,
+        "total_cached_tokens": 554740,
+        "total_tokens": 699824
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6555,
+      "compile_ok": true,
+      "build_seconds": 2,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 747
+    }
+  ],
+  "holdout": {
+    "seed": 1001,
+    "inputs": "<repo>/runs/ai/holdout-c2000-s1001-minus-expat-inputs-c300-s1",
+    "overlap_removed": 747,
+    "behaviors_tested": 1253,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 1253,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    }
+  }
+}
