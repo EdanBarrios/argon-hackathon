@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 2000,
+  "counts": {
+    "match": 2000,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 2000,
+    "attempted": 2000,
+    "scored": 2000,
+    "matched": 2000,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "backend/harness/expat/build/expat_driver",
+    "rust": "runs/build-expat/n2-seed4242/target/release/theseus_expat",
+    "inputs": "<repo>/runs/ai/expat-inputs-c2000-s4242",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "<repo>/backend/harness/expat/build/expat_driver",
+      "sha256": "3b6cac78c7f459deb7c49b7ea7a5eecd0dbd9c542a2690598e120e3bea0c0315"
+    },
+    "rust": {
+      "executable": "<repo>/runs/build-expat/n2-seed4242/target/release/theseus_expat",
+      "sha256": "74d1680e7fda5c8fefe90e3356596775ba17dc7c0e352eb6d78720ef9778cca9"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 11.28
+}

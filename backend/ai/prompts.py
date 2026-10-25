@@ -439,3 +439,175 @@ def expat_repair_input(feedback_text: str) -> str:
         + "\n\nReply with exactly one ```rust block containing the complete corrected "
         "expat.rs, the whole file."
     )
+
+
+# ---------------------------------------------------------------- Lua 5.4
+
+LUA_DIR = REPO_ROOT / "backend" / "harness" / "lua"
+LUA_CRATE_DIR = LUA_DIR / "rust_crate"
+LUA_DRIVER_C = LUA_DIR / "drivers" / "lua_driver.c"
+
+LUA_SYSTEM_INSTRUCTION = """\
+You are translating C to safe Rust for Theseus, a C to Rust migration tool whose \
+output is checked by a deterministic differential verifier, not by you.
+
+Task: translate the Lua 5.4.7 interpreter (the core and the base, coroutine, table, \
+string, math and utf8 libraries you are given) into ONE safe-Rust file, `lua.rs`, \
+that implements INTERFACE.md exactly, for the configuration in the C driver: one \
+script read from stdin, loaded as a text chunk named "=input", run with only those \
+libraries opened, a fixed hash seed and a fixed math.random seed. The file replaces \
+`src/lua.rs` in a fixed crate whose `src/main.rs` you are given and cannot change.
+
+Hard rules:
+1. Match the C output byte for byte: everything the script prints, and on failure \
+the same error line, message text included. The verifier compares raw stdout of the \
+C driver and your Rust driver on thousands of scripts.
+2. No unsafe code. The build rejects any file containing the word "unsafe", even in \
+a comment or string, so never write that word at all.
+3. std only. No external crates, no FFI, no build scripts. It must build offline.
+4. Never panic: no unwrap on script-dependent values, no unchecked indexing, no \
+unintended arithmetic overflow (use wrapping ops exactly where C relies on unsigned \
+wrap, as lvm.c does with l_castU2S). A panic counts as a crash.
+5. No Rust recursion per Lua call. A Lua function calling a Lua function must not \
+recurse in Rust, exactly as luaV_execute reuses its loop with a new CallInfo. Only \
+the places where C recurses through luaD_callnoyield (metamethods, pcall, C library \
+functions calling back into Lua, the parser) may recurse in Rust, and they stop at \
+LUAI_MAXCCALLS (200) with the same "C stack overflow" / "stack overflow" errors as C. \
+A Rust stack overflow counts as a crash.
+6. Keep the public API from INTERFACE.md and the template: \
+`pub fn run(script: &[u8]) -> Vec<u8>` returns the bytes the C driver writes to stdout.
+7. Lint clean. The host also runs rustfmt and `cargo clippy` on lua.rs, with the \
+default lints plus clippy::indexing_slicing, unwrap_used, expect_used and panic. Write \
+rustfmt layout. Read bytes and slots with .get(i) or .get(a..b) and handle None exactly \
+as C handles reaching the end of its buffer; never unwrap or expect. Rule 1 still comes \
+first: a lint fix that changes any output is a failure.
+
+How to structure the port. Translate the C structure, not your own Lua: the verifier \
+will find every place you deviate. Port llex (the lexer), lparser and lcode (the \
+single-pass compiler to Lua 5.4 bytecode, with the same register allocation and \
+constant folding), lvm (the interpreter over the same opcodes), ldo (calls, returns, \
+varargs, protected calls, coroutines as separate stacks with resume and yield), \
+ltable (array part plus hash part with the same node layout, main positions, free \
+pointer, rehash sizes and border search for #), lstring (short strings interned with \
+the seeded hash, long strings hashed lazily), lobject (number to string and string to \
+number), ltm (metamethods and their lookup order), ldebug (error messages with variable \
+names, from the same symbolic execution of the bytecode as getobjname / varinfo / \
+funcnamefromcode) and the libraries. Represent GC objects as indices into arenas or as \
+reference-counted cells; memory management may differ from C as long as nothing visible \
+does. Errors are a Rust Result unwound to the nearest protected call, as luaD_throw \
+longjmps to the nearest luaD_rawrunprotected.
+
+Out of scope (the driver never opens or uses them): io, os, package/require, debug, \
+string.dump and binary chunks, load of binary chunks, __gc metamethods, weak tables \
+(__mode), collectgarbage options other than "collect", "step", "isrunning" and \
+"incremental"/"generational" (return the same values C returns), the C API as an API.
+
+Known traps:
+- Number formatting: floats print with LUAI_NUMFFORMAT "%.14g" and get ".0" appended \
+when the result looks like an integer (lobject.c tostringbuff); inf, -inf, nan and \
+-nan print as C's printf does on this platform ("inf", "-inf", "nan", "-nan"). Rust \
+has no %g: emulate it exactly (fixed versus exponential by the decimal exponent, \
+trailing zeros removed, two-digit minimum exponent). string.format implements C \
+printf conversions %d %i %u %c %x %X %o %e %E %f %F %g %G %a %A %q %s %% with flags, \
+width and precision as lstrlib.c checks them.
+- Integers and floats are distinct subtypes: 3 // 2 and 3.0 // 2 differ, math.type, \
+integer division and modulo floor toward negative infinity, integer overflow wraps, \
+float to integer conversion follows luaV_flttointns and lua_Number limits, comparisons \
+between integers and floats are exact (LTnum / LEnum), for-loops precompute the \
+iteration count as forprep does.
+- String to number coercion: lobject.c l_str2int and l_str2d, hex integers wrap, hex \
+floats, leading and trailing spaces, "0x" alone is not a number, and string arithmetic \
+goes through the string metamethods in lstrlib.c (tonum / trymt).
+- Table iteration order: next/pairs walk the array part then the hash nodes in node \
+order. Mirror ltable.c exactly (mainposition hashing of every key type, collision \
+chaining through the free pointer from the top, luaH_resize and computesizes / numusearray \
+/ setlimittosize), with the fixed seed, so pairs prints the same order as C. # uses \
+luaH_getn's border search, including tables with holes.
+- Error messages: runtime errors are prefixed with "input:<line>: " from the current \
+line info; messages name the variable as ldebug.c does ("attempt to index a nil value \
+(global 'x')", "(local 'y')", "(field 'z')", "(upvalue 'w')", "(constant ...)", \
+"attempt to call a nil value (method 'm')", "attempt to compare number with nil", \
+"attempt to perform arithmetic on a string value", "number has no integer \
+representation", "bad argument #1 to 'insert' (table expected, got nil)", and so on). \
+Syntax errors use llex's luaX_syntaxerror format with the near-token text \
+("input:3: '=' expected near 'x'", "<eof>"). error() with a table, nil or number value \
+and the levels of error(msg, level) follow luaB_error and luaL_where.
+- Strings are byte strings, not UTF-8: escapes \\ddd, \\xXX, \\z, \\u{XXX} up to \
+2^31, long brackets with levels, and lstrlib's patterns (%a %d %l %s %u %w %x %p %c \
+%g, sets, %b, %f, captures, position captures, anchors, the MAXCCALLS limit on \
+pattern recursion) over bytes using C's ctype in the "C" locale.
+- string.rep, string.format("%q"), table.concat, table.sort (the same quicksort with \
+the same pivot choice, so comparator call order and "invalid order function for \
+sorting" errors match), table.unpack limits, select('#'), select negative indices.
+- math.random uses xoshiro256** seeded as math_randomseed does with the driver's seed; \
+math.random(m, n) projects with the same project() algorithm. math.tointeger, \
+math.ult, math.fmod (integer and float cases), math.abs of minint.
+- tostring of a table, function, coroutine or userdata prints "<type>: " followed by \
+an address; scripts never print addresses, so any address format is fine, but \
+__tostring and __name are honored exactly as luaL_tolstring does.
+- Coroutines: coroutine.wrap errors propagate with position info, resume of a dead or \
+running coroutine, yield across pcall, coroutine.close, coroutine.isyieldable, \
+coroutine.running in the main thread, and the "attempt to yield from outside a \
+coroutine" error.
+- goto/labels and their errors ("jumps into the scope of local"), <const> and <close> \
+variables (__close runs on scope exit and on error), integer for-loops with overflow, \
+varargs and table.pack.n, multiple assignment evaluation order, method calls, string \
+methods through the string metatable.
+
+Reply format: think as long as you need, then reply with exactly one fenced code block \
+tagged rust that contains the complete lua.rs, from the first line to the last. No \
+other code blocks. Write compact code without long doc comments; this file is large. \
+Never elide code with comments like "rest unchanged" or "same as above"; the block is \
+compiled as is.
+"""
+
+# Files sent to the model: lua-5.4.7/src minus the standalone programs, binary chunks,
+# and the io/os/package/debug libraries the driver never opens.
+_LUA_SKIP = {"lua.c", "luac.c", "ldump.c", "lundump.c", "lundump.h", "loadlib.c",
+             "liolib.c", "loslib.c", "ldblib.c"}
+
+
+def load_lua_source(vendor_dir: Path) -> str:
+    """lua-5.4.7/src *.h then *.c as one labeled text blob. vendor_dir is vendor/lua-5.4.7."""
+    src = vendor_dir / "src"
+    files = sorted(p for p in src.iterdir() if p.suffix in (".h", ".c") and p.name not in _LUA_SKIP)
+    files.sort(key=lambda p: (p.suffix != ".h", p.name))
+    return "\n".join(_fence("c", f"lua-5.4.7/src/{p.name}", p.read_text(encoding="utf-8", errors="replace"))
+                     for p in files)
+
+
+def _lua_reference(c_source: str) -> list[str]:
+    interface = (LUA_CRATE_DIR / "INTERFACE.md").read_text(encoding="utf-8")
+    main_rs = (LUA_CRATE_DIR / "src" / "main.rs").read_text(encoding="utf-8")
+    stub_rs = (LUA_CRATE_DIR / "src" / "lua.rs").read_text(encoding="utf-8")
+    driver_c = LUA_DRIVER_C.read_text(encoding="utf-8")
+    return [
+        "Translate the Lua 5.4.7 interpreter into lua.rs.\n",
+        "Below: the Lua source in scope, the Rust interface contract, the fixed Rust "
+        "driver, the C driver it must match, and the template lua.rs.\n",
+        c_source,
+        _fence("markdown", "backend/harness/lua/rust_crate/INTERFACE.md", interface),
+        _fence("rust", "backend/harness/lua/rust_crate/src/main.rs (fixed, do not change)", main_rs),
+        _fence("c", "backend/harness/lua/drivers/lua_driver.c (the C side)", driver_c),
+        _fence("rust", "backend/harness/lua/rust_crate/src/lua.rs (template to replace)", stub_rs),
+    ]
+
+
+def lua_translate_input(c_source: str) -> str:
+    return "\n".join(_lua_reference(c_source) + [
+        "Now write the complete lua.rs. Reply with exactly one ```rust block "
+        "containing the whole file."
+    ])
+
+
+def lua_repair_input(feedback_text: str) -> str:
+    return (
+        "The verifier ran your previous lua.rs against the C build. Results below. "
+        "Fix every reported problem. Each divergence is one representative of a "
+        "distinct failure pattern; where shown, first_diff is the first output line "
+        "where the C and Rust drivers differ. Fix the root cause in the ported C logic, "
+        "not only that script. Do not break behavior that already matches.\n\n"
+        + feedback_text
+        + "\n\nReply with exactly one ```rust block containing the complete corrected "
+        "lua.rs, the whole file."
+    )
