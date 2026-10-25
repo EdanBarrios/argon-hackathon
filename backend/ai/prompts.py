@@ -250,6 +250,22 @@ CONTINUE_INPUT = (
 )
 
 
+def fresh_repair_input(reference_input: str, rust_file: str, prev_rust: str, feedback_text: str) -> str:
+    """Repair as a new conversation: the full translate message, the previous file and the
+    verifier's report. Used when follow-up turns fail on long files."""
+    return (
+        reference_input
+        + f"\n\nA previous attempt at {rust_file} is below, followed by what the verifier and the "
+        "compiler reported for it. Keep everything that works, fix every reported problem at its "
+        "root cause (the C source is the specification), and do not break behavior that already "
+        "matches.\n\n"
+        + _fence("rust", f"{rust_file} (previous attempt)", prev_rust)
+        + "\n" + feedback_text
+        + f"\n\nReply with exactly one ```rust block containing the complete corrected {rust_file}, "
+        "the whole file."
+    )
+
+
 # ---------------------------------------------------------------- libexpat
 
 EXPAT_DIR = REPO_ROOT / "backend" / "harness" / "expat"

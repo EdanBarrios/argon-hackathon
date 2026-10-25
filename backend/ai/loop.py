@@ -208,6 +208,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="verify.sh seconds per run (its default 5 s gives false timeouts under ASan on macOS)")
     ap.add_argument("--continue-turns", type=int,
                     help="follow-up turns when a reply hits the output cap (default: the target's, 0 for cjson)")
+    ap.add_argument("--start-from", help="existing Rust file to use as round 1 instead of a translate call")
+    ap.add_argument("--fresh-repair", action="store_true",
+                    help="send each repair as a new conversation (C source + previous file + feedback)")
     ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
     ap.add_argument("--no-adversarial", action="store_true", help="skip the adversarial corpora check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
@@ -243,11 +246,17 @@ def main(argv: list[str] | None = None) -> int:
         rdir.mkdir(exist_ok=True)
         rec: dict = {"round": n, "kind": "translate" if prev is None else "repair"}
         try:
-            if prev is None:
+            if prev is None and args.start_from:
+                rec["kind"] = "start_from"
+                rec["start_from"] = str(Path(args.start_from).resolve())
+                res = TranslateResult(rust_source=Path(args.start_from).read_text(encoding="utf-8"),
+                                      interaction_id="", usage={}, seconds=0.0, model=args.model)
+            elif prev is None:
                 res = translate(c_source, model=args.model, target=target)
             else:
                 write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}, target.divergence_pattern))
-                res = repair(prev, feedback or {}, model=args.model, target=target)
+                res = repair(prev, feedback or {}, model=args.model, target=target,
+                             fresh_source=c_source if args.fresh_repair else None)
         except TranslateError as exc:
             rec["error"] = str(exc)
             rounds.append(rec)
@@ -314,6 +323,8 @@ def main(argv: list[str] | None = None) -> int:
         "model": args.model,
         "target": target.name,
         "rounds_budget": args.rounds,
+        "start_from": args.start_from,
+        "fresh_repair": args.fresh_repair,
         "rounds_run": len(rounds),
         "inputs": str(inputs),
         "verify_timeout": args.timeout,

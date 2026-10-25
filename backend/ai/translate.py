@@ -330,12 +330,19 @@ def translate(c_source: str, model: str = DEFAULT_MODEL, target: Target = CJSON)
 
 
 def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
-           target: Target = CJSON) -> TranslateResult:
+           target: Target = CJSON, *, fresh_source: str | None = None) -> TranslateResult:
     """Continue prev's conversation with verifier feedback; returns a full new cjson.rs (thinking medium).
 
     feedback is {"compile_errors": str | None, "divergences": [...], "crashes": [...]}
     in the shape of verify.sh output (extra verify.sh keys such as counts are used
     for the summary if present).
+
+    With fresh_source (the C source), the repair is a new conversation that resends the
+    whole translate message plus prev's file, instead of a previous_interaction_id turn.
     """
     text = prompts.format_feedback(trim_feedback(feedback, target.divergence_pattern))
+    if fresh_source is not None:
+        message = prompts.fresh_repair_input(target.translate_input(fresh_source), target.rust_file,
+                                             prev.rust_source, text)
+        return _run(model, message, "medium", previous_id=None, target=target)
     return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)
