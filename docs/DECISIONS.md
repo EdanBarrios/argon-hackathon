@@ -11,3 +11,4 @@ Anyone may add rows. Newest at the bottom.
 | pending (11:15) | Sandbox (remote) vs local runner | Depends on A's smoke test | A + C |
 | pending | Backend host | | C |
 | 10:31 | Repair loops use thinking_level medium, lead planner high | Organizer guide; speed for live demo | C |
+| 11:17 | Edan (C) builds frontend scaffold temporarily; Keon takes over on return | Keon blocked on Wi-Fi; keep 11:30 checkpoint | Edan |
