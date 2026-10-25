@@ -123,6 +123,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--final-inputs", help="optional bigger input dir to verify the last good build against")
     ap.add_argument("--holdout-seed", type=int, help="seed for the held-out check (default: --seed + 1000)")
+    ap.add_argument("--holdout-count", type=int, default=1000,
+                    help="inputs generated for the held-out check before overlap removal; 236 are fixed "
+                         "seeds/edge cases shared by every seed, so 300 would leave only 64 unseen")
+    ap.add_argument("--timeout", type=float, default=20.0,
+                    help="verify.sh seconds per run (its default 5 s gives false timeouts under ASan on macOS)")
     ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     args = ap.parse_args(argv)
@@ -182,7 +187,7 @@ def main(argv: list[str] | None = None) -> int:
             last_good_binary = build["binary"]
             verify, raw = run_json(
                 [str(verify_sh), "--c", str(c_driver), "--rust", build["binary"],
-                 "--inputs", str(inputs), "--jobs", str(args.jobs)],
+                 "--inputs", str(inputs), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
                 timeout=1800,
             )
             if verify is None:
@@ -218,6 +223,7 @@ def main(argv: list[str] | None = None) -> int:
         "rounds_budget": args.rounds,
         "rounds_run": len(rounds),
         "inputs": str(inputs),
+        "verify_timeout": args.timeout,
         "final_match_rate": final_rate,
         "rounds_to_100": next((r["round"] for r in rounds if r.get("match_rate") == 1.0), None),
         "total_model_seconds": round(sum(r.get("seconds") or 0 for r in rounds), 1),
@@ -228,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.final_inputs and last_good_binary:
         final, _ = run_json(
             [str(verify_sh), "--c", str(c_driver), "--rust", last_good_binary,
-             "--inputs", str(Path(args.final_inputs).resolve()), "--jobs", str(args.jobs)],
+             "--inputs", str(Path(args.final_inputs).resolve()), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
             timeout=3600,
         )
         if final is not None:
@@ -239,13 +245,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[loop] final verify on {args.final_inputs}: match_rate {final.get('match_rate')} {final.get('counts')}")
     if not args.no_holdout and last_good_binary:
         seed = args.holdout_seed if args.holdout_seed is not None else args.seed + 1000
-        hdir, overlap = holdout_inputs(root, args.count, seed, inputs)
+        hdir, overlap = holdout_inputs(root, args.holdout_count, seed, inputs)
         held = {"seed": seed, "inputs": str(hdir), "overlap_removed": overlap,
                 "behaviors_tested": sum(1 for p in hdir.iterdir() if p.is_file())}
         if held["behaviors_tested"]:
             hv, raw = run_json(
                 [str(verify_sh), "--c", str(c_driver), "--rust", last_good_binary,
-                 "--inputs", str(hdir), "--jobs", str(args.jobs)],
+                 "--inputs", str(hdir), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
                 timeout=1800,
             )
             if hv is None:

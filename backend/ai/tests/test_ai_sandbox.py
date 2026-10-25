@@ -87,3 +87,17 @@ def test_dry_run_makes_no_api_call(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert '"agent": "antigravity-preview-09-2026"' in out
     assert "--branch feat/x" in out
+
+
+def test_wait_gives_up_after_max_seconds(monkeypatch):
+    import types
+
+    import pytest
+
+    from ai import translate
+
+    stuck = types.SimpleNamespace(id="i-1", status="in_progress")
+    client = types.SimpleNamespace(interactions=types.SimpleNamespace(get=lambda _id: stuck))
+    monkeypatch.setattr(translate, "POLL_SECONDS", 0)
+    with pytest.raises(translate.TranslateError, match="still 'in_progress'"):
+        translate._wait(client, stuck, max_seconds=0.05)

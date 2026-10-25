@@ -28,6 +28,8 @@ from . import prompts
 
 DEFAULT_MODEL = "gemini-4-argon"
 POLL_SECONDS = 5
+# Wall-clock cap per interaction, so a stuck agent cannot hang a run forever.
+MAX_WAIT_SECONDS = 45 * 60
 # parse + print in Rust is ~20K output tokens; thinking also counts toward the cap.
 # Above 65,536 requires background=True, which we always use.
 MAX_OUTPUT_TOKENS = 131072
@@ -140,10 +142,17 @@ def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: lis
     raise TranslateError(f"interactions.create kept failing for {kwargs['model']}: {last}")
 
 
-def _wait(client: genai.Client, interaction: Any) -> Any:
-    """Poll interactions.get every POLL_SECONDS until the interaction leaves queued/in_progress."""
+def _wait(client: genai.Client, interaction: Any, max_seconds: float = MAX_WAIT_SECONDS) -> Any:
+    """Poll interactions.get every POLL_SECONDS until the interaction leaves queued/in_progress.
+
+    Raises TranslateError after max_seconds of wall clock."""
     transient = 0
+    deadline = time.monotonic() + max_seconds
     while getattr(interaction, "status", None) in ("queued", "in_progress", None):
+        if time.monotonic() > deadline:
+            raise TranslateError(
+                f"interaction {interaction.id} still {getattr(interaction, 'status', None)!r} after {max_seconds:.0f}s"
+            )
         time.sleep(POLL_SECONDS)
         try:
             interaction = client.interactions.get(interaction.id)
