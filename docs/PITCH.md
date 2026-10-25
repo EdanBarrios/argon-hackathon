@@ -12,6 +12,9 @@ Lines marked **[verify]** must be checked right before we go on stage.
 - Say out loud what we built today and what we used: cJSON and libexpat are third-party inputs, not our code.
 - One memorable moment per beat, not five stats.
 - libexpat model results are pending. Never fill them in by estimate.
+- Never say "any reviewer would approve it"; say "your CI would merge it" (provable: it passes all the tests).
+- The cJSON `\uZZZZ` behavior is already publicly documented (independent cJSON analysis, RFC 8259 requires four hex digits). Never claim we discovered it. Say "differential testing surfaced it".
+- Never say "proves", "mathematically", "audited" or "equivalence", even if a reviewer suggests it.
 
 ## Core line
 
@@ -19,44 +22,39 @@ Lines marked **[verify]** must be checked right before we go on stage.
 
 ## Script
 
-**Before 0:00.** Run view open, Flash's first-attempt start selected. Try panel one click away. PR #3 open in a background tab.
+Timing is built around measured numbers: the live run takes ~146 s (round 1 verify lands at ~25 s, Argon's repair ~90 s, round 2 plus held-out by ~2:25). A PR takes ~125 s, so we never open one on stage; we show the already-opened PR and say it came from an earlier run.
 
-**0:00 Start the run (live demo).**
-Click Start on the live repair run from Flash's first attempt. Talk over it.
-"If you ship a C parser inside your product, one bad pointer in that parser is your vulnerability. Theseus migrates it to memory-safe Rust and gives you evidence your auditors can rerun. Theseus doesn't ask the model whether the port works. It runs the original and the replacement on the same inputs, exposes the differences, and makes the model repair them. That run just started. Let's use it while it works."
+**Before 0:00.** Run view open with "Start live run" (from Flash's port) ready. Try panel one click away. The PR tab open in the background. A finished recorded run loaded as backup.
 
-**0:20 Try panel: a judge's JSON (live demo).**
-Open the Try panel and ask a judge for any JSON, or type one they call out.
-"Same bytes into the original C and into the Rust. We compare raw output, byte for byte. Not a replay: your input, right now."
-Moment: the two outputs side by side, identical.
+**0:00 The villain (click Start as you speak).**
+"This Rust port of cJSON compiles. It's memory-safe. It passes all 2,000 of our standard tests. Your CI would merge it. Watch."
+Round 1 lands at ~0:25: 96%, 19 divergences. Click the `"\uZ\t\\"` divergence.
+"It's wrong. Nine bytes: the original C says one thing, this rewrite says another. That's the bug that breaks someone downstream six months from now."
 
-**0:45 CVE preset (problem).**
-Click the CVE preset `{"1":1,`.
-"Seven bytes. Old cJSON, 1.7.17, reads past the end of its buffer on these, and AddressSanitizer catches it: CVE-2023-53154. The Rust port rejects this historical crashing input with a clean parse error. cJSON fixed this upstream in 1.7.18; the point is that safe Rust cannot express that read at all."
-Moment: the red ASan report next to `PARSE_ERROR at 7`.
+**0:35 What Theseus is.**
+"AI-written code is cheap now. Trusting it is the bottleneck. Theseus is the trust layer: it runs the old code and the new code on the same inputs and makes every behavior change visible. This divergence just went to Argon, with the exact input and both outputs, and Argon is fixing it right now. Argon never grades its own homework."
 
-**1:05 Back to the run: repairing Flash (live demo).**
-Switch to the run. By now it should show the divergences and Argon's repair round (a rehearsal took 166 s end to end).
-"We started from Gemini 3.8 Flash's port. Our verifier found inputs where it disagrees with C. Click one."
-Click the `"\uZ\t\\"` divergence.
-"C accepts this odd string and prints an empty string. Flash's port rejects it. Cleaner, maybe, but not what C does, and behavior-preserving means preserving the weird parts too. That input and both outputs went to Argon. Argon repaired it. Now it matches every input, including a held-out set it never saw."
-Moment: the divergence turning green.
+**0:55 Try panel: a judge's input (keep it to ~10 s).**
+"Give me a short JSON." Run it. "Your input, the real C and the real Rust, same bytes out."
 
-**1:40 Why Argon (originality).**
-"On cJSON, Argon wrote a working port on its first try, two runs out of two, about two and a half times faster than Flash with fewer tokens. Flash hit its 64K output cap mid-file and only finished by thinking less, and its port still diverged on 19 of our targeted edge inputs."
-"The real target is libexpat, the XML parser: 18,494 lines, 204,000 tokens. Flash caps thinking plus output at 65,536 tokens. We estimate a full port needs over 100,000 output tokens. That's the structural reason it needs Argon. The libexpat runs are pending, so that is a prediction, not a result."
+**1:05 CVE preset.**
+Click `{"1":1,`. "A published CVE in cJSON 1.7.17, fixed upstream since. The old C reads past its buffer, there's AddressSanitizer catching it. The Rust rejects it. That whole class of bug can't be written in safe Rust."
 
-**2:05 Managed Agents (managed agents prize).**
-Show a sandbox run card: the agent's claimed match rate next to the host check tick.
-"Bigger runs happen in managed-agent sandboxes. The agent installs the compilers, translates, builds, runs our verifier and repairs, all inside the sandbox. Its report is a claim, so we rebuild its Rust and rerun the verifier ourselves, including inputs it never saw. Here they agree."
-"Opening a PR needs a GitHub token. We tested with a fake token: GitHub received it through the sandbox's proxy, and the token never appeared inside the sandbox."
+**1:25 Why Argon (15 s, measured facts only).**
+If libexpat cleared the bar (compiles, no unsafe, stated agreement on stated inputs): say that one result and where Flash's single pass stopped.
+Otherwise: "Argon wrote this library's port right the first time in both runs, about 2.5x faster than Flash. Flash's single pass ran out of output room. The next target is libexpat, the XML parser inside Python, 18,000 lines."
 
-**2:30 Approve and the migration certificate.**
-Click Approve. Switch to PR #3 (or the PR the click opens).
-"Nothing ships without a person. The pull request is a migration certificate: the code, the evidence report from the verifier, the command to reproduce it, and what it does not cover." **[verify]** that the PR's EVIDENCE.md has a limitations section; if not, say "and the limits, which are in our README".
+**1:40 Managed Agents (recorded run, say so).**
+Show the sandbox run's claim-vs-check: "Bigger runs happen in Google's managed sandboxes. The agent compiles, tests and repairs on its own, but its report is only a claim, so our host rebuilds and re-runs it: the sandbox said 1.0, we got 1.0, including inputs it never saw."
+Switch to the PR tab. "After a human approves, the sandbox opens the pull request: the code, the evidence, a command to reproduce it, and what it doesn't cover. This PR came from an earlier run."
 
-**2:45 Close.**
-"Built today: the verifier, the repair pipeline, the sandbox runs, the UI. cJSON and libexpat are other people's code. Theseus doesn't ask the model whether the port works. It checks, and it shows you the receipts."
+**2:10 Back to the live run.**
+Repair lands green, round 2 at 100%, held-out check passing. "That's the live run: Argon's repair, re-checked on inputs the loop never saw."
+If it isn't finished: "Still running; here's the same flow from the run we recorded earlier," and show the recorded run, labeled as recorded.
+
+**2:35 The tradeoff, then close.**
+"One more thing. Flash's version was arguably more correct: the JSON spec says that input is invalid. But a drop-in replacement that silently changes behavior breaks people. Theseus doesn't decide that silently. It makes it a human's decision."
+"AI can already rewrite your C. Theseus is how you trust it. Built today: the verifier, the repair loop, the sandbox runs, the UI."
 
 ## Q&A answers to have ready
 
