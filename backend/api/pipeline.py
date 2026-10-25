@@ -196,6 +196,12 @@ class _Prev:
     model: str | None
 
 
+def _scored(report: dict) -> dict[str, Any]:
+    """verify.py's explicit counts (summary object), so the UI can say "100% of N scored"."""
+    s = report.get("summary") or {}
+    return {k: s.get(k) for k in ("inputs_found", "scored", "skipped", "infra_failures") if k in s}
+
+
 class RealPipeline:
     """Live pipeline: Argon translate/repair, build_rust.sh, verify.sh, in a background thread.
 
@@ -253,6 +259,9 @@ class RealPipeline:
     def inputs_step(self, count: int) -> Path:
         return harness.ensure_inputs(count)
 
+    def extra_inputs_step(self, base: Path, specs: list[str]) -> Path:
+        return harness.merged_inputs(base, specs)
+
     def cve_step(self, binary: Path) -> dict | None:
         """Run each known CVE input on old C (v1.7.17), current C and this Rust binary."""
         if not harness.OLD_CVE_INPUTS.is_dir():
@@ -294,6 +303,8 @@ class RealPipeline:
                 raise ValueError(f"inputs_dir {inputs_dir} is not a directory")
         else:
             inputs_dir = self.inputs_step(request.inputs)
+            if request.extra_inputs:
+                inputs_dir = self.extra_inputs_step(inputs_dir, request.extra_inputs)
         timed("inputs", t0, inputs_dir=str(inputs_dir))
 
         c_source = self.c_source_step()
@@ -383,6 +394,7 @@ class RealPipeline:
                 (rdir / "verify.json").write_text(json.dumps(report, indent=2, ensure_ascii=False))
                 n_crash = counts.get("rust_crash", 0) + counts.get("both_crash", 0)
                 emit("verify", AGENT_ID, {
+                    **_scored(report),
                     "iteration": iteration, "compile_ok": True, "match_rate": rate,
                     "behaviors_tested": behaviors, "divergences": counts.get("divergence", 0),
                     "crashes": n_crash, "timeouts": counts.get("timeout", 0),
@@ -446,6 +458,7 @@ class RealPipeline:
             behaviors = int(report.get("behaviors_tested") or 0)
             counts = report.get("counts") or {}
             emit("verify", AGENT_ID, {
+                **_scored(report),
                 "iteration": best_iter, "final_full": True, "match_rate": final_rate,
                 "behaviors_tested": behaviors, "divergences": counts.get("divergence", 0),
                 "crashes": counts.get("rust_crash", 0) + counts.get("both_crash", 0), "seconds": secs,
@@ -464,6 +477,7 @@ class RealPipeline:
             holdout = {"match_rate": report.get("match_rate"), "behaviors_tested": report.get("behaviors_tested"),
                        "overlap_removed": overlap, "counts": counts, "inputs": str(hdir)}
             emit("verify", AGENT_ID, {
+                **_scored(report),
                 "iteration": best_iter, "holdout": True, "match_rate": float(report.get("match_rate") or 0.0),
                 "behaviors_tested": report.get("behaviors_tested"), "divergences": counts.get("divergence", 0),
                 "crashes": counts.get("rust_crash", 0) + counts.get("both_crash", 0), "seconds": secs,

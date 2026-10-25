@@ -12,6 +12,7 @@ import json
 import os
 import re
 import subprocess
+import shutil
 import sys
 import threading
 from dataclasses import dataclass
@@ -197,6 +198,47 @@ def ensure_inputs(count: int, seed: int = 1) -> Path:
              "--out", str(out), "--cjson", str(VENDOR)],
             check=True, capture_output=True,
         )
+    return out
+
+
+ADVERSARIAL = HARNESS / "adversarial" / "corpus"
+_SKIP = ("README", "REASONS.md", ".")
+
+
+def corpus_files(spec: str) -> list[Path]:
+    """Files of an adversarial corpus. spec is "<corpus>" or "<corpus>:<name prefix>",
+    e.g. "targeted" (980 inputs) or "targeted:str_" (the 278 string inputs)."""
+    name, _, prefix = spec.partition(":")
+    src = ADVERSARIAL / name
+    if not re.fullmatch(r"[a-z0-9_-]+", name) or not src.is_dir():
+        known = sorted(p.name for p in ADVERSARIAL.iterdir() if p.is_dir()) if ADVERSARIAL.is_dir() else []
+        raise HarnessError(f"unknown extra_inputs corpus {name!r}; known: {known}")
+    files = [p for p in sorted(src.iterdir())
+             if p.is_file() and not p.name.startswith(_SKIP) and p.name.startswith(prefix)]
+    if not files:
+        raise HarnessError(f"extra_inputs {spec!r} matched no files")
+    return files
+
+
+def merged_inputs(base: Path, specs: list[str]) -> Path:
+    """base inputs plus adversarial corpus files in one cached directory (verify.py reads one dir).
+    Corpus files are prefixed adv-<corpus>- so names cannot collide (also on case-insensitive disks)."""
+    tag = "+".join(re.sub(r"[^A-Za-z0-9_-]", "_", s) for s in specs)
+    out = RUNS_AI / f"{base.name}+{tag}"
+    with _inputs_lock:
+        if out.is_dir() and any(out.iterdir()):
+            return out
+        tmp = out.with_name(out.name + ".tmp")
+        shutil.rmtree(tmp, ignore_errors=True)
+        tmp.mkdir(parents=True)
+        for p in base.iterdir():
+            if p.is_file() and not p.name.startswith("."):
+                shutil.copyfile(p, tmp / p.name)
+        for spec in specs:
+            corpus = spec.partition(":")[0]
+            for p in corpus_files(spec):
+                shutil.copyfile(p, tmp / f"adv-{corpus}-{p.name}")
+        tmp.rename(out)
     return out
 
 

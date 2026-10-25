@@ -44,6 +44,12 @@ def create_job(
         pipe = pipeline.get_pipeline(store, scenario=scenario)
     except ValueError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from None
+    if pipeline.mode() == "real":
+        try:
+            for spec in request.extra_inputs:
+                harness.corpus_files(spec)
+        except harness.HarnessError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from None
     if pipeline.mode() == "real" and request.start_from != "fresh":
         try:
             harness.load_candidate(request.start_from)
