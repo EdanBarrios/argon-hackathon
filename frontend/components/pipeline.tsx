@@ -2,10 +2,10 @@ import { Fragment } from "react";
 import type { PipelineStep, StepTone } from "@/lib/derive";
 
 const TONE: Record<StepTone, { box: string; text: string; dot: string }> = {
-  neutral: { box: "border-line", text: "text-white", dot: "bg-neutral-400" },
-  match: { box: "border-match/50 bg-match/[0.06]", text: "text-match glow-match", dot: "bg-match" },
-  div: { box: "border-div/60 bg-div/[0.07]", text: "text-div glow-div", dot: "bg-div" },
-  crash: { box: "border-crash/60 bg-crash/[0.07]", text: "text-crash glow-crash", dot: "bg-crash" },
+  neutral: { box: "border-line", text: "text-paper", dot: "bg-dim" },
+  match: { box: "border-match/50 bg-match/[0.06]", text: "text-match", dot: "bg-match" },
+  div: { box: "border-div/60 bg-div/[0.07]", text: "text-div", dot: "bg-div" },
+  crash: { box: "border-crash/60 bg-crash/[0.07]", text: "text-crash", dot: "bg-crash" },
 };
 
 // One card per real pipeline event, connected left to right. New steps rise in;
@@ -26,14 +26,14 @@ export function Pipeline({ steps }: { steps: PipelineStep[] }) {
             <div
               className={`rise min-w-0 flex-1 rounded-md border px-3 py-2.5 ${t.box} ${s.active ? "step-active border-match/70" : ""}`}
             >
-              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-dim">
+              <div className="flex items-center gap-2 text-xs text-dim">
                 <span className={`h-1.5 w-1.5 rounded-full ${s.active ? "live-dot bg-match" : t.dot}`} />
                 step {i + 1}
               </div>
-              <div className={`mt-1 text-base font-bold leading-tight ${s.active ? "text-white" : t.text}`}>{s.label}</div>
-              <div className="mt-0.5 font-mono text-xs leading-snug text-neutral-400">
+              <div className={`mt-1 text-base font-bold leading-tight ${s.active ? "text-paper" : t.text}`}>{s.label}</div>
+              <div className="mt-0.5 font-mono text-xs leading-snug text-dim">
                 {s.detail}
-                {s.active && <span className="cursor">▌</span>}
+                
               </div>
             </div>
           </Fragment>

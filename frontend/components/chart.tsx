@@ -8,7 +8,7 @@ const PAD = { l: 48, r: 90, t: 14, b: 32 };
 
 export function MatchChart({ series }: { series: Series[] }) {
   if (!series.length || series.every((s) => !s.points.length)) {
-    return <p className="text-lg text-neutral-500">No verify rounds yet.</p>;
+    return <p className="text-lg text-dim">No verify rounds yet.</p>;
   }
   const maxIt = Math.max(2, ...series.flatMap((s) => s.points.map((p) => p.iteration)));
   const x = (it: number) => PAD.l + ((it - 1) / (maxIt - 1)) * (W - PAD.l - PAD.r);
