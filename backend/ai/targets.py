@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import prompts
+from .feedback_patterns import divergence_pattern, expat_divergence_pattern
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,10 @@ class Target:
     build_c: str
     build_rust: str
     gen_inputs: Callable[[Path, int, int, Path], list[str]]  # (root, seed, count, out) -> argv
+    divergence_pattern: Callable[[dict], str] = divergence_pattern
+    # Rerun both drivers on listed divergences to find the first differing output
+    # line (verify.sh keeps only the first 300 chars of each output).
+    diff_context: bool = False
     inputs_prefix: str = "inputs"
     max_output_tokens: int = 131072
     max_wait_seconds: float = 45 * 60
@@ -59,4 +64,32 @@ CJSON = Target(
     gen_inputs=_cjson_gen,
 )
 
-TARGETS: dict[str, Target] = {CJSON.name: CJSON}
+
+def _expat_gen(root: Path, seed: int, count: int, out: Path) -> list[str]:
+    return [sys.executable, "-I", str(root / "backend/harness/expat/gen_inputs_expat.py"),
+            "--seed", str(seed), "--count", str(count), "--out", str(out)]
+
+
+# The Rust port is expected at 100K+ output tokens: well past Flash's 65,536 cap,
+# and a single Argon reply can take over an hour.
+EXPAT = Target(
+    name="expat",
+    rust_file="expat.rs",
+    system_instruction=prompts.EXPAT_SYSTEM_INSTRUCTION,
+    load_source=prompts.load_expat_source,
+    translate_input=prompts.expat_translate_input,
+    repair_input=prompts.expat_repair_input,
+    vendor="backend/harness/expat/vendor/libexpat",
+    vendor_check="expat/lib/xmlparse.c",
+    c_driver="backend/harness/expat/build/expat_driver",
+    build_c="backend/harness/expat/build_expat.sh",
+    build_rust="scripts/build_rust_expat.sh",
+    gen_inputs=_expat_gen,
+    divergence_pattern=expat_divergence_pattern,
+    diff_context=True,
+    inputs_prefix="expat-inputs",
+    max_output_tokens=1048576,
+    max_wait_seconds=3 * 3600,
+)
+
+TARGETS: dict[str, Target] = {CJSON.name: CJSON, EXPAT.name: EXPAT}

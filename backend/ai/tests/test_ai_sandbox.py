@@ -109,3 +109,20 @@ def test_cjson_target_keeps_the_original_prompt_words():
     assert CJSON.system_instruction == prompts.SYSTEM_INSTRUCTION
     assert CJSON.translate_input("C") == prompts.translate_input("C")
     assert CJSON.repair_input("fb") == prompts.repair_input("fb")
+
+
+def test_first_diff_and_expat_patterns():
+    from ai.feedback_patterns import expat_divergence_pattern
+
+    assert loop.first_diff(b"START \"a\"\nTEXT \"x\"\nOK\n", b"START \"a\"\nTEXT \"y\"\nOK\n") == \
+        {"line": 2, "c": 'TEXT "x"', "rust": 'TEXT "y"'}
+    assert loop.first_diff(b"A\nOK\n", b"A\n")["c"] == "OK"
+    pat = expat_divergence_pattern
+    assert pat({"c_output": "ERROR 4 line 1 col 2", "rust_output": "ERROR 2 line 1 col 0"}) == \
+        "both reject: C ERROR 4, Rust ERROR 2"
+    assert pat({"c_output": "ERROR 7 line 2 col 5", "rust_output": "ERROR 7 line 2 col 4"}) == \
+        "both reject with ERROR 7, line/col differ"
+    assert pat({"c_output": "START \"a\"", "rust_output": "ERROR 2 line 1 col 0"}) == "C events vs Rust ERROR 2"
+    assert pat({"c_output": "START", "rust_output": "START",
+                "first_diff": {"line": 3, "c": "END \"a\"", "rust": "TEXT \"b\""}}) == \
+        "both accept, first differing line: C END vs Rust TEXT"

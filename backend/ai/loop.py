@@ -29,6 +29,7 @@ import shutil
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -101,6 +102,40 @@ def holdout_inputs(root: Path, count: int, seed: int, seen_dir: Path,
     return out, removed
 
 
+def first_diff(c_out: bytes, r_out: bytes) -> dict:
+    """First output line where the two drivers differ (1-based), each side cut to 300 chars."""
+    cl, rl = c_out.decode("utf-8", "backslashreplace").split("\n"), r_out.decode("utf-8", "backslashreplace").split("\n")
+    i = next((j for j, (a, b) in enumerate(zip(cl, rl)) if a != b), min(len(cl), len(rl)))
+    pick = lambda lines: lines[i][:300] if i < len(lines) else None
+    return {"line": i + 1, "c": pick(cl), "rust": pick(rl)}
+
+
+def add_first_diffs(divergences: list[dict], inputs: Path, c_driver: Path, rust_bin: str,
+                    jobs: int, timeout: float) -> list[dict]:
+    """Copies of verify.sh's divergences with first_diff added, for the repair prompt only.
+
+    verify.sh keeps only the first 300 chars of each output, so for long event streams
+    the difference is often past the cut. This reruns both drivers on the same input
+    file. It changes what the model is shown, never the counts or the match rate.
+    """
+    def one(d: dict) -> dict:
+        d = dict(d)
+        path = inputs / (d.get("file") or "")
+        if not path.is_file():
+            return d
+        data = path.read_bytes()
+        try:
+            c = subprocess.run([str(c_driver)], input=data, capture_output=True, timeout=timeout).stdout
+            r = subprocess.run([rust_bin], input=data, capture_output=True, timeout=timeout).stdout
+        except subprocess.TimeoutExpired:
+            return d
+        d["first_diff"] = first_diff(c, r)
+        return d
+
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        return list(pool.map(one, divergences))
+
+
 def tokens(usage: dict) -> int:
     return sum(int(usage.get(k) or 0) for k in ("total_input_tokens", "total_output_tokens", "total_thought_tokens"))
 
@@ -161,7 +196,7 @@ def main(argv: list[str] | None = None) -> int:
             if prev is None:
                 res = translate(c_source, model=args.model, target=target)
             else:
-                write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}))
+                write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}, target.divergence_pattern))
                 res = repair(prev, feedback or {}, model=args.model, target=target)
         except TranslateError as exc:
             rec["error"] = str(exc)
@@ -195,6 +230,9 @@ def main(argv: list[str] | None = None) -> int:
                 verify = {}
             write_json(rdir / "verify.json", verify)
             feedback = dict(verify, compile_errors=None)
+            if target.diff_context and verify.get("divergences"):
+                feedback["divergences"] = add_first_diffs(verify["divergences"], inputs, c_driver,
+                                                          build["binary"], args.jobs, args.timeout)
             counts = verify.get("counts") or {}
             rec.update(match_rate=verify.get("match_rate"), divergences=counts.get("divergence"),
                        crashes=counts.get("rust_crash", 0) + counts.get("both_crash", 0),

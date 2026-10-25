@@ -25,6 +25,7 @@ from typing import Any
 from google import genai
 
 from . import prompts
+from .feedback_patterns import divergence_pattern, expat_divergence_pattern  # noqa: F401 (re-export)
 from .targets import CJSON, Target
 
 DEFAULT_MODEL = "gemini-4-argon"
@@ -243,60 +244,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
 # ---------------------------------------------------------------- feedback
 
 
-def _kind(line: str | None) -> str:
-    line = line or ""
-    if line.startswith("OK\t"):
-        return "OK"
-    if line.startswith("PARSE_ERROR at"):
-        return "ERR_AT"
-    if line == "PARSE_ERROR":
-        return "ERR"
-    if line == "TIMEOUT":
-        return "TIMEOUT"
-    return "OTHER"
-
-
-def _char_class(ch: str) -> str:
-    if ch == "":
-        return "end"
-    if ch.isdigit() or ch in "+-.eE":
-        return "num"
-    if ch == '"':
-        return "quote"
-    if ch == "\\":
-        return "backslash"
-    if ch in "{}[],:":
-        return ch
-    if ch.isalpha():
-        return "alpha"
-    return "punct"
-
-
-def divergence_pattern(d: dict) -> str:
-    """Coarse signature of a divergence, so 50 copies of one bug count as one pattern."""
-    c, r = d.get("c_output") or "", d.get("rust_output") or ""
-    kc, kr = _kind(c), _kind(r)
-    if kc == "OK" and kr == "OK":
-        i = next((j for j, (a, b) in enumerate(zip(c, r)) if a != b), min(len(c), len(r)))
-        before = c[max(0, i - 1):i]
-        in_string = c[:i].replace("\\\\", "").replace('\\"', "").count('"') % 2 == 1
-        where = "string" if in_string else ("number" if before and _char_class(before) == "num" else "structure")
-        return f"OK/OK print differs in {where}: C next={_char_class(c[i:i+1])} Rust next={_char_class(r[i:i+1])}"
-    inp = d.get("input") or ""
-    if kc == "ERR_AT" and kr == "ERR_AT":
-        try:
-            oc, orr = int(c.rsplit(" ", 1)[1]), int(r.rsplit(" ", 1)[1])
-            side = "earlier" if orr < oc else "later"
-        except ValueError:
-            oc, side = 0, "?"
-        # Byte class at C's error offset (approximate: the report input is text).
-        return f"both reject, Rust error offset {side} than C, C stops at {_char_class(inp[oc:oc+1])}"
-    # Accept/reject disagreements: split by what the document starts with.
-    first = inp.lstrip(" \t\r\n")[:1]
-    return f"C {kc} vs Rust {kr}, input starts with {_char_class(first)}"
-
-
-def trim_feedback(feedback: dict) -> dict:
+def trim_feedback(feedback: dict, pattern=divergence_pattern) -> dict:
     """Cut a raw verify.sh report (plus compile_errors) down to what goes in the prompt.
 
     Compile errors in full. Divergences deduped by pattern, the shortest input per
@@ -313,7 +261,7 @@ def trim_feedback(feedback: dict) -> dict:
         }
     groups: dict[str, list[dict]] = {}
     for d in feedback.get("divergences") or []:
-        groups.setdefault(divergence_pattern(d), []).append(d)
+        groups.setdefault(pattern(d), []).append(d)
     ranked = sorted(groups.items(), key=lambda kv: -len(kv[1]))
     picked = []
     for pattern, items in ranked[:MAX_DIVERGENCES]:
@@ -325,6 +273,7 @@ def trim_feedback(feedback: dict) -> dict:
             "file": best.get("file"),
             "pattern": pattern,
             "pattern_count": len(items),
+            **({"first_diff": best["first_diff"]} if best.get("first_diff") else {}),
         })
     out["divergences"] = picked
     out["divergence_total"] = (feedback.get("counts") or {}).get("divergence") or len(feedback.get("divergences") or [])
@@ -351,5 +300,5 @@ def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
     in the shape of verify.sh output (extra verify.sh keys such as counts are used
     for the summary if present).
     """
-    text = prompts.format_feedback(trim_feedback(feedback))
+    text = prompts.format_feedback(trim_feedback(feedback, target.divergence_pattern))
     return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)
