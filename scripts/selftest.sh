@@ -3,7 +3,9 @@
 # Fetches cJSON, builds the ASan/UBSan driver, generates inputs, runs
 # verify.sh with C on both sides, and exits nonzero unless match_rate is 1.0
 # with zero divergences. If this fails, the harness is broken, not the code
-# under test. Bash 3.2 compatible.
+# under test. Then runs the -O1 driver against a -O0 build: any difference
+# there means cJSON's behaviour depends on the optimiser (undefined behaviour
+# the sanitizers missed), and the self-test fails. Bash 3.2 compatible.
 #
 # Usage: scripts/selftest.sh [--seed N] [--count N]
 set -eu
@@ -22,6 +24,7 @@ done
 
 "$H/fetch_cjson.sh"
 "$H/build_cjson.sh" 2>/dev/null
+OPT=-O0 "$H/build_cjson.sh" "$H/build/cjson_driver_O0" 2>/dev/null
 python3 -I "$H/gen_inputs.py" --seed "$SEED" --count "$COUNT"
 
 DRIVER="$H/build/cjson_driver"
@@ -49,5 +52,24 @@ print("report: %s" % sys.argv[1])
 ok = r["match_rate"] == 1.0 and c["divergence"] == 0 and r["behaviors_tested"] > 0
 if not ok:
     print("SELFTEST FAILED: C vs C must be a perfect match", file=sys.stderr)
+sys.exit(0 if ok else 1)
+PY
+
+# Optimisation cross-check: -O1 against -O0, every input must match exactly.
+OUT_O0="$ROOT/runs/selftest-$STAMP-O0.json"
+"$H/verify.sh" --c "$DRIVER" --rust "$H/build/cjson_driver_O0" --inputs "$H/inputs/cjson" \
+  --out "$OUT_O0" >/dev/null
+
+python3 -I - "$OUT_O0" <<'PY'
+import json, sys
+r = json.load(open(sys.argv[1]))
+c = r["counts"]
+print("O1_vs_O0 match=%d/%d counts=%s" % (c["match"], r["behaviors_tested"], c))
+print("report: %s" % sys.argv[1])
+bad = [e["file"] for k in ("divergences", "crashes", "timeouts") for e in r[k]]
+ok = c["match"] == r["behaviors_tested"] > 0
+if not ok:
+    print("SELFTEST FAILED: -O1 and -O0 C drivers differ (optimiser-dependent"
+          " behaviour, likely undefined behaviour) on: %s" % " ".join(bad), file=sys.stderr)
 sys.exit(0 if ok else 1)
 PY
