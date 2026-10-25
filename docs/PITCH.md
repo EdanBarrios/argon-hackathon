@@ -1,51 +1,75 @@
 # Pitch (3 min, no slides)
 
 Mapped to the judging rubric: live demo 50%, problem and usefulness 25%, originality 15%, clarity 10%.
-Lines marked **[verify]** must be fact-checked before we say them on stage.
+Lines marked **[verify]** must be checked right before we go on stage.
 
 ## Rules for every line
 
 - Lead with the user, not the model.
-- Say "N tested behaviors preserved". Never "100% equivalent".
-- Theseus is a migration tool with proof. Never call it a dashboard (banned project type).
+- Say "independently checks agreement on N tested inputs" or "N tested behaviors preserved".
+- Never say "proves it behaves the same", "equivalent", "100% compatible", "secure", or "CVE fixed". For the CVE input say "rejects this historical crashing input".
+- Theseus is a migration tool with evidence. Never call it a dashboard (banned project type).
 - Say out loud what we built today and what we used: cJSON and libexpat are third-party inputs, not our code.
-- Only claim "smaller models can't do this" if our Flash baseline actually shows it.
+- One memorable moment per beat, not five stats.
+- libexpat model results are pending. Never fill them in by estimate.
+
+## Core line
+
+"Theseus doesn't ask the model whether the port works. It runs the original and the replacement on the same inputs, exposes the differences, and makes the model repair them."
 
 ## Script
 
-**0:00 Who and why (problem, 25%).**
-"This is for the people who maintain C libraries that everything depends on, like libexpat, the XML parser behind Python's built-in XML modules and shipped in Firefox's source tree. (Do not quote a team size; we have no verified number.) C lets one bad pointer become a remote takeover. Rust makes that whole class of bug impossible. Maintainers would migrate if they could trust the rewrite. Theseus rewrites their C into safe Rust and proves the new code behaves the same."
+**Before 0:00.** Run view open, Flash's first-attempt start selected. Try panel one click away. PR #3 open in a background tab.
 
-**0:25 Live, real input (live demo, 50%).**
-Open the Try panel. Ask a judge for any JSON, or type one.
-"Same bytes into the original C and into Argon's Rust. Byte-for-byte comparison."
-Then the CVE preset `{"1":1,`: "Seven bytes. On cJSON 1.7.17, parsed as an exact-length buffer, they trigger a heap over-read under AddressSanitizer: CVE-2023-53154, fixed in 1.7.18. Argon's Rust returns a clean parse error on the same seven bytes." (This uses a separate old-version driver; the normal reference is 1.7.19, which is already fixed. Present it as a safety demonstration, not proof that Rust alone supplied the fix.)
+**0:00 Start the run (live demo).**
+Click Start on the live repair run from Flash's first attempt. Talk over it.
+"If you ship a C parser inside your product, one bad pointer in that parser is your vulnerability. Theseus migrates it to memory-safe Rust and gives you evidence your auditors can rerun. Theseus doesn't ask the model whether the port works. It runs the original and the replacement on the same inputs, exposes the differences, and makes the model repair them. That run just started. Let's use it while it works."
 
-**1:05 The verification loop (live demo, 50%).**
-Start a live run from Flash's first attempt (or fresh at medium thinking). Lanes light up.
-"Argon writes the code. It never grades its own homework. Our verifier runs both versions on thousands of inputs. Every divergence goes back to Argon with the exact input and both outputs. Argon repairs. Repeat until it matches."
-Click a red divergence: input, C output, Rust output, the function.
+**0:20 Try panel: a judge's JSON (live demo).**
+Open the Try panel and ask a judge for any JSON, or type one they call out.
+"Same bytes into the original C and into the Rust. We compare raw output, byte for byte. Not a replay: your input, right now."
+Moment: the two outputs side by side, identical.
 
-**1:45 Why only Argon (originality, 15%).**
-Switch to the pre-run.
-"cJSON is 3,000 lines. Both Argon and Flash end at 2,000 of 2,000 tested behaviors. The difference is how: Argon did it in one pass at full thinking in about 5.5 minutes. Flash hit its 64K output ceiling twice at high thinking and only finished by thinking less, about 14 minutes and 2.7x the tokens. And on our edge-case inputs Flash's port gets one cJSON quirk wrong; Argon's doesn't." Then, only if the libexpat runs exist: "libexpat is **[N] lines, [M] tokens**. Argon read the whole library in one long-context pass and wrote **[K] tokens** of Rust. Flash on the same task: **[result]**." Source for cJSON numbers: results/cjson-flash-vs-argon/README.md. Never fill [N]/[M]/[K] by estimate.
+**0:45 CVE preset (problem).**
+Click the CVE preset `{"1":1,`.
+"Seven bytes. Old cJSON, 1.7.17, reads past the end of its buffer on these, and AddressSanitizer catches it: CVE-2023-53154. The Rust port rejects this historical crashing input with a clean parse error. cJSON fixed this upstream in 1.7.18; the point is that safe Rust cannot express that read at all."
+Moment: the red ASan report next to `PARSE_ERROR at 7`.
 
-**2:20 Managed Agents and human control.**
-"Pre-runs happen in Google-hosted sandboxes. The agent runs our verifier itself, and we re-verify locally, because its report is a claim, not evidence. Nothing ships without a human." Click Approve. Say "The PR opens with the code and the evidence report" only if the real PR step has been demonstrated today; otherwise say "Approval is the gate; the PR step runs in a sandbox with a scoped token" and show the dry run.
+**1:05 Back to the run: repairing Flash (live demo).**
+Switch to the run. By now it should show the divergences and Argon's repair round (a rehearsal took 166 s end to end).
+"We started from Gemini 3.8 Flash's port. Our verifier found inputs where it disagrees with C. Click one."
+Click the `"\uZ\t\\"` divergence.
+"C accepts this odd string and prints an empty string. Flash's port rejects it. Cleaner, maybe, but not what C does, and behavior-preserving means preserving the weird parts too. That input and both outputs went to Argon. Argon repaired it. Now it matches every input, including a held-out set it never saw."
+Moment: the divergence turning green.
 
-**2:40 Close (clarity, 10%).**
-"Built today: the verifier, the pipeline, the UI. N tested behaviors preserved, in isolated sandboxes. Argon never grades its own homework."
+**1:40 Why Argon (originality).**
+"On cJSON, Argon wrote a working port on its first try, two runs out of two, about two and a half times faster than Flash with fewer tokens. Flash hit its 64K output cap mid-file and only finished by thinking less, and its port still diverged on 19 of our targeted edge inputs."
+"The real target is libexpat, the XML parser: 18,494 lines, 204,000 tokens. Flash caps thinking plus output at 65,536 tokens. We estimate a full port needs over 100,000 output tokens. That's the structural reason it needs Argon. The libexpat runs are pending, so that is a prediction, not a result."
+
+**2:05 Managed Agents (managed agents prize).**
+Show a sandbox run card: the agent's claimed match rate next to the host check tick.
+"Bigger runs happen in managed-agent sandboxes. The agent installs the compilers, translates, builds, runs our verifier and repairs, all inside the sandbox. Its report is a claim, so we rebuild its Rust and rerun the verifier ourselves, including inputs it never saw. Here they agree."
+"Opening a PR needs a GitHub token. We tested with a fake token: GitHub received it through the sandbox's proxy, and the token never appeared inside the sandbox."
+
+**2:30 Approve and the migration certificate.**
+Click Approve. Switch to PR #3 (or the PR the click opens).
+"Nothing ships without a person. The pull request is a migration certificate: the code, the evidence report from the verifier, the command to reproduce it, and what it does not cover." **[verify]** that the PR's EVIDENCE.md has a limitations section; if not, say "and the limits, which are in our README".
+
+**2:45 Close.**
+"Built today: the verifier, the repair pipeline, the sandbox runs, the UI. cJSON and libexpat are other people's code. Theseus doesn't ask the model whether the port works. It checks, and it shows you the receipts."
 
 ## Q&A answers to have ready
 
+- **"Why not just Flash with retries?"** On cJSON Flash did get there with a retry at lower thinking, so we don't claim it can't. But it took about 2.5x longer and more tokens, and its finished port still had a real divergence on 19 targeted inputs. Retries don't move the output cap: Flash stops at 65,536 tokens of thinking plus output, and we estimate libexpat needs 100K+ output tokens. That libexpat comparison is pending.
+- **"Would you merge this into my repo? What does the certificate certify?"** It certifies one thing: on the listed inputs, the C and the Rust produced the same output bytes and exit status through our driver, checked by our verifier on our host, including held-out inputs the model never saw. It does not certify every input, every API function, or performance. You merge it after your own review, with the reproduce command in hand.
+- **"Why did the sandbox matter? It's three gh commands."** The PR step is the small part. The sandbox ran the real translate, build, verify and repair loop: it installed clang with ASan and Rust, built the C, and ran our verifier itself (517 s for Argon, 1,827 s for Flash in parallel). The host then rebuilt and re-verified the result. For the PR, the scoped token is injected at the egress proxy, so it never enters the sandbox.
+- **"20,000 inputs is not better than 200 good ones."** Agreed, which is why count is not our argument. We have 980 targeted edge inputs (number boundaries, every escape, invalid UTF-8, nesting at the limit), 225 inputs Argon wrote specifically to break its own port, and a mutation check that plants single-site bugs in the C to confirm our inputs catch them. The targeted set is what caught Flash's divergence.
 - **"Rust ports of cJSON already exist."** Yes, that's why cJSON is our floor, not our claim. The product is the repeatable migration workflow and the independent evidence. Rust ports of libexpat exist too (the experimental `expat` crate); we don't claim a first port.
-- **"How do you know your verifier is right?"** Three controls: C against C scores 100%, a canary input with one known output, and a do-nothing stub scores near 0%. Our first driver passed C-vs-C while broken. That's why the canary exists.
-- **"100% on the first try? Your tests are easy."** We built adversarial inputs, including ones Argon wrote to break its own port. Results: Argon's port matched 980/980 targeted edge inputs, 225/225 inputs Argon wrote to break it, and 20,000 extra fuzz inputs. Flash's port matched 961/980: 19 divergences from one cJSON string-parsing quirk (results/cjson-flash-vs-argon/README.md). That is agreement on those corpora, not full equivalence.
-- **"What does match rate exclude?"** Inputs where C crashes are listed separately as safety improvements, never counted as preserved behaviors. Oversized inputs are skipped and counted. It covers parse-and-print stdout and exit status through our driver, not every cJSON function or performance.
-- **"Why do you need 1M context?"** Honest answer: cJSON alone doesn't prove it; Flash also reached 2,000/2,000. The case rests on libexpat (only say results if we have them) and on Flash hitting its 64K output ceiling on a 3,000-line library.
-- **"Is this a dashboard replaying a success story?"** No: the Try panel runs a judge's own input through the real C and the real Rust live. Name any replayed part out loud.
-- **"Could the Rust cheat by calling the C binary?"** The build gate rejects process, filesystem and network access in the generated code (once the hardening branch is merged; until then say a code audit found none in any generated port).
-- **"Does the CVE demo prove Rust fixed it?"** It shows the vulnerable release crashing and the Rust returning an error on the same bytes. cJSON fixed it in 1.7.18 too. Rust removes the class of bug, not just this one.
-- **"Is the Rust actually safe?"** The crate root has `#![forbid(unsafe_code)]`, which the compiler enforces, plus a build-time check. No dependencies.
-- **"How do you know your verifier is right?" (weak spots to admit if pushed)** Embedded NUL bytes in strings are compared only up to the NUL; the canary set is small. Both are known and listed.
-- **One divergence story, in depth:** Flash on `"\uZ\t\\"`. cJSON's two-pass string parser turns bad `\u` hex into U+0000 and then accepts a lone backslash before the closing quote. Flash's port is stricter and rejects it; Argon's matches C. Behavior-preserving means preserving the weird parts too.
+- **"How do you know your verifier is right?"** Three controls: C against C must match on every input, a canary input with one known output must pass first, and a do-nothing stub scores near zero. Our first driver passed C-vs-C while broken. That's why the canary exists. Weak spots we admit: embedded NUL bytes in strings are compared only up to the NUL, and the canary set is small.
+- **"Everything matched on the first try? Your tests are easy."** Argon's port matched 980/980 targeted inputs, 225/225 inputs Argon wrote to break it, and 20,000 extra fuzz inputs. Flash's port matched 961/980. That is agreement on those inputs, nothing more.
+- **"What does the match rate exclude?"** Inputs where C crashes are listed separately as safety improvements, never counted as preserved behaviors. Infra failures never count as matches. Oversized inputs are skipped and counted. It covers parse-and-print output and exit status through our driver, not every cJSON function or performance.
+- **"Is this replaying a success story?"** No: the Try panel runs a judge's own input through the real C and the real Rust live, and the repair run is live. Name any replayed part out loud.
+- **"Could the Rust cheat by calling the C binary?"** The build gate rejects process, filesystem, network and environment APIs in the generated Rust, and the crate has `#![forbid(unsafe_code)]` with no dependencies.
+- **"Does the CVE demo show Rust fixed it?"** No. It shows the vulnerable release crashing and the Rust rejecting the same bytes cleanly. cJSON fixed it in 1.7.18. Safe Rust removes the class of bug (out-of-bounds reads), which is the point for the next one.
+- **"Why do you need 1M context?"** cJSON alone doesn't show it: Flash also reached 2,000/2,000. The case rests on libexpat (204K tokens of input, an estimated 100K+ tokens of output against Flash's 65,536 cap), and those runs are pending.
+- **One divergence story, in depth:** Flash on `"\uZ\t\\"`. cJSON's two-pass string parser turns bad `\u` hex into U+0000 and then accepts a lone backslash before the closing quote. Flash's port checks for two remaining bytes instead of one, so it rejects; Argon's matches C. In the sandbox run, Argon itself first rejected `"\uZZZZ"` (C parses it as `""`), scored 0.9933 in round 1, and repaired it in round 2.
