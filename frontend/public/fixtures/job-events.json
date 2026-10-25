@@ -1,49 +1,41 @@
 [
   {
     "seq": 1,
-    "at": "2026-10-25T12:20:04-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": null,
-    "type": "job_status",
-    "data": {
-      "status": "queued"
-    }
-  },
-  {
-    "seq": 2,
-    "at": "2026-10-25T12:20:06-07:00",
-    "job_id": "job_7f3a2c",
+    "at": "2026-10-25T12:32:19-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "job_status",
     "data": {
       "status": "running",
       "plan": [
-        "lexer",
-        "parser",
-        "printer"
+        "cjson parse+print"
       ]
+    }
+  },
+  {
+    "seq": 2,
+    "at": "2026-10-25T12:32:19-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "translate",
+    "data": {
+      "module": "cjson parse+print",
+      "iteration": 1,
+      "phase": "loaded",
+      "start_from": "flash-2",
+      "source_label": "Flash's first attempt",
+      "source_model": "gemini-3.8-flash",
+      "source_path": "/Users/edan/dev/argon-hackathon/runs/ai/flash-2/round_1/cjson.rs",
+      "interaction_id": "v1_ChdrVW5lYW9taUxZQ3M5TW9Qb1lqTTBBcxIXa1VuZWFvbWlMWUNzOU1vUG9Zak0wQXM",
+      "rust_lines": 734,
+      "model": "gemini-4-argon",
+      "summary": "Starting from Flash's first attempt (gemini-3.8-flash, 734 lines, saved earlier today, no model call). When it was produced it scored 100% on 300 inputs; it is re-verified now from scratch."
     }
   },
   {
     "seq": 3,
-    "at": "2026-10-25T12:21:30-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": "agent_printer",
-    "type": "translate",
-    "data": {
-      "module": "printer",
-      "iteration": 1,
-      "functions": [
-        "print_number",
-        "print_string_ptr",
-        "print_value"
-      ]
-    }
-  },
-  {
-    "seq": 4,
-    "at": "2026-10-25T12:21:31-07:00",
-    "job_id": "job_7f3a2c",
+    "at": "2026-10-25T12:32:19-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "job_status",
     "data": {
@@ -51,36 +43,97 @@
     }
   },
   {
-    "seq": 5,
-    "at": "2026-10-25T12:22:02-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": "agent_printer",
+    "seq": 4,
+    "at": "2026-10-25T12:32:44-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
     "type": "verify",
     "data": {
+      "inputs_found": 578,
+      "scored": 578,
+      "skipped": 0,
+      "infra_failures": 0,
       "iteration": 1,
-      "match_rate": 0.64,
-      "behaviors_tested": 512,
-      "divergences": 184,
-      "crashes": 0
+      "compile_ok": true,
+      "match_rate": 0.967128027681661,
+      "behaviors_tested": 578,
+      "divergences": 19,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "build_seconds": 3.1,
+      "seconds": 22.2,
+      "summary": "verify.sh: 559/578 inputs byte-identical (96.7%) in 22.2s."
+    }
+  },
+  {
+    "seq": 5,
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "divergence",
+    "data": {
+      "input": "\"\\uZ\\t\\\\\"",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "function": "parse_string",
+      "function_source": "guessed from the divergence pattern",
+      "pattern": "C OK vs Rust ERR_AT, input starts with quote",
+      "pattern_count": 6
     }
   },
   {
     "seq": 6,
-    "at": "2026-10-25T12:22:02-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": "agent_printer",
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
     "type": "divergence",
     "data": {
-      "input": "[1e999]",
-      "c_output": "OK\t[null]",
-      "rust_output": "OK\t[inf]",
-      "function": "print_number"
+      "input": "[\"\\uZ\\t\\\\\",1]",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "function": "parse_array",
+      "function_source": "guessed from the divergence pattern",
+      "pattern": "C OK vs Rust ERR_AT, input starts with [",
+      "pattern_count": 6
     }
   },
   {
     "seq": 7,
-    "at": "2026-10-25T12:22:03-07:00",
-    "job_id": "job_7f3a2c",
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "divergence",
+    "data": {
+      "input": "{\"\\uZ\\t\\\\\":1}",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "function": "parse_object",
+      "function_source": "guessed from the divergence pattern",
+      "pattern": "C OK vs Rust ERR_AT, input starts with {",
+      "pattern_count": 6
+    }
+  },
+  {
+    "seq": 8,
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "divergence",
+    "data": {
+      "input": "{\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\\u\\xd4\\t\\\\\"",
+      "c_output": "PARSE_ERROR at 58",
+      "rust_output": "PARSE_ERROR at 56",
+      "function": "parse_string",
+      "function_source": "guessed from the divergence pattern",
+      "pattern": "both reject, Rust error offset earlier than C, C stops at backslash",
+      "pattern_count": 1
+    }
+  },
+  {
+    "seq": 9,
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "job_status",
     "data": {
@@ -88,21 +141,50 @@
     }
   },
   {
-    "seq": 8,
-    "at": "2026-10-25T12:23:15-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": "agent_printer",
+    "seq": 10,
+    "at": "2026-10-25T12:32:45-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
     "type": "repair",
     "data": {
       "iteration": 2,
-      "function": "print_number",
-      "summary": "Non-finite doubles now print as null, matching C's print_number, instead of Rust's Display impl (\"inf\")."
+      "phase": "started",
+      "model": "gemini-4-argon",
+      "thinking": "medium",
+      "function": "parse_array",
+      "functions": [
+        "parse_array",
+        "parse_object",
+        "parse_string"
+      ],
+      "patterns": [
+        "C OK vs Rust ERR_AT, input starts with quote",
+        "C OK vs Rust ERR_AT, input starts with [",
+        "C OK vs Rust ERR_AT, input starts with {",
+        "both reject, Rust error offset earlier than C, C stops at backslash"
+      ],
+      "summary": "Sending 4 deduped divergence pattern(s) to gemini-4-argon."
     }
   },
   {
-    "seq": 9,
-    "at": "2026-10-25T12:23:16-07:00",
-    "job_id": "job_7f3a2c",
+    "seq": 11,
+    "at": "2026-10-25T12:34:16-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "repair",
+    "data": {
+      "iteration": 2,
+      "phase": "done",
+      "seconds": 90.5,
+      "interaction_id": "v1_ChdrVW5lYW9taUxZQ3M5TW9Qb1lqTTBBcxIXWUZuZWF1YTRLb1BnX3VNUDJZZjY2QTQ",
+      "function": "parse_array",
+      "summary": "gemini-4-argon returned a corrected cjson.rs in 90.5s."
+    }
+  },
+  {
+    "seq": 12,
+    "at": "2026-10-25T12:34:16-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "job_status",
     "data": {
@@ -110,53 +192,202 @@
     }
   },
   {
-    "seq": 10,
-    "at": "2026-10-25T12:23:49-07:00",
-    "job_id": "job_7f3a2c",
-    "agent_id": "agent_printer",
+    "seq": 13,
+    "at": "2026-10-25T12:34:40-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
     "type": "verify",
     "data": {
+      "inputs_found": 578,
+      "scored": 578,
+      "skipped": 0,
+      "infra_failures": 0,
       "iteration": 2,
+      "compile_ok": true,
       "match_rate": 1.0,
-      "behaviors_tested": 512,
+      "behaviors_tested": 578,
       "divergences": 0,
-      "crashes": 0
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "build_seconds": 3.5,
+      "seconds": 20.9,
+      "summary": "verify.sh: 578/578 inputs byte-identical (100.0%) in 20.9s."
     }
   },
   {
-    "seq": 11,
-    "at": "2026-10-25T12:30:58-07:00",
-    "job_id": "job_7f3a2c",
+    "seq": 14,
+    "at": "2026-10-25T12:34:40-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": null,
+    "type": "job_status",
+    "data": {
+      "status": "verifying"
+    }
+  },
+  {
+    "seq": 15,
+    "at": "2026-10-25T12:34:44-07:00",
+    "job_id": "job_2fc7b6",
+    "agent_id": "agent_cjson",
+    "type": "verify",
+    "data": {
+      "inputs_found": 64,
+      "scored": 64,
+      "skipped": 0,
+      "infra_failures": 0,
+      "iteration": 2,
+      "holdout": true,
+      "match_rate": 1.0,
+      "behaviors_tested": 64,
+      "divergences": 0,
+      "crashes": 0,
+      "seconds": 3.3,
+      "summary": "Held-out check: 64/64 inputs the model never saw are byte-identical (100.0%)."
+    }
+  },
+  {
+    "seq": 16,
+    "at": "2026-10-25T12:34:45-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "crash",
     "data": {
       "input": "{\"1\":1,",
       "side": "c",
-      "sanitizer": "AddressSanitizer: heap-buffer-overflow (cJSON v1.7.17, CVE-2023-53154)",
-      "rust_behavior": "clean error: PARSE_ERROR at 7"
+      "cve": "CVE-2023-53154",
+      "sanitizer": "SUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string (cJSON v1.7.17, CVE-2023-53154)",
+      "rust_behavior": "clean error: PARSE_ERROR at 7",
+      "c_version": "cJSON v1.7.17",
+      "current_c": "PARSE_ERROR at 7"
     }
   },
   {
-    "seq": 12,
-    "at": "2026-10-25T12:31:40-07:00",
-    "job_id": "job_7f3a2c",
+    "seq": 17,
+    "at": "2026-10-25T12:34:45-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "job_status",
     "data": {
       "status": "completed",
       "final_match_rate": 1.0,
-      "behaviors_tested": 2048
+      "behaviors_tested": 578,
+      "result": {
+        "baseline_match_rate": 0.967128027681661,
+        "final_match_rate": 1.0,
+        "behaviors_tested": 578,
+        "divergences": [
+          {
+            "input": "\"\\uZ\\t\\\\\"",
+            "c_output": "OK\t\"\"",
+            "rust_output": "PARSE_ERROR at 7",
+            "function": "parse_string",
+            "resolved": true
+          },
+          {
+            "input": "[\"\\uZ\\t\\\\\",1]",
+            "c_output": "OK\t[\"\",1]",
+            "rust_output": "PARSE_ERROR at 8",
+            "function": "parse_array",
+            "resolved": true
+          },
+          {
+            "input": "{\"\\uZ\\t\\\\\":1}",
+            "c_output": "OK\t{\"\":1}",
+            "rust_output": "PARSE_ERROR at 8",
+            "function": "parse_object",
+            "resolved": true
+          },
+          {
+            "input": "{\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\\u\\xd4\\t\\\\\"",
+            "c_output": "PARSE_ERROR at 58",
+            "rust_output": "PARSE_ERROR at 56",
+            "function": "parse_string",
+            "resolved": true
+          }
+        ],
+        "crashes": [
+          {
+            "input": "{\"1\":1,",
+            "sanitizer_report": "=================================================================\n==59190==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000000f7 at pc 0x000106d79e03 bp 0x7ff7b91988b0 sp 0x7ff7b91988a8\nREAD of size 1 at 0x6020000000f7 thread T0\n    #0 0x000106d79e02 in parse_string cJSON.c:786\n    #1 0x000106d7f727 in parse_object cJSON.c:1665\n    #2 0x000106d6a714 in parse_value cJSON.c:1365\n    #3 0x000106d6791c in cJSON_ParseWithLengthOpts cJSON.c:1125\n    #4 0x000106d88218 in main cjson_driver_old.c:89\n    #5 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\n0x6020000000f7 is located 0 bytes after 7-byte region [0x6020000000f0,0x6020000000f7)\nallocated by thread T0 here:\n    #0 0x0001072a6b22 in malloc+0x82 (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0x9db22)\n    #1 0x000106d88158 in main cjson_driver_old.c:77\n    #2 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\nSUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string",
+            "rust_behavior": "clean error: PARSE_ERROR at 7"
+          }
+        ]
+      },
+      "timings": [
+        {
+          "stage": "inputs",
+          "seconds": 0.5,
+          "inputs_dir": "/Users/edan/dev/argon-hackathon/runs/ai/inputs-c300-s1+targeted_str_"
+        },
+        {
+          "stage": "build",
+          "seconds": 3.1,
+          "iteration": 1,
+          "ok": true
+        },
+        {
+          "stage": "verify",
+          "seconds": 22.2,
+          "iteration": 1,
+          "inputs": 578
+        },
+        {
+          "stage": "repair",
+          "seconds": 90.5,
+          "iteration": 2,
+          "model": "gemini-4-argon"
+        },
+        {
+          "stage": "build",
+          "seconds": 3.5,
+          "iteration": 2,
+          "ok": true
+        },
+        {
+          "stage": "verify",
+          "seconds": 20.9,
+          "iteration": 2,
+          "inputs": 578
+        },
+        {
+          "stage": "holdout_verify",
+          "seconds": 3.3,
+          "inputs": 64
+        },
+        {
+          "stage": "cve_check",
+          "seconds": 0.9
+        }
+      ],
+      "seconds": 146.0,
+      "best_binary": "/Users/edan/dev/argon-hackathon/runs/build/live-job_2fc7b6-r2/target/release/theseus_cjson",
+      "holdout": {
+        "match_rate": 1.0,
+        "behaviors_tested": 64,
+        "overlap_removed": 236,
+        "counts": {
+          "match": 64,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0,
+          "infra_failure": 0
+        },
+        "inputs": "/Users/edan/dev/argon-hackathon/runs/ai/holdout-c300-s1001-minus-inputs-c300-s1+targeted_str_"
+      }
     }
   },
   {
-    "seq": 13,
-    "at": "2026-10-25T12:31:40-07:00",
-    "job_id": "job_7f3a2c",
+    "seq": 18,
+    "at": "2026-10-25T12:34:45-07:00",
+    "job_id": "job_2fc7b6",
     "agent_id": null,
     "type": "approval_required",
     "data": {
       "action": "open_pr",
-      "evidence": "/jobs/job_7f3a2c/result"
+      "evidence": "/jobs/job_2fc7b6/result"
     }
   }
 ]
