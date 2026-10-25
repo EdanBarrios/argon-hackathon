@@ -1,0 +1,1 @@
+for i=1,3 do for j=1,3 do if j==2 then goto continue end print(i,j) ::continue:: end end do local x <close> = setmetatable({}, {__close=function() print("closed") end}) print("in") end local k <const> = 5 print(k)

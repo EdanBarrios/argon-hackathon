@@ -1,0 +1,1 @@
+local co=coroutine.create(function(a,b) local c=coroutine.yield(a+b) local d,e=coroutine.yield(c*2) return d+e end) print(coroutine.resume(co,1,2)) print(coroutine.resume(co,10)) print(coroutine.resume(co,3,4)) print(coroutine.resume(co)) print(coroutine.status(co)) local g=coroutine.wrap(function() for i=1,3 do coroutine.yield(i) end end) print(g(),g(),g())

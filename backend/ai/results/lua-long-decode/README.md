@@ -22,4 +22,6 @@ Run 2026-10-25 15:43-16:14 PT on a local runner. This is the same call as `ai.lo
 - **No behavior is claimed.** Nothing has been run against the C driver. Verified results need the systems harness: generator, `build_rust_lua.sh` and preflight.
 - **No Flash run.** Flash's 65,536-token cap is a third of this reply's output.
 
-How to say it: "Argon translated the Lua 5.4.7 interpreter (25.6K lines of C) into 17,430 lines of safe Rust in one 31-minute reply: 191K output tokens, almost three times Flash's output cap. It type-checks; two borrow-checker errors remain. Behavior not yet verified."
+**Informal, ours:** with 2 hand compile fixes (9 lines), the port builds and matches the C driver byte for byte on 22/22 hand-written smoke scripts (`informal-smoke/`). This is not the verifier.
+
+How to say it: "Argon translated the Lua 5.4.7 interpreter (25.6K lines of C) into 17,430 lines of safe Rust in one 31-minute reply: 191K output tokens, almost three times Flash's output cap. It type-checks; two borrow-checker errors remain. With those two fixed by hand it runs, and matched C on all 22 scripts we tried; the full verifier run comes next."
