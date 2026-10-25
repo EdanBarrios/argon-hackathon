@@ -11,12 +11,12 @@ scripts/selftest.sh            # fetch, build, generate 2000 inputs, verify C ag
 scripts/selftest.sh --count 300 --seed 1   # quicker run
 ```
 
-It exits nonzero unless `match_rate` is 1.0 with 0 divergences, and saves a report to `runs/selftest-<stamp>.json`. Run it before trusting any Rust number: if C against C is not a perfect match, the harness is broken.
+It exits nonzero unless `match_rate` is 1.0 with 0 divergences, and saves a report to `runs/selftest-<stamp>.json`. It then runs the `-O1` driver against a `-O0` build of the same code (`runs/selftest-<stamp>-O0.json`) and fails, listing the inputs, unless every input matches: a difference there means cJSON's behaviour depends on the optimiser, i.e. undefined behaviour the sanitizers did not catch. Run it before trusting any Rust number: if C against C is not a perfect match, the harness is broken.
 
 Pieces (all under `backend/harness/`):
 
 - `fetch_cjson.sh`: shallow-clones cJSON v1.7.19 into `vendor/cJSON` and checks the pinned commit. Idempotent.
-- `build_cjson.sh`: builds `build/cjson_driver` with `clang -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer`.
+- `build_cjson.sh [OUTPUT]`: builds `build/cjson_driver` (or `OUTPUT`) with `clang -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer`. `OPT=-O0` changes the optimisation level; `CJSON_C=<path>` compiles a different `cJSON.c` (used by `mutants.py`).
 - `drivers/cjson_driver.c`: reads stdin, prints one line, `OK\t<cJSON_PrintUnformatted output>` or `PARSE_ERROR at <offset>`. Always exits 0 unless it crashes. A Rust driver must follow the same protocol.
 - `gen_inputs.py`: deterministic inputs (`--seed`, `--count`) into `inputs/cjson/`: cJSON's own test and fuzz seeds, hand-written edge cases, then mutations.
 - `verify.sh` / `verify.py`: the differential verifier.
