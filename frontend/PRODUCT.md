@@ -24,7 +24,7 @@ Theseus doesn't ask the model whether the port works. It runs the original and t
 
 The run view (`/jobs/[id]`) is where a live run is followed: Theseus starts from a translation (Flash's saved first attempt, Argon's, or a fresh Argon translation), verifies it, sends deduped divergence patterns to Argon for repair, re-verifies, runs a held-out check and a CVE check, then waits for human approval, after which a managed agent opens a pull request with the crate and an EVIDENCE.md. The view polls `GET /jobs/{id}` and `/events` every second and falls back to the recorded run (`job_2fc7b6`) when the API is unreachable.
 
-Confirmed jobs on the run view: follow the run live; inspect any divergence (input, C output, Rust output side by side); see Argon's repair and the verifier feedback it was given; see the held-out result; see the CVE input crash C under AddressSanitizer while Rust returns a clean error; approve to open the PR; compare Flash vs Argon; try any input against the real binaries (`POST /try`).
+Confirmed jobs on the run view: follow the run live; inspect any divergence (input, C output, Rust output side by side); see Argon's repair and the verifier feedback it was given; see the held-out result; see the CVE input crash C under AddressSanitizer while Rust returns a clean error; approve to open the PR; try any input against the real binaries (`POST /try`, JSON via cJSON or XML via libexpat).
 
 ## Capabilities and Constraints
 
@@ -42,7 +42,8 @@ Confirmed jobs on the run view: follow the run live; inspect any divergence (inp
 ## Evidence on Hand
 
 - Recorded real run `job_2fc7b6`: `public/fixtures/job-completed.json`, `job-events.json` (Flash draft 559/578 → Argon repair in 91 s → 578/578, held-out 64/64, CVE-2023-53154 ASan report).
-- Flash vs Argon results: `data/baseline.json` (from `results/cjson-flash-vs-argon`).
+- libexpat: about 18,500 lines of C to 6,554 lines of safe Rust; matched on every input we tried (Edan's wording, use exactly).
+- No Flash vs Argon comparison on screen: Argon misses the same 19 targeted inputs in 3 of 4 ports, so a 980 vs 961 claim is not supported.
 - Real code: cJSON.c v1.7.19 and Flash's draft `parse_string` (`data/excerpts.ts`).
 - libexpat results are pending: never fill them in. No customers, testimonials or benchmarks beyond the files above.
 

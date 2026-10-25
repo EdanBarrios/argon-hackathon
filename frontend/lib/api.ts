@@ -182,10 +182,14 @@ export interface TryResult {
   verdict: TryVerdict;
   old_verdict: TryVerdict | null;
   old_c_missing?: string;
+  /** Where C and Rust stdout first differ; null when identical. */
+  first_difference?: { offset: number; line: number; c_bytes: number; rust_bytes: number } | null;
 }
 
+export type TryLibrary = "cjson" | "expat";
+
 export interface TryBody {
-  library: "cjson";
+  library: TryLibrary;
   input: string;
   compare_old?: boolean;
 }
@@ -214,6 +218,25 @@ export async function tryInput(body: TryBody): Promise<TryResult> {
     throw new ApiError(res.status, `POST /try failed (${detail})`);
   }
   return (await res.json()) as TryResult;
+}
+
+export interface TryPreset {
+  id: string;
+  title: string;
+  description: string;
+  input: string;
+}
+
+/** GET /try/presets?library=expat: example inputs served by the backend. */
+export async function tryPresets(library: TryLibrary): Promise<TryPreset[]> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/try/presets?library=${encodeURIComponent(library)}`);
+  } catch {
+    throw new ApiError(0, `API unreachable at ${API_URL}`);
+  }
+  if (!res.ok) throw new ApiError(res.status, `GET /try/presets failed (${res.status})`);
+  return (await res.json()) as TryPreset[];
 }
 
 export const TERMINAL: Status[] = ["completed", "failed", "cancelled"];

@@ -44,8 +44,10 @@ export function Evidence({
         {checks.length ? (
           <ul className="flex flex-col gap-2">
             {checks.map((c, i) => (
-              <li key={i} className="flex items-center gap-3 text-lg">
-                <Mark state={c.ok ? "registered" : "apart"} size={12} />
+              <li key={i} className="flex items-start gap-3 text-lg">
+                <span className="mt-[0.45em] flex">
+                  <Mark state={c.ok ? "registered" : "apart"} size={12} />
+                </span>
                 <span>{c.text}</span>
               </li>
             ))}
