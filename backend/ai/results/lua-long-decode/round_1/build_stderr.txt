@@ -1,0 +1,4 @@
+   Compiling theseus_lua v0.1.0 (<scratch>/build/crate-r1)
+src/lua.rs:930:42: error[E0499]: cannot borrow `self.ci_vec` as mutable more than once at a time: second mutable borrow occurs here
+src/lua.rs:9798:41: error[E0503]: cannot use `pc_inst` because it was mutably borrowed: use of borrowed `pc_inst`
+error: could not compile `theseus_lua` (bin "theseus_lua") due to 2 previous errors

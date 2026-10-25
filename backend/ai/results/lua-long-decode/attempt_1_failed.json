@@ -1,0 +1,4 @@
+{
+  "started": "15:35:35",
+  "error": "TranslateError(\"interaction v1_ChZPSVRlYXJLQ1BZdlVqTWNQNHBUaVdBEhZPSVRlYXJLQ1BZdlVqTWNQNHBUaVdB ended with status 'failed' after 432.7s, usage {'total_input_tokens': 0, 'total_output_tokens': 0, 'total_thought_tokens': 0, 'total_cached_tokens': 0, 'total_tokens': 0}: [Error(code='INTERNAL', message='There was a problem processing your request. You will only be charged for tokens successfully generated.')]\")"
+}

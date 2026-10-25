@@ -103,6 +103,10 @@ n = 2 translations now; before this, n = 2 was two repair runs from one translat
 
 The repair round's reply was the whole file again (73,794 output tokens); it changed only that line. Not yet through the quality gate (round 2: clippy 8, panic lints 180).
 
+## Lua 5.4.7: one long-decode pass, round 1 only (`lua-long-decode/`)
+
+Run 2026-10-25 15:43-16:14 PT. **One reply, 17,430 lines of Rust, 191,440 output tokens** (libexpat: 6,554 lines, 73,653), 1,854 s, $4.69. The prompt was 276,914 tokens from 25,575 lines of C. The build fails only in the borrow checker (2 errors), so the file type-checks. No behavior has been verified yet; that waits on the Lua harness. The first attempt failed server-side (`INTERNAL`, 0 tokens).
+
 ## Files
 
 - `<run>/summary.json`: per-round results, seconds, token usage, held-out block.
