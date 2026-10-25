@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-// No next/font/google on purpose: venue Wi-Fi is unreliable, so we use system stacks.
+// Fonts are self-hosted in public/fonts (see globals.css): venue Wi-Fi is unreliable.
 export const metadata: Metadata = {
   title: "Theseus",
-  description: "C to Rust migration with behavioral evidence",
+  description: "C parsers to memory-safe Rust, with evidence a reviewer can rerun.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="dark h-full antialiased">
-      <body className="min-h-full bg-ink text-neutral-100">{children}</body>
+      <body className="min-h-full bg-ink text-paper">{children}</body>
     </html>
   );
 }
