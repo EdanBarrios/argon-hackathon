@@ -34,7 +34,7 @@ const TONE: Partial<Record<JobEvent["type"], string>> = {
 
 export function EventLog({ events }: { events: JobEvent[] }) {
   return (
-    <details className="rounded-xl border border-line bg-panel p-5">
+    <details className="border-t border-line pt-5">
       <summary className="cursor-pointer text-base font-bold text-dim hover:text-paper">
         Event log ({events.length})
       </summary>

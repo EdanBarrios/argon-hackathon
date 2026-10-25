@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { WallState } from "@/lib/derive";
-import { CountUp } from "./ui";
 
 /** Spread the fill over this long, however many inputs there are. */
 const FILL_MS = 1400;
@@ -54,30 +53,12 @@ export function VerifierWall({ wall, holdout }: { wall: WallState; holdout: { ma
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <div className={`text-6xl font-extrabold tracking-[-0.03em] tabular-nums ${full ? "text-match" : "text-paper"}`}>
-            <CountUp value={round.match} />
-            <span className="text-3xl text-dim"> / {round.total.toLocaleString("en-US")}</span>
-          </div>
-          <div className="mt-1 text-base text-dim">
-            inputs where C and Rust print byte-identical output
-            {round.iteration !== null && (
-              <span className="font-mono text-dim">
-                {" "}
-                · verify #{round.iteration}
-                {wall.rounds.length > 1 && ` of ${wall.rounds.length}`}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex gap-4 font-mono text-sm">
-          <Legend cls="bg-match" label="match" n={round.match} />
-          <Legend cls="bg-div" label="divergence" n={round.div} />
-          {round.crash > 0 && <Legend cls="bg-crash" label="crash" n={round.crash} />}
-        </div>
+      <div className="text-base text-dim">
+        One mark per input, {round.total.toLocaleString("en-US")} in all
+        {round.iteration !== null && <> · verify #{round.iteration}{wall.rounds.length > 1 && ` of ${wall.rounds.length}`}</>}
+        {round.div > 0 && <span className="text-div"> · {round.div} apart</span>}
+        {full && <span className="text-match"> · all byte-identical</span>}
       </div>
-
       <Grid states={states} size={size} revealed={revealed} />
 
       {!onLatest && round.div > 0 && (
@@ -89,7 +70,7 @@ export function VerifierWall({ wall, holdout }: { wall: WallState; holdout: { ma
       {showHoldout && (
         <div className="rise mt-auto border-t border-line pt-3">
           <div className="mb-2 flex items-baseline justify-between font-mono text-sm">
-            <span className="text-dim">Held-out: inputs the model never saw</span>
+            <span className="font-sans text-dim">Held-out inputs the model never saw</span>
             <span className={holdout.match === holdout.total ? "text-match" : "text-div"}>
               {holdout.match}/{holdout.total}
             </span>
@@ -122,14 +103,5 @@ function Grid({ states, size, revealed }: { states: CellState[]; size: number; r
         />
       ))}
     </div>
-  );
-}
-
-function Legend({ cls, label, n }: { cls: string; label: string; n: number }) {
-  return (
-    <span className="flex items-center gap-1.5 text-paper/80">
-      <span className={`h-2.5 w-2.5 rounded-sm ${cls}`} />
-      <CountUp value={n} /> {label}
-    </span>
   );
 }

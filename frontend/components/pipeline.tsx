@@ -15,17 +15,19 @@ export function Pipeline({ steps }: { steps: PipelineStep[] }) {
       {steps.map((s, i) => (
         <li
           key={s.key}
-          className={`rise min-w-0 flex-1 border-t-[3px] pt-2 text-sm ${s.active ? "border-paper" : RULE[s.tone]} ${
+          className={`min-w-0 flex-1 border-t-[3px] pt-2 text-sm ${i < steps.length - 1 ? "hidden md:block" : ""} ${s.active ? "border-paper" : RULE[s.tone]} ${
             s.tone === "neutral" && !s.active ? "text-dim" : "text-paper"
           }`}
         >
           <div className="flex items-center gap-2 font-bold">
             {s.active && <span className="live-dot inline-block h-2 w-2 rounded-full bg-paper" />}
             <span className="truncate">
-              {i + 1} · {s.label}
+              <span className="md:hidden">{i + 1} of {steps.length} · </span>
+              <span className="hidden md:inline">{i + 1} · </span>
+              {s.label}
             </span>
           </div>
-          <div className="truncate font-mono text-xs text-dim">{s.detail}</div>
+          <div className="font-mono text-xs leading-snug text-dim">{s.detail}</div>
         </li>
       ))}
     </ol>

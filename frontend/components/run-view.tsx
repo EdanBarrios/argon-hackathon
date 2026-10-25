@@ -56,10 +56,11 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
   const roundFirst = wall?.rounds[0] ?? null;
   const repair = rows.find((r) => r.repair)?.repair ?? null;
   const openCount = rows.filter((r) => !r.resolved).length;
+  const repairFunctions = [...new Set(rows.filter((r) => r.repair).map((r) => r.function))];
   const working = job.status === "running" || job.status === "verifying" || job.status === "queued";
 
   return (
-    <main className="mx-auto flex max-w-[1440px] flex-col gap-5 px-6 py-4 md:px-12">
+    <main className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 pb-16 pt-4 md:px-12">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-4">
         <Wordmark />
         <span className="text-dim">/</span>
@@ -102,34 +103,30 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           </div>
         )}
         <DivergenceRows rows={rows} confirmed={!!roundLast && roundLast.div === 0 && !(wall?.scanning ?? false)} />
-        {repair && <RepairRow repair={repair} />}
+        {repair && <RepairRow repair={repair} functions={repairFunctions} guessed={rows.some((r) => r.function_guessed)} />}
         {holdout && <HoldoutRow match={holdout.match} total={holdout.total} />}
         {crashes.map((c, i) => (
           <CrashRow key={i} crash={c} />
         ))}
-        <div className="border-t border-line" />
+        <div id="approve" className="scroll-mt-6">
+          <Evidence job={job} source={source} onJob={setJob} wall={wall} holdout={holdout} rows={rows} crashes={crashes} />
+        </div>
       </section>
 
       {(working || (wall && wall.rounds.length > 0)) && (
-        <section className="rounded-md border border-line p-5">
-          <h2 className="mb-4 text-base font-bold">Every input, one mark each</h2>
+        <section className="border-t border-line px-1 pt-6">
+          <h2 className="mb-4 text-xl font-bold">Every input, one mark each</h2>
           {wall ? <VerifierWall wall={wall} holdout={holdout} /> : <p className="text-lg text-dim">Waiting for the first verify round.</p>}
         </section>
       )}
 
-      <section id="approve" className="grid items-start gap-5 lg:grid-cols-2">
-        <div className="rounded-md border border-line p-5">
-          <h2 className="mb-4 text-base font-bold">Evidence report</h2>
-          <Evidence job={job} source={source} onJob={setJob} wall={wall} holdout={holdout} rows={rows} crashes={crashes} />
-        </div>
-        <div className="rounded-md border border-line p-5">
-          <h2 className="mb-4 text-base font-bold">Flash vs Argon</h2>
-          <BaselineCompare />
-        </div>
+      <section className="border-t border-line px-1 pt-6">
+        <h2 className="mb-4 text-xl font-bold">Flash vs Argon</h2>
+        <BaselineCompare />
       </section>
 
-      <section className="rounded-md border border-line p-5">
-        <h2 className="mb-4 text-base font-bold">Try any input</h2>
+      <section className="border-t border-line px-1 pt-6">
+        <h2 className="mb-4 text-xl font-bold">Try any input</h2>
         <TryPanel compact />
       </section>
 
