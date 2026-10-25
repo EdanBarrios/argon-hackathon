@@ -1,0 +1,12 @@
+[package]
+name = "theseus_cjson"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# std only. Do not add dependencies: builds must work offline.
+[dependencies]
+
+[profile.release]
+debug = false
+panic = "unwind"
