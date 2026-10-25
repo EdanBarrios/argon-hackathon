@@ -16,6 +16,7 @@ Base URL: `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`). All bodies ar
 | `GET` | `/jobs` | Jobs this server has run, newest first (in memory; for "Load pre-run") | |
 | `GET` | `/jobs/{id}/cost` | Token usage and USD per model for the job | |
 | `POST` | `/try` | One input run through C, the current Rust binary, and old C for CVE inputs | |
+| `GET` | `/remote-runs` | Managed-agent sandbox runs: sandbox claim vs host re-verify vs held-out (`?include_stubs=true` adds dev stubs) | |
 
 `POST /jobs` body: `{"library": "cjson", "modules": ["lexer"]}` (`modules` optional; omit for the whole library).
 `POST /jobs/{id}/approve` body: `{"approved_by": "<name>"}`.
@@ -43,6 +44,15 @@ Real-mode events carry extra `data` keys the UI may show: `summary` (one human s
 ### `GET /jobs/{id}/cost`
 
 `{"job_id", "models": [{"model", "input_tokens", "cached_tokens", "output_tokens", "thought_tokens", "usd"}], "total_usd"}`. Cached input is billed at 5%, thought tokens at the output rate (see `backend/api/cost.py`). Empty `models` when no model call was made (e.g. `start_from` a saved candidate that already matches).
+
+### `GET /remote-runs`
+
+Newest first, one row per `runs/remote/<stamp>/<library>-<model>/result.json`:
+`run_id`, `library`, `model`, `status`, `seconds`, `cost_usd`, `rounds_used`, `claimed_rounds` (`[{round, build_ok, match_rate}]`),
+`sandbox_match_rate` + `sandbox_behaviors` (the agent's own verify.sh claim), `host_match_rate` + `host_behaviors`
+(host rebuild, same seed), `holdout_match_rate` + `holdout_behaviors` + `holdout_seed` (host, unseen inputs),
+`match_rates_agree` (claim == host), `interaction_id`, `environment_id`, `error`. The UI line is
+"sandbox claims {sandbox_match_rate} -> host re-verified {host_match_rate}" with a check when `match_rates_agree`.
 
 ### `POST /try`
 

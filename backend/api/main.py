@@ -5,7 +5,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import cost, harness, pipeline, pr, try_input
+from . import cost, harness, pipeline, pr, remote_runs, try_input
 from .models import ApproveRequest, CreateJobRequest, Event, Job, JobCost, TryRequest
 from .store import JobNotFound, JobStore
 
@@ -64,6 +64,12 @@ def create_job(
 def list_jobs() -> list[Job]:
     """Jobs this server has run, newest first (in memory; lets the UI load a pre-run)."""
     return store.all_jobs()
+
+
+@app.get("/remote-runs")
+def list_remote_runs(include_stubs: bool = False) -> list[dict[str, Any]]:
+    """Managed-agent sandbox runs: sandbox claim vs host re-verify vs held-out, newest first."""
+    return remote_runs.list_runs(include_stubs)
 
 
 @app.get("/jobs/{job_id}", response_model=Job)
