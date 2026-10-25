@@ -1,0 +1,1168 @@
+{
+ "what": "clang source-based coverage of libexpat R_2_9_0 (a76b1174) under drivers/expat_driver.c, seed 4242, 2000 inputs",
+ "build": "clang -g -O0 -fprofile-instr-generate -fcoverage-mapping -std=c99; xmlparse.c xmlrole.c xmltok.c xcs.c random_dev_urandom.c random_arc4random_buf.c + drivers/expat_driver.c; config/expat_config.h",
+ "toolchain": "Apple clang / llvm-cov 17.0.0 (xcrun)",
+ "inputs": {
+  "seed": 4242,
+  "count": 2000,
+  "runs": 2000,
+  "nonzero_exits": 0,
+  "profraw_files": 2000
+ },
+ "raw_llvm_cov_report": {
+  "files": {
+   "xmlparse.c": {
+    "lines": {
+     "covered": 2628,
+     "count": 6671,
+     "pct": 39.39
+    },
+    "functions": {
+     "covered": 94,
+     "count": 201,
+     "pct": 46.77
+    },
+    "branches": {
+     "covered": 1102,
+     "count": 3768,
+     "pct": 29.25
+    },
+    "regions": {
+     "covered": 2349,
+     "count": 5978,
+     "pct": 39.29
+    }
+   },
+   "xmlrole.c": {
+    "lines": {
+     "covered": 792,
+     "count": 914,
+     "pct": 86.65
+    },
+    "functions": {
+     "covered": 47,
+     "count": 54,
+     "pct": 87.04
+    },
+    "branches": {
+     "covered": 410,
+     "count": 492,
+     "pct": 83.33
+    },
+    "regions": {
+     "covered": 552,
+     "count": 652,
+     "pct": 84.66
+    }
+   },
+   "xmltok.c": {
+    "lines": {
+     "covered": 509,
+     "count": 806,
+     "pct": 63.15
+    },
+    "functions": {
+     "covered": 25,
+     "count": 37,
+     "pct": 67.57
+    },
+    "branches": {
+     "covered": 306,
+     "count": 530,
+     "pct": 57.74
+    },
+    "regions": {
+     "covered": 502,
+     "count": 746,
+     "pct": 67.29
+    }
+   },
+   "xmltok_impl.c": {
+    "lines": {
+     "covered": 1231,
+     "count": 1527,
+     "pct": 80.62
+    },
+    "functions": {
+     "covered": 27,
+     "count": 28,
+     "pct": 96.43
+    },
+    "branches": {
+     "covered": 1201,
+     "count": 2028,
+     "pct": 59.22
+    },
+    "regions": {
+     "covered": 2236,
+     "count": 4381,
+     "pct": 51.04
+    }
+   },
+   "xmltok_ns.c": {
+    "lines": {
+     "covered": 38,
+     "count": 48,
+     "pct": 79.17
+    },
+    "functions": {
+     "covered": 5,
+     "count": 7,
+     "pct": 71.43
+    },
+    "branches": {
+     "covered": 8,
+     "count": 10,
+     "pct": 80
+    },
+    "regions": {
+     "covered": 29,
+     "count": 45,
+     "pct": 64.44
+    }
+   }
+  },
+  "xmltok_combined": {
+   "lines": {
+    "covered": 1778,
+    "count": 2381,
+    "pct": 74.67
+   },
+   "functions": {
+    "covered": 57,
+    "count": 72,
+    "pct": 79.17
+   },
+   "branches": {
+    "covered": 1515,
+    "count": 2568,
+    "pct": 59.0
+   },
+   "regions": {
+    "covered": 2767,
+    "count": 5172,
+    "pct": 53.5
+   }
+  },
+  "parser_total": {
+   "lines": {
+    "covered": 5198,
+    "count": 9966,
+    "pct": 52.16
+   },
+   "functions": {
+    "covered": 198,
+    "count": 327,
+    "pct": 60.55
+   },
+   "branches": {
+    "covered": 3027,
+    "count": 6828,
+    "pct": 44.33
+   },
+   "regions": {
+    "covered": 5668,
+    "count": 11802,
+    "pct": 48.03
+   }
+  }
+ },
+ "in_scope_estimate_lines": {
+  "files": {
+   "xmlparse.c": {
+    "raw_lines": 6717,
+    "raw_lines_hit": 2658,
+    "raw_line_pct": 39.57,
+    "scope_lines": 4190,
+    "scope_lines_hit": 2658,
+    "scope_line_pct": 63.44,
+    "functions_instantiated": 201,
+    "functions_instantiated_hit": 94,
+    "scope_functions": 95,
+    "scope_functions_hit": 94,
+    "in_scope_never_called": [
+     "poolAppendString"
+    ]
+   },
+   "xmltok.c": {
+    "raw_lines": 884,
+    "raw_lines_hit": 572,
+    "raw_line_pct": 64.71,
+    "scope_lines": 651,
+    "scope_lines_hit": 572,
+    "scope_line_pct": 87.86,
+    "functions_instantiated": 39,
+    "functions_instantiated_hit": 26,
+    "scope_functions": 26,
+    "scope_functions_hit": 26,
+    "in_scope_never_called": []
+   },
+   "xmltok_impl.c": {
+    "raw_lines": 1599,
+    "raw_lines_hit": 1374,
+    "raw_line_pct": 85.93,
+    "scope_lines": 1552,
+    "scope_lines_hit": 1374,
+    "scope_line_pct": 88.53,
+    "functions_instantiated": 84,
+    "functions_instantiated_hit": 51,
+    "scope_functions": 81,
+    "scope_functions_hit": 51,
+    "in_scope_never_called": [
+     "big2_attributeValueTok",
+     "big2_cdataSectionTok",
+     "big2_charRefNumber",
+     "big2_entityValueTok",
+     "big2_isPublicId",
+     "big2_predefinedEntityName",
+     "big2_scanCdataSection",
+     "big2_scanCharRef",
+     "big2_scanComment",
+     "big2_scanDecl",
+     "big2_scanHexCharRef",
+     "big2_scanLit",
+     "big2_scanPercent",
+     "big2_scanPoundName",
+     "big2_scanRef",
+     "big2_skipS",
+     "little2_attributeValueTok",
+     "little2_cdataSectionTok",
+     "little2_charRefNumber",
+     "little2_entityValueTok",
+     "little2_isPublicId",
+     "little2_predefinedEntityName",
+     "little2_scanCdataSection",
+     "little2_scanCharRef",
+     "little2_scanComment",
+     "little2_scanHexCharRef",
+     "little2_scanLit",
+     "little2_scanPercent",
+     "little2_scanRef",
+     "little2_skipS"
+    ]
+   },
+   "xmltok_ns.c": {
+    "raw_lines": 48,
+    "raw_lines_hit": 38,
+    "raw_line_pct": 79.17,
+    "scope_lines": 48,
+    "scope_lines_hit": 38,
+    "scope_line_pct": 79.17,
+    "functions_instantiated": 14,
+    "functions_instantiated_hit": 5,
+    "scope_functions": 5,
+    "scope_functions_hit": 5,
+    "in_scope_never_called": []
+   },
+   "xmlrole.c": {
+    "raw_lines": 916,
+    "raw_lines_hit": 794,
+    "raw_line_pct": 86.68,
+    "scope_lines": 838,
+    "scope_lines_hit": 794,
+    "scope_line_pct": 94.75,
+    "functions_instantiated": 54,
+    "functions_instantiated_hit": 47,
+    "scope_functions": 48,
+    "scope_functions_hit": 47,
+    "in_scope_never_called": [
+     "error"
+    ]
+   }
+  },
+  "excluded_functions": [
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ParserCreateNS",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ParserReset",
+    "reason": "public API function the driver never calls",
+    "lines_span": 44
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetEncoding",
+    "reason": "public API function the driver never calls",
+    "lines_span": 24
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ExternalEntityParserCreate",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 170
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_UseParserAsHandlerArg",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_UseForeignDTD",
+    "reason": "public API function the driver never calls",
+    "lines_span": 14
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetReturnNSTriplet",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetUserData",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetBase",
+    "reason": "public API function the driver never calls",
+    "lines_span": 12
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetBase",
+    "reason": "public API function the driver never calls",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetSpecifiedAttributeCount",
+    "reason": "public API function the driver never calls",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetIdAttributeIndex",
+    "reason": "public API function the driver never calls",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetStartElementHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetEndElementHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetStartCdataSectionHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetEndCdataSectionHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetDefaultHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetDefaultHandlerExpand",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetStartDoctypeDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetEndDoctypeDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetUnparsedEntityDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetNotationDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetNamespaceDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetStartNamespaceDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetEndNamespaceDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetNotStandaloneHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetExternalEntityRefHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetExternalEntityRefHandlerArg",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetUnknownEncodingHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetElementDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetAttlistDeclHandler",
+    "reason": "public API function the driver never calls",
+    "lines_span": 4
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetParamEntityParsing",
+    "reason": "public API function the driver never calls",
+    "lines_span": 13
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetHashSalt",
+    "reason": "public API function the driver never calls",
+    "lines_span": 3
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_StopParser",
+    "reason": "public API function the driver never calls",
+    "lines_span": 34
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ResumeParser",
+    "reason": "public API function the driver never calls",
+    "lines_span": 39
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetParsingStatus",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentByteIndex64",
+    "reason": "public API function the driver never calls",
+    "lines_span": 9
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentByteIndex",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentByteCount64",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentByteCount",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetInputContext64",
+    "reason": "public API function the driver never calls",
+    "lines_span": 18
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetInputContext",
+    "reason": "public API function the driver never calls",
+    "lines_span": 30
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentLineNumber",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetCurrentColumnNumber",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_FreeContentModel",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_MemMalloc",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_MemRealloc",
+    "reason": "public API function the driver never calls",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_MemFree",
+    "reason": "public API function the driver never calls",
+    "lines_span": 9
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_DefaultCurrent",
+    "reason": "public API function the driver never calls",
+    "lines_span": 13
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ErrorString",
+    "reason": "public API function the driver never calls",
+    "lines_span": 106
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ExpatVersion",
+    "reason": "public API function the driver never calls",
+    "lines_span": 17
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_ExpatVersionInfo",
+    "reason": "public API function the driver never calls",
+    "lines_span": 9
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetFeatureList",
+    "reason": "public API function the driver never calls",
+    "lines_span": 49
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetBillionLaughsAttackProtectionMaximumAmplification",
+    "reason": "public API function the driver never calls",
+    "lines_span": 7
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetBillionLaughsAttackProtectionActivationThreshold",
+    "reason": "public API function the driver never calls",
+    "lines_span": 7
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetAllocTrackerMaximumAmplification",
+    "reason": "public API function the driver never calls",
+    "lines_span": 7
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetAllocTrackerActivationThreshold",
+    "reason": "public API function the driver never calls",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetReparseDeferralEnabled",
+    "reason": "public API function the driver never calls",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetPropertyBool",
+    "reason": "public API function the driver never calls",
+    "lines_span": 20
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetPropertyDouble",
+    "reason": "public API function the driver never calls",
+    "lines_span": 26
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_SetPropertyUInt64",
+    "reason": "public API function the driver never calls",
+    "lines_span": 27
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetPropertyBool",
+    "reason": "public API function the driver never calls",
+    "lines_span": 24
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetPropertyDouble",
+    "reason": "public API function the driver never calls",
+    "lines_span": 26
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "XML_GetPropertyUInt64",
+    "reason": "public API function the driver never calls",
+    "lines_span": 26
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "testingAccountingGetCountBytesDirect",
+    "reason": "debug/test-only accounting",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "testingAccountingGetCountBytesIndirect",
+    "reason": "debug/test-only accounting",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "unsignedCharToPrintable",
+    "reason": "debug/test-only accounting",
+    "lines_span": 522
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "expat_heap_stat",
+    "reason": "debug/test-only accounting",
+    "lines_span": 11
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "callUnknownEncodingRelease",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 7
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "moveToFreeBindingList",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "moveEntityList",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "callUnknownEncodingConvert",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "accountingReportDiff",
+    "reason": "debug/test-only accounting",
+    "lines_span": 32
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "getContext",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 84
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "addBinding",
+    "reason": "namespaces (XML_ParserCreate(NULL))",
+    "lines_span": 155
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "is_rfc3986_uri_char",
+    "reason": "namespaces (XML_ParserCreate(NULL))",
+    "lines_span": 109
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "cdataSectionProcessor",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 17
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalEntityContentProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 11
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "doIgnoreSection",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 77
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "ignoreSectionProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 12
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "nextScaffoldPart",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 68
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "build_model",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 137
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "xmlSetHashSalt",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 25
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "generate_hash_secret_salt",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 50
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setBillionLaughsAttackProtectionMaximumAmplification",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 14
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setBillionLaughsAttackProtectionActivationThreshold",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 11
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setAllocTrackerMaximumAmplification",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 15
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setAllocTrackerActivationThreshold",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 11
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setReparseDeferralEnabled",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 11
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalEntityInitProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 7
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalEntityInitProcessor2",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 42
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalEntityInitProcessor3",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 49
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalParEntInitProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 17
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "entityValueInitProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 81
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "entityValueProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 42
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "externalParEntProcessor",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 43
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "errorProcessor",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 6
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "reportDefault",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 49
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "setContext",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 70
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "poolCopyStringNoFinish",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 13
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "dtdReset",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 40
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "hashTableClear",
+    "reason": "suspend, reset, re-parse after error, or multi-call parsing",
+    "lines_span": 8
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "dtdCopy",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 149
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "copyEntityTable",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 60
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "poolCopyStringN",
+    "reason": "external entities / external subset / conditional sections",
+    "lines_span": 21
+   },
+   {
+    "file": "xmlparse.c",
+    "name": "copyString",
+    "reason": "handler or option the driver never sets (default handler, element-decl content model, unknown-encoding handler, protocol encoding, entropy salt)",
+    "lines_span": 21
+   },
+   {
+    "file": "xmltok.c",
+    "name": "XmlUtf16Encode",
+    "reason": "UTF-16 XML_Char output (XML_UNICODE builds only)",
+    "lines_span": 15
+   },
+   {
+    "file": "xmltok.c",
+    "name": "XmlSizeOfUnknownEncoding",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 3
+   },
+   {
+    "file": "xmltok.c",
+    "name": "XmlInitUnknownEncoding",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 69
+   },
+   {
+    "file": "xmltok.c",
+    "name": "XmlInitUnknownEncodingNS",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 6
+   },
+   {
+    "file": "xmltok.c",
+    "name": "latin1_toUtf16",
+    "reason": "UTF-16 XML_Char output (XML_UNICODE builds only)",
+    "lines_span": 10
+   },
+   {
+    "file": "xmltok.c",
+    "name": "unknown_isName",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 7
+   },
+   {
+    "file": "xmltok.c",
+    "name": "unknown_isNmstrt",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 7
+   },
+   {
+    "file": "xmltok.c",
+    "name": "unknown_isInvalid",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 5
+   },
+   {
+    "file": "xmltok.c",
+    "name": "unknown_toUtf8",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 27
+   },
+   {
+    "file": "xmltok.c",
+    "name": "unknown_toUtf16",
+    "reason": "unknown-encoding handler not set",
+    "lines_span": 18
+   },
+   {
+    "file": "xmltok.c",
+    "name": "utf8_toUtf16",
+    "reason": "UTF-16 XML_Char output (XML_UNICODE builds only)",
+    "lines_span": 53
+   },
+   {
+    "file": "xmltok.c",
+    "name": "little2_toUtf16",
+    "reason": "UTF-16 XML_Char output (XML_UNICODE builds only)",
+    "lines_span": 18
+   },
+   {
+    "file": "xmltok.c",
+    "name": "big2_toUtf16",
+    "reason": "UTF-16 XML_Char output (XML_UNICODE builds only)",
+    "lines_span": 18
+   },
+   {
+    "file": "xmltok_impl.c",
+    "name": "normal_ignoreSectionTok",
+    "reason": "conditional sections (external subset only)",
+    "lines_span": 47
+   },
+   {
+    "file": "xmltok_impl.c",
+    "name": "little2_ignoreSectionTok",
+    "reason": "conditional sections (external subset only)",
+    "lines_span": 47
+   },
+   {
+    "file": "xmltok_impl.c",
+    "name": "big2_ignoreSectionTok",
+    "reason": "conditional sections (external subset only)",
+    "lines_span": 47
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "XmlGetUtf16InternalEncoding",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 11
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "XmlGetUtf8InternalEncodingNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 3
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "XmlGetUtf16InternalEncodingNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 11
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "XmlInitEncodingNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 12
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "XmlParseXmlDeclNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 5
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "initScanContent",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 4
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "initScanPrologNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 4
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "initScanContentNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 4
+   },
+   {
+    "file": "xmltok_ns.c",
+    "name": "findEncodingNS",
+    "reason": "namespace-aware encoding init (XML_ParserCreate(NULL))",
+    "lines_span": 16
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "XmlPrologStateInitExternalEntity",
+    "reason": "external subset / conditional sections",
+    "lines_span": 5
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "externalSubset1",
+    "reason": "external subset / conditional sections",
+    "lines_span": 23
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "condSect0",
+    "reason": "external subset / conditional sections",
+    "lines_span": 17
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "condSect1",
+    "reason": "external subset / conditional sections",
+    "lines_span": 14
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "condSect2",
+    "reason": "external subset / conditional sections",
+    "lines_span": 13
+   },
+   {
+    "file": "xmlrole.c",
+    "name": "externalSubset0",
+    "reason": "external subset / conditional sections",
+    "lines_span": 6
+   }
+  ],
+  "total_parser_files": {
+   "raw_lines": 10164,
+   "raw_lines_hit": 5436,
+   "scope_lines": 7279,
+   "scope_lines_hit": 5436,
+   "raw_line_pct": 53.48,
+   "scope_line_pct": 74.68
+  }
+ },
+ "xmlparse_called_functions_most_missed_regions": [
+  {
+   "name": "doProlog",
+   "regions_missed": 321,
+   "regions_total": 662,
+   "calls": 2000
+  },
+  {
+   "name": "storeAtts",
+   "regions_missed": 161,
+   "regions_total": 263,
+   "calls": 124383
+  },
+  {
+   "name": "doContent",
+   "regions_missed": 109,
+   "regions_total": 310,
+   "calls": 2288515
+  },
+  {
+   "name": "getAttributeId",
+   "regions_missed": 49,
+   "regions_total": 61,
+   "calls": 3410
+  },
+  {
+   "name": "storeEntityValue",
+   "regions_missed": 45,
+   "regions_total": 86,
+   "calls": 243
+  },
+  {
+   "name": "parserCreate",
+   "regions_missed": 40,
+   "regions_total": 94,
+   "calls": 2000
+  },
+  {
+   "name": "expat_realloc",
+   "regions_missed": 40,
+   "regions_total": 77,
+   "calls": 198
+  },
+  {
+   "name": "handleUnknownEncoding",
+   "regions_missed": 32,
+   "regions_total": 35,
+   "calls": 4
+  },
+  {
+   "name": "doCdataSection",
+   "regions_missed": 32,
+   "regions_total": 63,
+   "calls": 28
+  },
+  {
+   "name": "expat_heap_increase_tolerable",
+   "regions_missed": 27,
+   "regions_total": 46,
+   "calls": 241250
+  }
+ ]
+}
