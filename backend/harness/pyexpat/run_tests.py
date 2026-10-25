@@ -56,6 +56,9 @@ def run(label: str, extra_path: str | None, root: Path) -> dict:
                             "print(pyexpat.EXPAT_VERSION);print(_elementtree.__file__)"],
                            env=env, capture_output=True, text=True)
     (d / "probe.txt").write_text(probe.stdout + probe.stderr)
+    if extra_path and probe.stdout.count(extra_path) < 2:
+        sys.exit(f"{label}: our pyexpat/_elementtree did not load from {extra_path}:\n"
+                 f"{probe.stdout}{probe.stderr}")
     for s in SUITES:
         t = time.time()
         try:
