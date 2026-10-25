@@ -2,24 +2,31 @@ You are the **AI role (A)** on Theseus in `/Users/brendankeane/Documents/GitHub/
 
 ## Goal
 
-Run the Rust quality optimizer from `feat/ai-quality` on **libexpat**, the next repo. It is the big, proven port and has never been through the quality gate. Then, if there is time, prepare the third repo (below). The deliverable is a committed `backend/ai/results/expat-quality/` with numbers that come only from harness and tool output.
+Run the Rust quality optimizer (merged to main at `f5c4ac6`) on **libexpat**, the next repo. It is the big, proven port and has never been through the quality gate. Then, if there is time, prepare the third repo (below). The deliverable is a committed `backend/ai/results/expat-quality/` with numbers that come only from harness and tool output.
 
 "Perfected" means: held-out match 1.0, `cargo fmt --check` clean on the generated file, default `cargo clippy` at 0 (`-D warnings` exits 0), panic lints (`indexing_slicing`, `unwrap_used`, `expect_used`, `panic`) as low as possible without changing behavior, and 0 Rust crashes on every input set.
 
-## Where things stand (13:15)
+## Where things stand (13:50)
 
-- **main** has the libexpat results: Argon's one-pass port (6,555 lines, `backend/ai/results/expat-long-decode/argon-fresh-a/round_3/expat.rs`) needed 3 lines of compile fixes, then matched 747/747 loop inputs and 1,253/1,253 held-out. Edan's independent host re-verify on fresh seed 4242: 2000/2000 (`results/libexpat-host-reverify/`). Flash produced no file.
-- **`feat/ai-quality`** (pushed, `7fbcaeb`, not yet on main) has the optimizer: `backend/ai/quality.py` (rustfmt and clippy counts on the generated file only, in a temp crate built from `target.crate_template`), `loop.host_fix` (host `cargo clippy --fix` + rustfmt, then rebuild and reverify; the fix is kept only if the loop rate is no lower, crashes are no higher and lints are no worse), polish rounds (`--polish-rounds`, lint-only turns after the build matches every loop input; a polish that breaks behavior is never chosen, and the next round repairs it), and prompt rule 7 (lint-clean) **in the cJSON system instruction only**.
+- **libexpat behavior is done, n = 2.** Argon's one-pass port (6,554 lines, `backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs`) needed only compile fixes. Two independent repair runs from that file, with identical settings, both pass **747/747** loop inputs and **1,253/1,253** held-out:
+  - `argon-fresh-a/round_3/expat.rs`: 3 changed lines, two compile fixes only (`round1_to_round3.diff`).
+  - `argon-fresh-b/round_4/expat.rs`: the same two fixes, plus `tag_stack.pop().unwrap()` replaced by a `let ... else { return XML_ERROR_ASYNC_ENTITY }` (`round1_to_round4.diff`).
+  - Edan's independent host re-verify on fresh seed 4242: 2000/2000 (`results/libexpat-host-reverify/`). Flash produced no file.
+- **The optimizer is on main** (`f5c4ac6`): `backend/ai/quality.py` (rustfmt and clippy counts on the generated file only, in a temp crate built from `target.crate_template`), `loop.host_fix` (host `cargo clippy --fix` + rustfmt, then rebuild and reverify; kept only if the loop rate is no lower, crashes are no higher and lints are no worse), polish rounds (`--polish-rounds`; a polish that breaks behavior is never chosen, and the next round repairs it), and prompt rule 7 (lint-clean) **in the cJSON system instruction only**.
   - cJSON result: clippy 3 → **0**, panic lints 41 → **0**, held-out 763/763, targeted 980/980, $0.67 (`backend/ai/results/cjson-quality/`). One polish of the older port broke `\t`/`\r` print escapes on 6/300 and was correctly rejected, so the guard is real.
 - **libexpat target today:** `polish_rounds=0` and no lint rule in `EXPAT_SYSTEM_INSTRUCTION`, so the optimizer is wired but switched off for it. libexpat has no adversarial corpus (`adversarial_run=None`), so its evidence is the loop corpus + held-out.
+- **Stage answers** for the 815K input tokens, the two compile fixes, and what the quality gate checks are in `backend/ai/results/QA.md`. If your run changes any of those facts (for example libexpat clippy numbers), update QA.md too. Until then, "0 clippy" is a cJSON claim only.
+- **Not yet on main:** branch `feat/ai-expat-evidence` (`bcb73ab`: argon-fresh-b, QA.md, this handoff). If `git log origin/main` does not show it, ask the user to run `git push -u origin feat/ai-expat-evidence` and open the PR; merge it into your branch so you have the files.
+- **Running on this machine:** mock API on :8000 and the Next.js dev server on :3000 (started by the previous session). Leave them alone unless the user asks.
 
 ## First steps
 
 1. **Work in your own worktree.** Another session shares the main checkout and switches branches in it; that is how commits ended up on the wrong branch earlier. Put the worktree under `.claude/worktrees/` (excluded via `.git/info/exclude`), so `translate._load_key` still finds the repo-root `.env` by walking up:
    ```bash
    cd /Users/brendankeane/Documents/GitHub/argon-hackathon1
-   git fetch -q && git worktree add .claude/worktrees/ai-expat-quality -b feat/ai-expat-quality origin/feat/ai-quality
-   cd .claude/worktrees/ai-expat-quality && echo ai > .role && git merge --no-edit origin/main
+   git fetch -q && git worktree add .claude/worktrees/ai-expat-quality -b feat/ai-expat-quality origin/main
+   cd .claude/worktrees/ai-expat-quality && echo ai > .role
+   git merge --no-edit origin/feat/ai-expat-evidence   # only if it is not on main yet
    cd backend && THESEUS_ROOT=/Users/brendankeane/Documents/GitHub/argon-hackathon1 uv run pytest -q
    ```
    Always pass `THESEUS_ROOT=` the main checkout: the vendored libexpat, the ASan build and the generated inputs live there (gitignored), not in the worktree.
@@ -28,12 +35,12 @@ Run the Rust quality optimizer from `feat/ai-quality` on **libexpat**, the next 
 
 ## Test plan, cheapest first
 
-1. **Measure only, no model call.** Use the passing port as round 1, with the host fix on and polish off:
+1. **Measure only, no model call (about 5 min each).** Measure both passing ports as round 1, with the host fix on and polish off. Run b has one fewer `unwrap`, so its panic-lint count may be lower; pick the better one as the polish starting point (behavior is identical on every input). Command for a (for b, use `argon-fresh-b/round_4/expat.rs` and `--out ../runs/ai/expat-quality/measure-b`):
    ```bash
    uv run python -m ai.loop --target expat --model gemini-4-argon --rounds 1 --seed 1 --count 300 \
      --holdout-count 2000 --jobs 4 --timeout 20 \
      --start-from ../backend/ai/results/expat-long-decode/argon-fresh-a/round_3/expat.rs \
-     --out ../runs/ai/expat-quality/measure
+     --out ../runs/ai/expat-quality/measure-a
    ```
    Record fmt, clippy warnings, panic lints, `arithmetic_side_effects` and whether `host_fix` was kept. This is the baseline row. Expect hundreds of `indexing_slicing` sites in a byte-level parser; that is the honest starting point.
 2. **Turn polish on for libexpat** (prompt changes go in `prompts.py` only):
@@ -43,10 +50,10 @@ Run the Rust quality optimizer from `feat/ai-quality` on **libexpat**, the next 
    ```bash
    uv run python -m ai.loop --target expat --model gemini-4-argon --rounds 4 --polish-rounds 3 --fresh-repair \
      --seed 1 --count 300 --holdout-count 2000 --jobs 4 --timeout 20 \
-     --start-from ../backend/ai/results/expat-long-decode/argon-fresh-a/round_3/expat.rs \
+     --start-from <the port you picked in step 1> \
      --out ../runs/ai/expat-quality/polish
    ```
-   About 10 min per round, about 40 min total. Start it by 1:45 so the result exists before the freeze.
+   About 10 min per round, about 40 min total. **Start it by 2:30 at the latest** so the result is committed before the 3:30 freeze. If it is later than that, commit the step-1 measurement alone: it is still a real, honest row.
 3. **Independent recheck.** Adapt `backend/ai/results/cjson-quality/recheck.py` (it rebuilds and reverifies independently of `backend/ai`; read it first) for the chosen libexpat build, and send C the file so C can re-verify on a fresh seed as before.
 4. **Commit** `backend/ai/results/expat-quality/` (summary.json, every round's verify, held-out and quality json, the chosen `expat.rs`, the diff from the passing port, and a README table: before vs after for each metric). Replace the local home path with `<repo>`, and grep for keys before committing. Open the PR from your branch; the user runs `git push` and `gh pr create --body-file <file>` (long `--body` strings get cut when pasted).
 
