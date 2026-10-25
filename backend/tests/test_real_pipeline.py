@@ -68,6 +68,8 @@ def fake(monkeypatch, tmp_path):
     monkeypatch.setattr(RealPipeline, "build_step", build_step)
     monkeypatch.setattr(RealPipeline, "verify_step", verify_step)
     monkeypatch.setattr(RealPipeline, "inputs_step", lambda self, n: tmp_path)
+    (tmp_path / "holdout").mkdir()
+    (tmp_path / "holdout" / "h1").write_text("[1]")
     monkeypatch.setattr(RealPipeline, "holdout_step", lambda self, n, seen: (tmp_path / "holdout", 3))
     monkeypatch.setattr(RealPipeline, "c_source_step", lambda self: "/* cJSON */")
     monkeypatch.setattr(RealPipeline, "cve_step", lambda self, b: {
@@ -243,3 +245,15 @@ def test_extra_inputs_reach_verify(client, fake, monkeypatch, tmp_path):
 
 def test_unknown_extra_inputs_is_400(client, fake):
     assert client.post("/jobs", json={"extra_inputs": ["../etc"]}).status_code == 400
+
+
+def test_empty_holdout_emits_no_zero_rate(client, fake, monkeypatch, tmp_path):
+    (tmp_path / "empty").mkdir()
+    asked = []
+    monkeypatch.setattr(RealPipeline, "holdout_step",
+                        lambda self, n, seen: asked.append(n) or (tmp_path / "empty", 236))
+    job = client.post("/jobs", json={"rounds": 3, "inputs": 10}).json()
+    assert wait(client, job["id"])["status"] == "completed"
+    assert asked == [300]  # small counts are raised so unseen inputs exist
+    events = client.get(f"/jobs/{job['id']}/events").json()
+    assert not [e for e in events if e["type"] == "verify" and e["data"].get("holdout")]

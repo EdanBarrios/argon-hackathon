@@ -155,6 +155,7 @@ class MockPipeline:
 AGENT_ID = "agent_cjson"
 AGENT_MODULE = "cjson parse+print"
 MAX_EVENT_DIVERGENCES = 10
+HOLDOUT_MIN_COUNT = 300
 
 
 _NUMBERISH = re.compile(r"^(-?[0-9]|-?inf|-?nan|null)", re.IGNORECASE)
@@ -470,12 +471,16 @@ class RealPipeline:
         if request.holdout and not request.inputs_dir:
             emit("job_status", None, {"status": "verifying"})
             t0 = time.monotonic()
-            hdir, overlap = self.holdout_step(request.inputs, inputs_dir)
-            report = self.verify_step(best_bin, hdir)
+            # gen_inputs.py always emits ~236 fixed files (cJSON tests + edge cases) that every seed shares,
+            # so a small count has no unseen inputs left after the overlap is removed. Use at least 300.
+            hdir, overlap = self.holdout_step(max(request.inputs, HOLDOUT_MIN_COUNT), inputs_dir)
+            empty = not any(p.is_file() and not p.name.startswith(".") for p in Path(hdir).iterdir())
+            report = {"behaviors_tested": 0, "counts": {}} if empty else self.verify_step(best_bin, hdir)
             secs = timed("holdout_verify", t0, inputs=report.get("behaviors_tested"))
             counts = report.get("counts") or {}
             holdout = {"match_rate": report.get("match_rate"), "behaviors_tested": report.get("behaviors_tested"),
                        "overlap_removed": overlap, "counts": counts, "inputs": str(hdir)}
+        if holdout and holdout["behaviors_tested"]:  # no event when nothing unseen was left to run
             emit("verify", AGENT_ID, {
                 **_scored(report),
                 "iteration": best_iter, "holdout": True, "match_rate": float(report.get("match_rate") or 0.0),
