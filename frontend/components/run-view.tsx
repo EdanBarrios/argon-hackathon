@@ -8,6 +8,7 @@ import { EventLog } from "./event-log";
 import { Evidence } from "./evidence";
 import { Lanes } from "./lanes";
 import { Pipeline } from "./pipeline";
+import { RunBanner } from "./run-banner";
 import { CrashRow, DivergenceRows, HoldoutRow, PlateHeads, RepairRow, TotalsRow } from "./plates";
 import { Ticker } from "./ticker";
 import { TryPanel } from "./try-panel";
@@ -85,6 +86,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
         </div>
       )}
 
+      <RunBanner job={job} steps={steps} round={roundLast} />
       <Pipeline steps={steps} />
       <Ticker text={latestSummary(events)} />
 
