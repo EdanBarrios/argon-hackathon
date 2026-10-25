@@ -42,3 +42,11 @@ python3 -I backend/harness/mutants.py --inputs backend/harness/inputs/cjson [--t
 ```
 
 For each of a fixed list of single-site mutations in cJSON's parse/print path (flipped comparisons, off-by-one bounds, changed constants such as the nesting limit or `%1.15g`, a dropped escape case, a narrower whitespace test, and so on), it copies the vendored `cJSON.c` to a temp dir, applies the one exact-string substitution (it errors out, naming the mutation, if a site does not match exactly once), builds a driver with `build_cjson.sh`, and runs `verify.sh` with the unmutated driver against the mutant. A mutant is KILLED if any input does not match, SURVIVED otherwise. It prints one JSON report (`mutants`, `killed`, `survived`, `kill_rate`, per-mutant counts and example inputs), lists survivors on stderr and exits 1 if any survived. A survivor is not a harness bug: it names behaviour the generated inputs never exercise. About 45 s for 300 inputs on 8 cores.
+
+## C coverage
+
+```bash
+scripts/coverage.sh [--inputs backend/harness/inputs/cjson]
+```
+
+Builds an instrumented driver (`-fprofile-instr-generate -fcoverage-mapping`, no sanitizers), runs every input through it, merges the profiles with `xcrun llvm-profdata` and prints one JSON line: line, branch, function and region coverage of `cJSON.c`, plus region and branch coverage per parse/print function. Whole-file numbers are low because `cJSON.c` is mostly API the driver never calls; the per-function numbers are the useful ones. Reported only, never a gate.
