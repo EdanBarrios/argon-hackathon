@@ -10,3 +10,4 @@ Anyone may add rows. Newest at the bottom.
 | pending (kickoff) | Target library (cJSON vs inih) | Requirements in docs/PLAN.md section 2 | Team |
 | pending (11:15) | Sandbox (remote) vs local runner | Depends on A's smoke test | A + C |
 | pending | Backend host | | C |
+| 10:31 | Repair loops use thinking_level medium, lead planner high | Organizer guide; speed for live demo | C |
