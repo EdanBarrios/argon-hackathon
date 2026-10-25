@@ -74,18 +74,20 @@ def test_create_and_poll_until_completed(client):
 
 def test_agent_lanes_move_during_replay(client, monkeypatch):
     monkeypatch.setenv("THESEUS_MOCK_DURATION", "1.0")
+    # The fixture is a real recorded run, so read the agent and its first verify rate from it.
+    first = next(e for e in fixture("job-events.json") if e["type"] == "verify")
     job_id = client.post("/jobs", json={"library": "cjson"}).json()["id"]
-    printer_rates = set()
+    rates = set()
     deadline = time.monotonic() + 7
     while time.monotonic() < deadline:
         job = client.get(f"/jobs/{job_id}").json()
-        printer = next(a for a in job["agents"] if a["id"] == "agent_printer")
-        printer_rates.add(printer["match_rate"])
+        agent = next(a for a in job["agents"] if a["id"] == first["agent_id"])
+        rates.add(agent["match_rate"])
         if job["status"] == "completed":
             break
         time.sleep(0.01)
-    assert 0.64 in printer_rates
-    assert 1.0 in printer_rates
+    assert first["data"]["match_rate"] in rates
+    assert 1.0 in rates
 
 
 def test_events_after(client):
