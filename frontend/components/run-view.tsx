@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
 import { crashViews, divergenceRows, holdoutResult, latestSummary, pipelineSteps, wallState } from "@/lib/derive";
+import { isPlaceholderPr } from "./approval";
 import { EventLog } from "./event-log";
 import { Evidence } from "./evidence";
 import { Lanes } from "./lanes";
@@ -71,7 +72,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
         <span className="ml-auto flex items-center gap-4">
           {source === "fixture" ? <SampleBadge notice={notice} /> : notice && <span className="text-sm text-dim">{notice}</span>}
           <a href="#approve" className={`rounded-md px-4 py-2 text-base font-bold transition ${job.status === "completed" ? "bg-paper text-ink hover:bg-white" : "border border-line text-dim"}`}>
-            {job.approval.pr_url ? "PR opened" : job.approval.approved_by ? "Approved" : "Approve and open PR"}
+            {job.approval.pr_url && !isPlaceholderPr(job.approval.pr_url) ? "PR opened" : job.approval.approved_by ? "Approved" : "Approve and open PR"}
           </a>
         </span>
       </header>
