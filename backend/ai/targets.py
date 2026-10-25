@@ -44,6 +44,9 @@ class Target:
     # Follow-up turns allowed when a reply hits the output cap; 0 keeps the old
     # behaviour (retry once at a lower thinking level).
     continue_turns: int = 0
+    # Script that runs the committed adversarial corpora against one Rust binary
+    # (C's harness); None when the target has none yet.
+    adversarial_run: str | None = None
 
 
 def _cjson_gen(root: Path, seed: int, count: int, out: Path) -> list[str]:
@@ -65,6 +68,7 @@ CJSON = Target(
     build_c="backend/harness/build_cjson.sh",
     build_rust="scripts/build_rust.sh",
     gen_inputs=_cjson_gen,
+    adversarial_run="backend/harness/adversarial/run.sh",
 )
 
 

@@ -12,10 +12,16 @@ Harness tools, the cJSON sources, the C driver and runs/ are taken from the
 THESEUS_ROOT. Each round saves cjson.rs, build.json, verify.json, the feedback
 sent, usage and seconds under <out>/round_N/, and summary.json at the end.
 
-Held-out check: after the last round, the last good build is verified once more on
+Held-out check: after the last round, the best build (highest loop match rate; the
+later round wins a tie, as in api.pipeline) is verified once more on
 inputs from --holdout-seed (default seed + 1000), minus any input whose bytes also
 appear in the loop's input set. The model never sees these inputs or their results,
 so summary.json's "holdout" rate is the number to quote, not the loop's own rate.
+
+Adversarial check: when the target has committed adversarial corpora (cJSON), the
+same best build also runs through C's adversarial/run.sh, and summary.json gets
+per-corpus rates under "adversarial". Generated inputs alone cannot tell Argon from
+Flash on cJSON (both 1.0 held-out); the targeted corpus can (980/980 vs 961/980).
 """
 
 from __future__ import annotations
@@ -137,6 +143,44 @@ def add_first_diffs(divergences: list[dict], inputs: Path, c_driver: Path, rust_
         return list(pool.map(one, divergences))
 
 
+ADVERSARIAL_CORPORA = ("targeted", "argon", "human")
+
+
+def run_adversarial(root: Path, script: str, binary: str, label: str) -> dict:
+    """Run C's adversarial/run.sh on one binary; returns {corpus: rates} from its reports.
+
+    run.sh stages each corpus (dropping README/REASONS files), runs verify.sh at
+    --timeout 20 and writes runs/adversarial/<label>-<corpus>.json. A corpus with no
+    inputs gets no report and is left out.
+    """
+    reports = {c: root / "runs/adversarial" / f"{label}-{c}.json" for c in ADVERSARIAL_CORPORA}
+    for report in reports.values():
+        report.unlink(missing_ok=True)  # a reused --out must not pick up an old report
+    proc = subprocess.run([str(root / script), binary, label, *ADVERSARIAL_CORPORA],
+                          capture_output=True, text=True, timeout=3600)
+    out: dict = {}
+    for corpus, report in reports.items():
+        if not report.is_file():
+            continue
+        data = json.loads(report.read_text())
+        out[corpus] = {"match_rate": data.get("match_rate"),
+                                             "behaviors_tested": data.get("behaviors_tested"),
+                                             "counts": data.get("counts"), "report": str(report)}
+    if not out:
+        out["error"] = (proc.stderr + proc.stdout)[-2000:]
+    return out
+
+
+def usd(usage: dict) -> float:
+    """Cost of one call's usage at the prices in api/cost.py (one source for pricing)."""
+    from api.cost import usd_for
+
+    return usd_for(input_tokens=int(usage.get("total_input_tokens") or 0),
+                   cached_tokens=int(usage.get("total_cached_tokens") or 0),
+                   output_tokens=int(usage.get("total_output_tokens") or 0),
+                   thought_tokens=int(usage.get("total_thought_tokens") or 0))
+
+
 def tokens(usage: dict) -> int:
     return sum(int(usage.get(k) or 0) for k in ("total_input_tokens", "total_output_tokens", "total_thought_tokens"))
 
@@ -165,6 +209,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--continue-turns", type=int,
                     help="follow-up turns when a reply hits the output cap (default: the target's, 0 for cjson)")
     ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
+    ap.add_argument("--no-adversarial", action="store_true", help="skip the adversarial corpora check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     args = ap.parse_args(argv)
 
@@ -191,7 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     rounds: list[dict] = []
     prev: TranslateResult | None = None
     feedback: dict | None = None
-    last_good_binary: str | None = None
+    best: tuple[float, str, int] | None = None  # (loop match rate, binary, round)
     final_rate = None
     for n in range(1, args.rounds + 1):
         rdir = out / f"round_{n}"
@@ -223,7 +268,6 @@ def main(argv: list[str] | None = None) -> int:
 
         verify = None
         if build.get("ok"):
-            last_good_binary = build["binary"]
             verify, raw = run_json(
                 [str(verify_sh), "--c", str(c_driver), "--rust", build["binary"],
                  "--inputs", str(inputs), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
@@ -244,6 +288,11 @@ def main(argv: list[str] | None = None) -> int:
                        timeouts=counts.get("timeout"), safety_improvements=counts.get("safety_improvement"),
                        behaviors_tested=verify.get("behaviors_tested"))
             final_rate = verify.get("match_rate")
+            # Same rule as api.pipeline: keep the best build, later round wins a tie,
+            # so a repair that regresses never becomes the build we hold out.
+            rate = float(final_rate or 0.0)
+            if best is None or rate >= best[0]:
+                best = (rate, build["binary"], n)
         else:
             feedback = {"compile_errors": build.get("errors") or "build failed", "divergences": [], "crashes": []}
             rec.update(match_rate=None, divergences=None, crashes=None)
@@ -260,6 +309,7 @@ def main(argv: list[str] | None = None) -> int:
         if verify and verify.get("match_rate") == 1.0:
             break
 
+    best_binary = best[1] if best else None
     summary: dict = {
         "model": args.model,
         "target": target.name,
@@ -268,15 +318,18 @@ def main(argv: list[str] | None = None) -> int:
         "inputs": str(inputs),
         "verify_timeout": args.timeout,
         "final_match_rate": final_rate,
+        "best_round": best[2] if best else None,
+        "best_match_rate": best[0] if best else None,
         "rounds_to_100": next((r["round"] for r in rounds if r.get("match_rate") == 1.0), None),
         "total_model_seconds": round(sum(r.get("seconds") or 0 for r in rounds), 1),
         "total_tokens": {k: sum(int((r.get("usage") or {}).get(k) or 0) for r in rounds)
                          for k in ("total_input_tokens", "total_output_tokens", "total_thought_tokens", "total_cached_tokens")},
+        "usd": round(sum(usd(r.get("usage") or {}) for r in rounds), 4),
         "rounds": rounds,
     }
-    if args.final_inputs and last_good_binary:
+    if args.final_inputs and best_binary:
         final, _ = run_json(
-            [str(verify_sh), "--c", str(c_driver), "--rust", last_good_binary,
+            [str(verify_sh), "--c", str(c_driver), "--rust", best_binary,
              "--inputs", str(Path(args.final_inputs).resolve()), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
             timeout=3600,
         )
@@ -286,14 +339,14 @@ def main(argv: list[str] | None = None) -> int:
                                      "behaviors_tested": final.get("behaviors_tested"),
                                      "counts": final.get("counts")}
             print(f"[loop] final verify on {args.final_inputs}: match_rate {final.get('match_rate')} {final.get('counts')}")
-    if not args.no_holdout and last_good_binary:
+    if not args.no_holdout and best_binary:
         seed = args.holdout_seed if args.holdout_seed is not None else args.seed + 1000
         hdir, overlap = holdout_inputs(root, args.holdout_count, seed, inputs, target)
         held = {"seed": seed, "inputs": str(hdir), "overlap_removed": overlap,
                 "behaviors_tested": sum(1 for p in hdir.iterdir() if p.is_file())}
         if held["behaviors_tested"]:
             hv, raw = run_json(
-                [str(verify_sh), "--c", str(c_driver), "--rust", last_good_binary,
+                [str(verify_sh), "--c", str(c_driver), "--rust", best_binary,
                  "--inputs", str(hdir), "--timeout", str(args.timeout), "--jobs", str(args.jobs)],
                 timeout=1800,
             )
@@ -305,6 +358,12 @@ def main(argv: list[str] | None = None) -> int:
         summary["holdout"] = held
         print(f"[loop] held-out seed {seed} ({held['behaviors_tested']} unseen inputs, {overlap} overlap removed): "
               f"match_rate {held.get('match_rate')} {held.get('counts')}", flush=True)
+    if target.adversarial_run and not args.no_adversarial and best_binary:
+        summary["adversarial"] = run_adversarial(root, target.adversarial_run, best_binary,
+                                                 f"loop-{out.name}")
+        print(f"[loop] adversarial: " + ", ".join(
+            f"{k} {v.get('counts', {}).get('match')}/{v.get('behaviors_tested')}"
+            for k, v in summary["adversarial"].items() if isinstance(v, dict)), flush=True)
     write_json(out / "summary.json", summary)
     print(f"[loop] summary: {out / 'summary.json'}", flush=True)
     return 0
