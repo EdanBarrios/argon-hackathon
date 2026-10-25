@@ -1,0 +1,4252 @@
+[
+ {
+  "file": "expat_driver.c",
+  "name": "main",
+  "count": 2000,
+  "start": 337,
+  "end": 385,
+  "span": 49,
+  "regions_covered": 20,
+  "regions_total": 24
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "read_stdin",
+  "count": 2000,
+  "start": 303,
+  "end": 334,
+  "span": 32,
+  "regions_covered": 20,
+  "regions_total": 29
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_xmldecl",
+  "count": 306,
+  "start": 175,
+  "end": 183,
+  "span": 9,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "put_str",
+  "count": 250865,
+  "start": 119,
+  "end": 125,
+  "span": 7,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "put_quoted_n",
+  "count": 250341,
+  "start": 97,
+  "end": 116,
+  "span": 20,
+  "regions_covered": 14,
+  "regions_total": 14
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "out_char",
+  "count": 16537099,
+  "start": 78,
+  "end": 80,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "out_bytes",
+  "count": 16785375,
+  "start": 58,
+  "end": 75,
+  "span": 18,
+  "regions_covered": 15,
+  "regions_total": 17
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "out_int",
+  "count": 1502,
+  "start": 88,
+  "end": 92,
+  "span": 5,
+  "regions_covered": 6,
+  "regions_total": 7
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_doctype_start",
+  "count": 902,
+  "start": 188,
+  "end": 198,
+  "span": 11,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_doctype_end",
+  "count": 423,
+  "start": 201,
+  "end": 205,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_entity_decl",
+  "count": 291,
+  "start": 211,
+  "end": 230,
+  "span": 20,
+  "regions_covered": 9,
+  "regions_total": 9
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_start",
+  "count": 124367,
+  "start": 233,
+  "end": 246,
+  "span": 14,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_end",
+  "count": 116175,
+  "start": 249,
+  "end": 255,
+  "span": 7,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_text",
+  "count": 1087269,
+  "start": 147,
+  "end": 169,
+  "span": 23,
+  "regions_covered": 17,
+  "regions_total": 20
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_pi",
+  "count": 73,
+  "start": 258,
+  "end": 266,
+  "span": 9,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_comment",
+  "count": 227,
+  "start": 269,
+  "end": 275,
+  "span": 7,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_cdata_start",
+  "count": 28,
+  "start": 278,
+  "end": 282,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_cdata_end",
+  "count": 22,
+  "start": 285,
+  "end": 289,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "on_skipped",
+  "count": 3,
+  "start": 292,
+  "end": 298,
+  "span": 7,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "flush_text",
+  "count": 244817,
+  "start": 135,
+  "end": 144,
+  "span": 10,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "expat_driver.c",
+  "name": "out_cstr",
+  "count": 246774,
+  "start": 83,
+  "end": 85,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "random_arc4random_buf.c",
+  "name": "writeRandomBytes_arc4random_buf",
+  "count": 0,
+  "start": 45,
+  "end": 49,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "random_dev_urandom.c",
+  "name": "writeRandomBytes_dev_urandom",
+  "count": 0,
+  "start": 48,
+  "end": 74,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 20
+ },
+ {
+  "file": "xcs.c",
+  "name": "xcslen",
+  "count": 1346136,
+  "start": 45,
+  "end": 60,
+  "span": 16,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xcs.c",
+  "name": "xcscmp",
+  "count": 0,
+  "start": 63,
+  "end": 75,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xcs.c",
+  "name": "xcsncmp",
+  "count": 0,
+  "start": 78,
+  "end": 90,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParserCreate",
+  "count": 2000,
+  "start": 1061,
+  "end": 1063,
+  "span": 3,
+  "regions_covered": 3,
+  "regions_total": 3
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParserCreateNS",
+  "count": 0,
+  "start": 1066,
+  "end": 1069,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParserCreate_MM",
+  "count": 2000,
+  "start": 1294,
+  "end": 1296,
+  "span": 3,
+  "regions_covered": 3,
+  "regions_total": 3
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParserReset",
+  "count": 0,
+  "start": 1595,
+  "end": 1638,
+  "span": 44,
+  "regions_covered": 0,
+  "regions_total": 21
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEncoding",
+  "count": 0,
+  "start": 1654,
+  "end": 1677,
+  "span": 24,
+  "regions_covered": 0,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ExternalEntityParserCreate",
+  "count": 0,
+  "start": 1681,
+  "end": 1850,
+  "span": 170,
+  "regions_covered": 0,
+  "regions_total": 32
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParserFree",
+  "count": 2000,
+  "start": 1865,
+  "end": 1942,
+  "span": 78,
+  "regions_covered": 33,
+  "regions_total": 36
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_UseParserAsHandlerArg",
+  "count": 0,
+  "start": 1945,
+  "end": 1948,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_UseForeignDTD",
+  "count": 0,
+  "start": 1951,
+  "end": 1964,
+  "span": 14,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetReturnNSTriplet",
+  "count": 0,
+  "start": 1967,
+  "end": 1974,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetUserData",
+  "count": 0,
+  "start": 1977,
+  "end": 1984,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetBase",
+  "count": 0,
+  "start": 1987,
+  "end": 1998,
+  "span": 12,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetBase",
+  "count": 0,
+  "start": 2001,
+  "end": 2005,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetSpecifiedAttributeCount",
+  "count": 0,
+  "start": 2008,
+  "end": 2012,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetIdAttributeIndex",
+  "count": 0,
+  "start": 2015,
+  "end": 2019,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetElementHandler",
+  "count": 2000,
+  "start": 2023,
+  "end": 2028,
+  "span": 6,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetStartElementHandler",
+  "count": 0,
+  "start": 2031,
+  "end": 2034,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEndElementHandler",
+  "count": 0,
+  "start": 2037,
+  "end": 2040,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetCharacterDataHandler",
+  "count": 2000,
+  "start": 2044,
+  "end": 2047,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetProcessingInstructionHandler",
+  "count": 2000,
+  "start": 2051,
+  "end": 2054,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetCommentHandler",
+  "count": 2000,
+  "start": 2057,
+  "end": 2060,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetCdataSectionHandler",
+  "count": 2000,
+  "start": 2065,
+  "end": 2070,
+  "span": 6,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetStartCdataSectionHandler",
+  "count": 0,
+  "start": 2074,
+  "end": 2077,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEndCdataSectionHandler",
+  "count": 0,
+  "start": 2081,
+  "end": 2084,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetDefaultHandler",
+  "count": 0,
+  "start": 2087,
+  "end": 2092,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetDefaultHandlerExpand",
+  "count": 0,
+  "start": 2095,
+  "end": 2100,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetDoctypeDeclHandler",
+  "count": 2000,
+  "start": 2104,
+  "end": 2109,
+  "span": 6,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetStartDoctypeDeclHandler",
+  "count": 0,
+  "start": 2113,
+  "end": 2116,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEndDoctypeDeclHandler",
+  "count": 0,
+  "start": 2119,
+  "end": 2122,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetUnparsedEntityDeclHandler",
+  "count": 0,
+  "start": 2126,
+  "end": 2129,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetNotationDeclHandler",
+  "count": 0,
+  "start": 2132,
+  "end": 2135,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetNamespaceDeclHandler",
+  "count": 0,
+  "start": 2140,
+  "end": 2145,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetStartNamespaceDeclHandler",
+  "count": 0,
+  "start": 2149,
+  "end": 2152,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEndNamespaceDeclHandler",
+  "count": 0,
+  "start": 2156,
+  "end": 2159,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetNotStandaloneHandler",
+  "count": 0,
+  "start": 2163,
+  "end": 2166,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetExternalEntityRefHandler",
+  "count": 0,
+  "start": 2170,
+  "end": 2173,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetExternalEntityRefHandlerArg",
+  "count": 0,
+  "start": 2176,
+  "end": 2183,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetSkippedEntityHandler",
+  "count": 2000,
+  "start": 2187,
+  "end": 2190,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetUnknownEncodingHandler",
+  "count": 0,
+  "start": 2194,
+  "end": 2199,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetElementDeclHandler",
+  "count": 0,
+  "start": 2202,
+  "end": 2205,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetAttlistDeclHandler",
+  "count": 0,
+  "start": 2208,
+  "end": 2211,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetEntityDeclHandler",
+  "count": 2000,
+  "start": 2214,
+  "end": 2217,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetXmlDeclHandler",
+  "count": 2000,
+  "start": 2220,
+  "end": 2223,
+  "span": 4,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetParamEntityParsing",
+  "count": 0,
+  "start": 2227,
+  "end": 2239,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetHashSalt",
+  "count": 0,
+  "start": 2272,
+  "end": 2274,
+  "span": 3,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetHashSalt16Bytes",
+  "count": 2000,
+  "start": 2277,
+  "end": 2298,
+  "span": 22,
+  "regions_covered": 14,
+  "regions_total": 22
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_Parse",
+  "count": 2000,
+  "start": 2301,
+  "end": 2411,
+  "span": 111,
+  "regions_covered": 33,
+  "regions_total": 48
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ParseBuffer",
+  "count": 2000,
+  "start": 2414,
+  "end": 2496,
+  "span": 83,
+  "regions_covered": 21,
+  "regions_total": 44
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetBuffer",
+  "count": 2000,
+  "start": 2522,
+  "end": 2614,
+  "span": 93,
+  "regions_covered": 40,
+  "regions_total": 64
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_StopParser",
+  "count": 0,
+  "start": 2622,
+  "end": 2655,
+  "span": 34,
+  "regions_covered": 0,
+  "regions_total": 29
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ResumeParser",
+  "count": 0,
+  "start": 2658,
+  "end": 2696,
+  "span": 39,
+  "regions_covered": 0,
+  "regions_total": 21
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetParsingStatus",
+  "count": 0,
+  "start": 2699,
+  "end": 2704,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 14
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetErrorCode",
+  "count": 1659,
+  "start": 2707,
+  "end": 2711,
+  "span": 5,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentByteIndex64",
+  "count": 0,
+  "start": 2714,
+  "end": 2722,
+  "span": 9,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentByteIndex",
+  "count": 0,
+  "start": 2726,
+  "end": 2733,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentByteCount64",
+  "count": 0,
+  "start": 2736,
+  "end": 2743,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentByteCount",
+  "count": 0,
+  "start": 2747,
+  "end": 2752,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetInputContext64",
+  "count": 0,
+  "start": 2755,
+  "end": 2772,
+  "span": 18,
+  "regions_covered": 0,
+  "regions_total": 18
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetInputContext",
+  "count": 0,
+  "start": 2776,
+  "end": 2805,
+  "span": 30,
+  "regions_covered": 0,
+  "regions_total": 19
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentLineNumber64",
+  "count": 1659,
+  "start": 2808,
+  "end": 2817,
+  "span": 10,
+  "regions_covered": 8,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentLineNumber",
+  "count": 0,
+  "start": 2821,
+  "end": 2828,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentColumnNumber64",
+  "count": 1659,
+  "start": 2831,
+  "end": 2840,
+  "span": 10,
+  "regions_covered": 8,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetCurrentColumnNumber",
+  "count": 0,
+  "start": 2844,
+  "end": 2851,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_FreeContentModel",
+  "count": 0,
+  "start": 2854,
+  "end": 2861,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_MemMalloc",
+  "count": 0,
+  "start": 2864,
+  "end": 2871,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_MemRealloc",
+  "count": 0,
+  "start": 2874,
+  "end": 2881,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_MemFree",
+  "count": 0,
+  "start": 2884,
+  "end": 2892,
+  "span": 9,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_DefaultCurrent",
+  "count": 0,
+  "start": 2895,
+  "end": 2907,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ErrorString",
+  "count": 0,
+  "start": 2910,
+  "end": 3015,
+  "span": 106,
+  "regions_covered": 0,
+  "regions_total": 49
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ExpatVersion",
+  "count": 0,
+  "start": 3018,
+  "end": 3034,
+  "span": 17,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_ExpatVersionInfo",
+  "count": 0,
+  "start": 3037,
+  "end": 3045,
+  "span": 9,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetFeatureList",
+  "count": 0,
+  "start": 3048,
+  "end": 3096,
+  "span": 49,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetBillionLaughsAttackProtectionMaximumAmplification",
+  "count": 0,
+  "start": 3118,
+  "end": 3124,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetBillionLaughsAttackProtectionActivationThreshold",
+  "count": 0,
+  "start": 3142,
+  "end": 3148,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetAllocTrackerMaximumAmplification",
+  "count": 0,
+  "start": 3170,
+  "end": 3176,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetAllocTrackerActivationThreshold",
+  "count": 0,
+  "start": 3194,
+  "end": 3199,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetReparseDeferralEnabled",
+  "count": 0,
+  "start": 3216,
+  "end": 3220,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetPropertyBool",
+  "count": 0,
+  "start": 3224,
+  "end": 3243,
+  "span": 20,
+  "regions_covered": 0,
+  "regions_total": 22
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetPropertyDouble",
+  "count": 0,
+  "start": 3247,
+  "end": 3272,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 22
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_SetPropertyUInt64",
+  "count": 0,
+  "start": 3276,
+  "end": 3302,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 22
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetPropertyBool",
+  "count": 0,
+  "start": 3306,
+  "end": 3329,
+  "span": 24,
+  "regions_covered": 0,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetPropertyDouble",
+  "count": 0,
+  "start": 3333,
+  "end": 3358,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "XML_GetPropertyUInt64",
+  "count": 0,
+  "start": 3362,
+  "end": 3387,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "testingAccountingGetCountBytesDirect",
+  "count": 0,
+  "start": 9071,
+  "end": 9075,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "testingAccountingGetCountBytesIndirect",
+  "count": 0,
+  "start": 9078,
+  "end": 9082,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "unsignedCharToPrintable",
+  "count": 0,
+  "start": 9162,
+  "end": 9683,
+  "span": 522,
+  "regions_covered": 0,
+  "regions_total": 276
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "parserCreate",
+  "count": 2000,
+  "start": 1301,
+  "end": 1476,
+  "span": 176,
+  "regions_covered": 54,
+  "regions_total": 94
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "expat_heap_increase_tolerable",
+  "count": 241250,
+  "start": 861,
+  "end": 891,
+  "span": 31,
+  "regions_covered": 19,
+  "regions_total": 46
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "getDebugLevel",
+  "count": 8000,
+  "start": 9688,
+  "end": 9704,
+  "span": 17,
+  "regions_covered": 4,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "expat_heap_stat",
+  "count": 0,
+  "start": 847,
+  "end": 857,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "expat_malloc",
+  "count": 241229,
+  "start": 898,
+  "end": 944,
+  "span": 47,
+  "regions_covered": 20,
+  "regions_total": 36
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "dtdCreate",
+  "count": 2000,
+  "start": 7864,
+  "end": 7894,
+  "span": 31,
+  "regions_covered": 10,
+  "regions_total": 11
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hashTableInit",
+  "count": 11234,
+  "start": 8379,
+  "end": 8385,
+  "span": 7,
+  "regions_covered": 2,
+  "regions_total": 2
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolInit",
+  "count": 8000,
+  "start": 8404,
+  "end": 8411,
+  "span": 8,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "isCalledFromInsideHandler",
+  "count": 8000,
+  "start": 1187,
+  "end": 1189,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "callUnknownEncodingRelease",
+  "count": 0,
+  "start": 1192,
+  "end": 1198,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 3
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "beforeHandler",
+  "count": 1330086,
+  "start": 1175,
+  "end": 1178,
+  "span": 4,
+  "regions_covered": 5,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "afterHandler",
+  "count": 1330086,
+  "start": 1181,
+  "end": 1184,
+  "span": 4,
+  "regions_covered": 5,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "moveToFreeBindingList",
+  "count": 0,
+  "start": 1574,
+  "end": 1581,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 3
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "moveEntityList",
+  "count": 0,
+  "start": 1585,
+  "end": 1592,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "expat_free",
+  "count": 374635,
+  "start": 951,
+  "end": 980,
+  "span": 30,
+  "regions_covered": 19,
+  "regions_total": 35
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "parserInit",
+  "count": 2000,
+  "start": 1479,
+  "end": 1570,
+  "span": 92,
+  "regions_covered": 55,
+  "regions_total": 56
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "prologInitProcessor",
+  "count": 2000,
+  "start": 5266,
+  "end": 5272,
+  "span": 7,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "initializeEncoding",
+  "count": 2000,
+  "start": 5095,
+  "end": 5122,
+  "span": 28,
+  "regions_covered": 5,
+  "regions_total": 7
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "handleUnknownEncoding",
+  "count": 4,
+  "start": 5219,
+  "end": 5262,
+  "span": 44,
+  "regions_covered": 3,
+  "regions_total": 35
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "callUnknownEncodingConvert",
+  "count": 0,
+  "start": 1201,
+  "end": 1208,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "prologProcessor",
+  "count": 2000,
+  "start": 5475,
+  "end": 5481,
+  "span": 7,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "doProlog",
+  "count": 2000,
+  "start": 5486,
+  "end": 6607,
+  "span": 1122,
+  "regions_covered": 341,
+  "regions_total": 662
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "accountingDiffTolerated",
+  "count": 3659486,
+  "start": 9018,
+  "end": 9068,
+  "span": 51,
+  "regions_covered": 23,
+  "regions_total": 30
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "accountingGetCurrentAmplification",
+  "count": 2563831,
+  "start": 8937,
+  "end": 8952,
+  "span": 16,
+  "regions_covered": 7,
+  "regions_total": 13
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "accountingReportStats",
+  "count": 1,
+  "start": 8955,
+  "end": 8971,
+  "span": 17,
+  "regions_covered": 8,
+  "regions_total": 15
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "accountingReportDiff",
+  "count": 0,
+  "start": 8982,
+  "end": 9013,
+  "span": 32,
+  "regions_covered": 0,
+  "regions_total": 33
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "accountingOnAbort",
+  "count": 1,
+  "start": 8974,
+  "end": 8976,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "processXmlDecl",
+  "count": 361,
+  "start": 5126,
+  "end": 5216,
+  "span": 91,
+  "regions_covered": 59,
+  "regions_total": 71
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolStoreString",
+  "count": 1233906,
+  "start": 8523,
+  "end": 8529,
+  "span": 7,
+  "regions_covered": 5,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "lookup",
+  "count": 1344583,
+  "start": 8356,
+  "end": 8358,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "lookupWithLength",
+  "count": 1344583,
+  "start": 8250,
+  "end": 8338,
+  "span": 89,
+  "regions_covered": 61,
+  "regions_total": 82
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hash",
+  "count": 1344277,
+  "start": 8219,
+  "end": 8227,
+  "span": 9,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip24_valid",
+  "count": 0,
+  "start": 290,
+  "end": 375,
+  "span": 86,
+  "regions_covered": 0,
+  "regions_total": 7
+ },
+ {
+  "file": "siphash.h",
+  "name": "siphash24",
+  "count": 0,
+  "start": 273,
+  "end": 276,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "copy_salt_to_sipkey",
+  "count": 1344277,
+  "start": 8211,
+  "end": 8216,
+  "span": 6,
+  "regions_covered": 6,
+  "regions_total": 11
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip24_init",
+  "count": 1344277,
+  "start": 194,
+  "end": 204,
+  "span": 11,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip24_update",
+  "count": 1344277,
+  "start": 209,
+  "end": 230,
+  "span": 22,
+  "regions_covered": 10,
+  "regions_total": 10
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip_round",
+  "count": 2690750,
+  "start": 169,
+  "end": 191,
+  "span": 23,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip24_final",
+  "count": 1344277,
+  "start": 233,
+  "end": 270,
+  "span": 38,
+  "regions_covered": 10,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "keyeq",
+  "count": 1341216,
+  "start": 8189,
+  "end": 8203,
+  "span": 15,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "keylen",
+  "count": 1345127,
+  "start": 8206,
+  "end": 8208,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "normalizePublicId",
+  "count": 12,
+  "start": 7843,
+  "end": 7861,
+  "span": 19,
+  "regions_covered": 17,
+  "regions_total": 17
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "contentProcessor",
+  "count": 7045,
+  "start": 3445,
+  "end": 3455,
+  "span": 11,
+  "regions_covered": 7,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "doContent",
+  "count": 2288515,
+  "start": 3581,
+  "end": 4096,
+  "span": 516,
+  "regions_covered": 201,
+  "regions_total": 310
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "getContext",
+  "count": 0,
+  "start": 7685,
+  "end": 7768,
+  "span": 84,
+  "regions_covered": 0,
+  "regions_total": 64
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolAppendChars",
+  "count": 1087,
+  "start": 688,
+  "end": 700,
+  "span": 13,
+  "regions_covered": 10,
+  "regions_total": 14
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolGrowUntil",
+  "count": 1087,
+  "start": 8665,
+  "end": 8675,
+  "span": 11,
+  "regions_covered": 7,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolGrow",
+  "count": 13499,
+  "start": 8560,
+  "end": 8662,
+  "span": 103,
+  "regions_covered": 37,
+  "regions_total": 53
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolBytesToAllocateFor",
+  "count": 2730,
+  "start": 8532,
+  "end": 8557,
+  "span": 26,
+  "regions_covered": 9,
+  "regions_total": 12
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hashTableIterInit",
+  "count": 2000,
+  "start": 8388,
+  "end": 8391,
+  "span": 4,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hashTableIterNext",
+  "count": 3234,
+  "start": 8394,
+  "end": 8401,
+  "span": 8,
+  "regions_covered": 7,
+  "regions_total": 7
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "storeAtts",
+  "count": 124383,
+  "start": 4136,
+  "end": 4551,
+  "span": 416,
+  "regions_covered": 102,
+  "regions_total": 263
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setElementTypePrefix",
+  "count": 225,
+  "start": 7592,
+  "end": 7618,
+  "span": 27,
+  "regions_covered": 6,
+  "regions_total": 20
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "addBinding",
+  "count": 0,
+  "start": 4669,
+  "end": 4823,
+  "span": 155,
+  "regions_covered": 0,
+  "regions_total": 126
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "is_rfc3986_uri_char",
+  "count": 0,
+  "start": 4554,
+  "end": 4662,
+  "span": 109,
+  "regions_covered": 0,
+  "regions_total": 87
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "freeBindings",
+  "count": 10154,
+  "start": 4103,
+  "end": 4121,
+  "span": 19,
+  "regions_covered": 2,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "epilogProcessor",
+  "count": 370,
+  "start": 6611,
+  "end": 6685,
+  "span": 75,
+  "regions_covered": 28,
+  "regions_total": 43
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "doCdataSection",
+  "count": 28,
+  "start": 4854,
+  "end": 4987,
+  "span": 134,
+  "regions_covered": 31,
+  "regions_total": 63
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "cdataSectionProcessor",
+  "count": 0,
+  "start": 4830,
+  "end": 4846,
+  "span": 17,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalEntityContentProcessor",
+  "count": 0,
+  "start": 3566,
+  "end": 3576,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "storeRawNames",
+  "count": 6393,
+  "start": 3395,
+  "end": 3441,
+  "span": 47,
+  "regions_covered": 15,
+  "regions_total": 25
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "getElementType",
+  "count": 272,
+  "start": 8888,
+  "end": 8909,
+  "span": 22,
+  "regions_covered": 12,
+  "regions_total": 18
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "getAttributeId",
+  "count": 3410,
+  "start": 7622,
+  "end": 7680,
+  "span": 59,
+  "regions_covered": 12,
+  "regions_total": 61
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolAppendString",
+  "count": 0,
+  "start": 8515,
+  "end": 8519,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolAppend",
+  "count": 1244455,
+  "start": 8450,
+  "end": 8463,
+  "span": 14,
+  "regions_covered": 13,
+  "regions_total": 17
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "defineAttribute",
+  "count": 266,
+  "start": 7527,
+  "end": 7589,
+  "span": 63,
+  "regions_covered": 43,
+  "regions_total": 52
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolAppendChar",
+  "count": 1237450,
+  "start": 679,
+  "end": 685,
+  "span": 7,
+  "regions_covered": 6,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "storeAttributeValue",
+  "count": 98,
+  "start": 6840,
+  "end": 6913,
+  "span": 74,
+  "regions_covered": 47,
+  "regions_total": 59
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "appendAttributeValue",
+  "count": 21234,
+  "start": 6918,
+  "end": 7107,
+  "span": 190,
+  "regions_covered": 85,
+  "regions_total": 108
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "callStoreEntityValue",
+  "count": 243,
+  "start": 7302,
+  "end": 7368,
+  "span": 67,
+  "regions_covered": 15,
+  "regions_total": 40
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "storeEntityValue",
+  "count": 243,
+  "start": 7113,
+  "end": 7297,
+  "span": 185,
+  "regions_covered": 41,
+  "regions_total": 86
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "doIgnoreSection",
+  "count": 0,
+  "start": 5014,
+  "end": 5090,
+  "span": 77,
+  "regions_covered": 0,
+  "regions_total": 26
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "ignoreSectionProcessor",
+  "count": 0,
+  "start": 4996,
+  "end": 5007,
+  "span": 12,
+  "regions_covered": 0,
+  "regions_total": 7
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "expat_realloc",
+  "count": 198,
+  "start": 987,
+  "end": 1057,
+  "span": 71,
+  "regions_covered": 37,
+  "regions_total": 77
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "nextScaffoldPart",
+  "count": 0,
+  "start": 8678,
+  "end": 8745,
+  "span": 68,
+  "regions_covered": 0,
+  "regions_total": 41
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "processEntity",
+  "count": 1214781,
+  "start": 6689,
+  "end": 6744,
+  "span": 56,
+  "regions_covered": 16,
+  "regions_total": 27
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "internalEntityProcessor",
+  "count": 3485077,
+  "start": 6748,
+  "end": 6826,
+  "span": 79,
+  "regions_covered": 36,
+  "regions_total": 45
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "triggerReenter",
+  "count": 3610872,
+  "start": 2617,
+  "end": 2619,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "entityTrackingOnOpen",
+  "count": 1214781,
+  "start": 9119,
+  "end": 9131,
+  "span": 13,
+  "regions_covered": 8,
+  "regions_total": 13
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "entityTrackingReportStats",
+  "count": 2429505,
+  "start": 9086,
+  "end": 9116,
+  "span": 31,
+  "regions_covered": 7,
+  "regions_total": 25
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "entityTrackingOnClose",
+  "count": 1214724,
+  "start": 9134,
+  "end": 9140,
+  "span": 7,
+  "regions_covered": 6,
+  "regions_total": 11
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "build_model",
+  "count": 0,
+  "start": 8748,
+  "end": 8884,
+  "span": 137,
+  "regions_covered": 0,
+  "regions_total": 31
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "reportProcessingInstruction",
+  "count": 73,
+  "start": 7424,
+  "end": 7449,
+  "span": 26,
+  "regions_covered": 7,
+  "regions_total": 12
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "normalizeLines",
+  "count": 300,
+  "start": 7402,
+  "end": 7420,
+  "span": 19,
+  "regions_covered": 16,
+  "regions_total": 16
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "reportComment",
+  "count": 227,
+  "start": 7453,
+  "end": 7471,
+  "span": 19,
+  "regions_covered": 5,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "parserBusy",
+  "count": 2000,
+  "start": 1641,
+  "end": 1651,
+  "span": 11,
+  "regions_covered": 4,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "destroyBindings",
+  "count": 117763,
+  "start": 1853,
+  "end": 1862,
+  "span": 10,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "xmlSetHashSalt",
+  "count": 0,
+  "start": 2244,
+  "end": 2268,
+  "span": 25,
+  "regions_covered": 0,
+  "regions_total": 23
+ },
+ {
+  "file": "siphash.h",
+  "name": "sip_tokey",
+  "count": 2000,
+  "start": 150,
+  "end": 154,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "ENTROPY_DEBUG",
+  "count": 2000,
+  "start": 1111,
+  "end": 1120,
+  "span": 10,
+  "regions_covered": 2,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "startParsing",
+  "count": 2000,
+  "start": 1276,
+  "end": 1289,
+  "span": 14,
+  "regions_covered": 4,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "generate_hash_secret_salt",
+  "count": 0,
+  "start": 1123,
+  "end": 1172,
+  "span": 50,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "callProcessor",
+  "count": 2000,
+  "start": 1212,
+  "end": 1273,
+  "span": 62,
+  "regions_covered": 17,
+  "regions_total": 25
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setParserBuffer",
+  "count": 2000,
+  "start": 2500,
+  "end": 2519,
+  "span": 20,
+  "regions_covered": 3,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setBillionLaughsAttackProtectionMaximumAmplification",
+  "count": 0,
+  "start": 3101,
+  "end": 3114,
+  "span": 14,
+  "regions_covered": 0,
+  "regions_total": 21
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setBillionLaughsAttackProtectionActivationThreshold",
+  "count": 0,
+  "start": 3128,
+  "end": 3138,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setAllocTrackerMaximumAmplification",
+  "count": 0,
+  "start": 3152,
+  "end": 3166,
+  "span": 15,
+  "regions_covered": 0,
+  "regions_total": 21
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setAllocTrackerActivationThreshold",
+  "count": 0,
+  "start": 3180,
+  "end": 3190,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setReparseDeferralEnabled",
+  "count": 0,
+  "start": 3203,
+  "end": 3213,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalEntityInitProcessor",
+  "count": 0,
+  "start": 3459,
+  "end": 3465,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalEntityInitProcessor2",
+  "count": 0,
+  "start": 3469,
+  "end": 3510,
+  "span": 42,
+  "regions_covered": 0,
+  "regions_total": 20
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalEntityInitProcessor3",
+  "count": 0,
+  "start": 3514,
+  "end": 3562,
+  "span": 49,
+  "regions_covered": 0,
+  "regions_total": 22
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalParEntInitProcessor",
+  "count": 0,
+  "start": 5278,
+  "end": 5294,
+  "span": 17,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "entityValueInitProcessor",
+  "count": 0,
+  "start": 5298,
+  "end": 5378,
+  "span": 81,
+  "regions_covered": 0,
+  "regions_total": 36
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "entityValueProcessor",
+  "count": 0,
+  "start": 5428,
+  "end": 5469,
+  "span": 42,
+  "regions_covered": 0,
+  "regions_total": 20
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "externalParEntProcessor",
+  "count": 0,
+  "start": 5382,
+  "end": 5424,
+  "span": 43,
+  "regions_covered": 0,
+  "regions_total": 21
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "errorProcessor",
+  "count": 0,
+  "start": 6830,
+  "end": 6835,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "reportDefault",
+  "count": 0,
+  "start": 7475,
+  "end": 7523,
+  "span": 49,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "setContext",
+  "count": 0,
+  "start": 7771,
+  "end": 7840,
+  "span": 70,
+  "regions_covered": 0,
+  "regions_total": 60
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolCopyStringNoFinish",
+  "count": 0,
+  "start": 8477,
+  "end": 8489,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "dtdReset",
+  "count": 0,
+  "start": 7897,
+  "end": 7936,
+  "span": 40,
+  "regions_covered": 0,
+  "regions_total": 11
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hashTableDestroy",
+  "count": 11234,
+  "start": 8371,
+  "end": 8376,
+  "span": 6,
+  "regions_covered": 3,
+  "regions_total": 3
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "hashTableClear",
+  "count": 0,
+  "start": 8361,
+  "end": 8368,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "dtdDestroy",
+  "count": 2000,
+  "start": 7939,
+  "end": 7963,
+  "span": 25,
+  "regions_covered": 7,
+  "regions_total": 7
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "dtdCopy",
+  "count": 0,
+  "start": 7970,
+  "end": 8118,
+  "span": 149,
+  "regions_covered": 0,
+  "regions_total": 79
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "copyEntityTable",
+  "count": 0,
+  "start": 8122,
+  "end": 8181,
+  "span": 60,
+  "regions_covered": 0,
+  "regions_total": 44
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolCopyStringN",
+  "count": 0,
+  "start": 8492,
+  "end": 8512,
+  "span": 21,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolClear",
+  "count": 126160,
+  "start": 8414,
+  "end": 8430,
+  "span": 17,
+  "regions_covered": 9,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolDestroy",
+  "count": 8000,
+  "start": 8433,
+  "end": 8446,
+  "span": 14,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "poolCopyString",
+  "count": 1009,
+  "start": 8466,
+  "end": 8472,
+  "span": 7,
+  "regions_covered": 3,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "copyString",
+  "count": 0,
+  "start": 8912,
+  "end": 8932,
+  "span": 21,
+  "regions_covered": 0,
+  "regions_total": 14
+ },
+ {
+  "file": "xmlparse.c",
+  "name": "getRootParserOf",
+  "count": 6826318,
+  "start": 9145,
+  "end": 9157,
+  "span": 13,
+  "regions_covered": 9,
+  "regions_total": 15
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "XmlPrologStateInit",
+  "count": 2000,
+  "start": 1238,
+  "end": 1245,
+  "span": 8,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "XmlPrologStateInitExternalEntity",
+  "count": 0,
+  "start": 1250,
+  "end": 1254,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "prolog0",
+  "count": 1874,
+  "start": 143,
+  "end": 170,
+  "span": 28,
+  "regions_covered": 12,
+  "regions_total": 12
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "prolog1",
+  "count": 800,
+  "start": 174,
+  "end": 202,
+  "span": 29,
+  "regions_covered": 10,
+  "regions_total": 11
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype0",
+  "count": 1907,
+  "start": 226,
+  "end": 239,
+  "span": 14,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype1",
+  "count": 1850,
+  "start": 243,
+  "end": 265,
+  "span": 23,
+  "regions_covered": 10,
+  "regions_total": 10
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "internalSubset",
+  "count": 4029,
+  "start": 336,
+  "end": 375,
+  "span": 40,
+  "regions_covered": 16,
+  "regions_total": 17
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity0",
+  "count": 674,
+  "start": 418,
+  "end": 433,
+  "span": 16,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity1",
+  "count": 98,
+  "start": 437,
+  "end": 449,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity7",
+  "count": 82,
+  "start": 545,
+  "end": 565,
+  "span": 21,
+  "regions_covered": 9,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity9",
+  "count": 30,
+  "start": 585,
+  "end": 597,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity10",
+  "count": 22,
+  "start": 601,
+  "end": 613,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "externalSubset1",
+  "count": 0,
+  "start": 390,
+  "end": 412,
+  "span": 23,
+  "regions_covered": 0,
+  "regions_total": 14
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "condSect0",
+  "count": 0,
+  "start": 1124,
+  "end": 1140,
+  "span": 17,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "condSect1",
+  "count": 0,
+  "start": 1144,
+  "end": 1157,
+  "span": 14,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "condSect2",
+  "count": 0,
+  "start": 1161,
+  "end": 1173,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity8",
+  "count": 2,
+  "start": 569,
+  "end": 581,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "declClose",
+  "count": 1087,
+  "start": 1179,
+  "end": 1191,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity2",
+  "count": 556,
+  "start": 453,
+  "end": 473,
+  "span": 21,
+  "regions_covered": 9,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity4",
+  "count": 89,
+  "start": 493,
+  "end": 505,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity5",
+  "count": 62,
+  "start": 509,
+  "end": 524,
+  "span": 16,
+  "regions_covered": 7,
+  "regions_total": 7
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity6",
+  "count": 36,
+  "start": 528,
+  "end": 541,
+  "span": 14,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "entity3",
+  "count": 15,
+  "start": 477,
+  "end": 489,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist0",
+  "count": 549,
+  "start": 706,
+  "end": 719,
+  "span": 14,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist1",
+  "count": 861,
+  "start": 723,
+  "end": 739,
+  "span": 17,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist2",
+  "count": 616,
+  "start": 743,
+  "end": 769,
+  "span": 27,
+  "regions_covered": 12,
+  "regions_total": 12
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist8",
+  "count": 571,
+  "start": 862,
+  "end": 888,
+  "span": 27,
+  "regions_covered": 11,
+  "regions_total": 11
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist9",
+  "count": 18,
+  "start": 892,
+  "end": 904,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist5",
+  "count": 22,
+  "start": 810,
+  "end": 822,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist6",
+  "count": 19,
+  "start": 826,
+  "end": 838,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist7",
+  "count": 19,
+  "start": 842,
+  "end": 857,
+  "span": 16,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist3",
+  "count": 22,
+  "start": 773,
+  "end": 787,
+  "span": 15,
+  "regions_covered": 4,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "attlist4",
+  "count": 19,
+  "start": 791,
+  "end": 806,
+  "span": 16,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element0",
+  "count": 1624,
+  "start": 908,
+  "end": 921,
+  "span": 14,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element1",
+  "count": 1592,
+  "start": 925,
+  "end": 947,
+  "span": 23,
+  "regions_covered": 9,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element2",
+  "count": 439,
+  "start": 951,
+  "end": 981,
+  "span": 31,
+  "regions_covered": 11,
+  "regions_total": 12
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element3",
+  "count": 358,
+  "start": 985,
+  "end": 1005,
+  "span": 21,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element4",
+  "count": 11,
+  "start": 1009,
+  "end": 1022,
+  "span": 14,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element5",
+  "count": 7,
+  "start": 1026,
+  "end": 1042,
+  "span": 17,
+  "regions_covered": 3,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element6",
+  "count": 59,
+  "start": 1046,
+  "end": 1071,
+  "span": 26,
+  "regions_covered": 7,
+  "regions_total": 9
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "element7",
+  "count": 118,
+  "start": 1075,
+  "end": 1118,
+  "span": 44,
+  "regions_covered": 16,
+  "regions_total": 17
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "notation0",
+  "count": 110,
+  "start": 617,
+  "end": 629,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "notation1",
+  "count": 109,
+  "start": 633,
+  "end": 649,
+  "span": 17,
+  "regions_covered": 8,
+  "regions_total": 8
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "notation3",
+  "count": 82,
+  "start": 669,
+  "end": 682,
+  "span": 14,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "notation2",
+  "count": 20,
+  "start": 653,
+  "end": 665,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "notation4",
+  "count": 11,
+  "start": 686,
+  "end": 702,
+  "span": 17,
+  "regions_covered": 5,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype5",
+  "count": 402,
+  "start": 320,
+  "end": 332,
+  "span": 13,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "prolog2",
+  "count": 779,
+  "start": 206,
+  "end": 222,
+  "span": 17,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype3",
+  "count": 70,
+  "start": 285,
+  "end": 297,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype4",
+  "count": 41,
+  "start": 301,
+  "end": 316,
+  "span": 16,
+  "regions_covered": 4,
+  "regions_total": 5
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "doctype2",
+  "count": 11,
+  "start": 269,
+  "end": 281,
+  "span": 13,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "error",
+  "count": 0,
+  "start": 1215,
+  "end": 1222,
+  "span": 8,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "common",
+  "count": 241,
+  "start": 1226,
+  "end": 1235,
+  "span": 10,
+  "regions_covered": 4,
+  "regions_total": 6
+ },
+ {
+  "file": "xmlrole.c",
+  "name": "externalSubset0",
+  "count": 0,
+  "start": 381,
+  "end": 386,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok.c",
+  "name": "_INTERNAL_trim_to_complete_utf8_characters",
+  "count": 1364980,
+  "start": 272,
+  "end": 307,
+  "span": 36,
+  "regions_covered": 19,
+  "regions_total": 24
+ },
+ {
+  "file": "xmltok.c",
+  "name": "XmlUtf8Encode",
+  "count": 136,
+  "start": 1181,
+  "end": 1214,
+  "span": 34,
+  "regions_covered": 14,
+  "regions_total": 16
+ },
+ {
+  "file": "xmltok.c",
+  "name": "XmlUtf16Encode",
+  "count": 0,
+  "start": 1217,
+  "end": 1231,
+  "span": 15,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok.c",
+  "name": "XmlSizeOfUnknownEncoding",
+  "count": 0,
+  "start": 1244,
+  "end": 1246,
+  "span": 3,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "XmlInitUnknownEncoding",
+  "count": 0,
+  "start": 1326,
+  "end": 1394,
+  "span": 69,
+  "regions_covered": 0,
+  "regions_total": 54
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlGetUtf8InternalEncoding",
+  "count": 2000,
+  "start": 43,
+  "end": 45,
+  "span": 3,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlGetUtf16InternalEncoding",
+  "count": 0,
+  "start": 48,
+  "end": 58,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlInitEncoding",
+  "count": 4000,
+  "start": 83,
+  "end": 94,
+  "span": 12,
+  "regions_covered": 3,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlParseXmlDecl",
+  "count": 361,
+  "start": 119,
+  "end": 123,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlGetUtf8InternalEncodingNS",
+  "count": 0,
+  "start": 43,
+  "end": 45,
+  "span": 3,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlGetUtf16InternalEncodingNS",
+  "count": 0,
+  "start": 48,
+  "end": 58,
+  "span": 11,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlInitEncodingNS",
+  "count": 0,
+  "start": 83,
+  "end": 94,
+  "span": 12,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "XmlParseXmlDeclNS",
+  "count": 0,
+  "start": 119,
+  "end": 123,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "XmlInitUnknownEncodingNS",
+  "count": 0,
+  "start": 1589,
+  "end": 1594,
+  "span": 6,
+  "regions_covered": 0,
+  "regions_total": 3
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_prologTok",
+  "count": 22850,
+  "start": 1018,
+  "end": 1258,
+  "span": 241,
+  "regions_covered": 111,
+  "regions_total": 164
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanLit",
+  "count": 463,
+  "start": 984,
+  "end": 1014,
+  "span": 31,
+  "regions_covered": 26,
+  "regions_total": 31
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanDecl",
+  "count": 2860,
+  "start": 183,
+  "end": 228,
+  "span": 46,
+  "regions_covered": 22,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanComment",
+  "count": 270,
+  "start": 146,
+  "end": 177,
+  "span": 32,
+  "regions_covered": 25,
+  "regions_total": 28
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanPi",
+  "count": 758,
+  "start": 277,
+  "end": 333,
+  "span": 57,
+  "regions_covered": 50,
+  "regions_total": 68
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_checkPiTarget",
+  "count": 589,
+  "start": 232,
+  "end": 271,
+  "span": 40,
+  "regions_covered": 18,
+  "regions_total": 19
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanPercent",
+  "count": 68,
+  "start": 924,
+  "end": 950,
+  "span": 27,
+  "regions_covered": 18,
+  "regions_total": 41
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanPoundName",
+  "count": 632,
+  "start": 954,
+  "end": 980,
+  "span": 27,
+  "regions_covered": 21,
+  "regions_total": 43
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_contentTok",
+  "count": 3605790,
+  "start": 824,
+  "end": 918,
+  "span": 95,
+  "regions_covered": 65,
+  "regions_total": 74
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanLt",
+  "count": 230930,
+  "start": 726,
+  "end": 820,
+  "span": 95,
+  "regions_covered": 56,
+  "regions_total": 96
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanCdataSection",
+  "count": 34,
+  "start": 337,
+  "end": 352,
+  "span": 16,
+  "regions_covered": 8,
+  "regions_total": 8
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanEndTag",
+  "count": 106051,
+  "start": 432,
+  "end": 477,
+  "span": 46,
+  "regions_covered": 36,
+  "regions_total": 49
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanAtts",
+  "count": 624,
+  "start": 573,
+  "end": 720,
+  "span": 148,
+  "regions_covered": 79,
+  "regions_total": 129
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanRef",
+  "count": 1215451,
+  "start": 545,
+  "end": 567,
+  "span": 23,
+  "regions_covered": 15,
+  "regions_total": 38
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanCharRef",
+  "count": 203,
+  "start": 514,
+  "end": 539,
+  "span": 26,
+  "regions_covered": 13,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_scanHexCharRef",
+  "count": 91,
+  "start": 483,
+  "end": 508,
+  "span": 26,
+  "regions_covered": 11,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_cdataSectionTok",
+  "count": 65,
+  "start": 356,
+  "end": 426,
+  "span": 71,
+  "regions_covered": 32,
+  "regions_total": 55
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_ignoreSectionTok",
+  "count": 0,
+  "start": 1398,
+  "end": 1444,
+  "span": 47,
+  "regions_covered": 0,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_attributeValueTok",
+  "count": 31420,
+  "start": 1262,
+  "end": 1327,
+  "span": 66,
+  "regions_covered": 31,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_entityValueTok",
+  "count": 754,
+  "start": 1331,
+  "end": 1392,
+  "span": 62,
+  "regions_covered": 27,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_nameMatchesAscii",
+  "count": 7967,
+  "start": 1715,
+  "end": 1730,
+  "span": 16,
+  "regions_covered": 10,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_nameLength",
+  "count": 233676,
+  "start": 1733,
+  "end": 1760,
+  "span": 28,
+  "regions_covered": 11,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_skipS",
+  "count": 73,
+  "start": 1763,
+  "end": 1775,
+  "span": 13,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_getAtts",
+  "count": 124368,
+  "start": 1510,
+  "end": 1599,
+  "span": 90,
+  "regions_covered": 63,
+  "regions_total": 65
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_charRefNumber",
+  "count": 154,
+  "start": 1602,
+  "end": 1657,
+  "span": 56,
+  "regions_covered": 37,
+  "regions_total": 37
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_predefinedEntityName",
+  "count": 1215146,
+  "start": 1661,
+  "end": 1711,
+  "span": 51,
+  "regions_covered": 21,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_updatePosition",
+  "count": 3280,
+  "start": 1779,
+  "end": 1809,
+  "span": 31,
+  "regions_covered": 11,
+  "regions_total": 11
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "normal_isPublicId",
+  "count": 22,
+  "start": 1450,
+  "end": 1501,
+  "span": 52,
+  "regions_covered": 35,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok.c",
+  "name": "latin1_toUtf8",
+  "count": 3016,
+  "start": 448,
+  "end": 467,
+  "span": 20,
+  "regions_covered": 12,
+  "regions_total": 14
+ },
+ {
+  "file": "xmltok.c",
+  "name": "latin1_toUtf16",
+  "count": 0,
+  "start": 471,
+  "end": 480,
+  "span": 10,
+  "regions_covered": 0,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok.c",
+  "name": "checkCharRefNumber",
+  "count": 150,
+  "start": 1157,
+  "end": 1178,
+  "span": 22,
+  "regions_covered": 19,
+  "regions_total": 20
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unknown_isName",
+  "count": 0,
+  "start": 1249,
+  "end": 1255,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unknown_isNmstrt",
+  "count": 0,
+  "start": 1258,
+  "end": 1264,
+  "span": 7,
+  "regions_covered": 0,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unknown_isInvalid",
+  "count": 0,
+  "start": 1267,
+  "end": 1271,
+  "span": 5,
+  "regions_covered": 0,
+  "regions_total": 3
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unknown_toUtf8",
+  "count": 0,
+  "start": 1275,
+  "end": 1301,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 17
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unknown_toUtf16",
+  "count": 0,
+  "start": 1305,
+  "end": 1322,
+  "span": 18,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_toUtf8",
+  "count": 1364980,
+  "start": 311,
+  "end": 346,
+  "span": 36,
+  "regions_covered": 18,
+  "regions_total": 19
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_toUtf16",
+  "count": 0,
+  "start": 350,
+  "end": 402,
+  "span": 53,
+  "regions_covered": 0,
+  "regions_total": 25
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isName2",
+  "count": 52,
+  "start": 148,
+  "end": 151,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isName3",
+  "count": 656,
+  "start": 154,
+  "end": 157,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "isNever",
+  "count": 1,
+  "start": 141,
+  "end": 145,
+  "span": 5,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isNmstrt2",
+  "count": 66,
+  "start": 162,
+  "end": 165,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isNmstrt3",
+  "count": 249,
+  "start": 168,
+  "end": 171,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isInvalid2",
+  "count": 179,
+  "start": 176,
+  "end": 179,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isInvalid3",
+  "count": 1188,
+  "start": 182,
+  "end": 185,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "utf8_isInvalid4",
+  "count": 16,
+  "start": 188,
+  "end": 191,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_prologTok",
+  "count": 115,
+  "start": 1018,
+  "end": 1258,
+  "span": 241,
+  "regions_covered": 70,
+  "regions_total": 164
+ },
+ {
+  "file": "xmltok.c",
+  "name": "unicode_byte_type",
+  "count": 121,
+  "start": 540,
+  "end": 563,
+  "span": 24,
+  "regions_covered": 8,
+  "regions_total": 14
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanLit",
+  "count": 0,
+  "start": 984,
+  "end": 1014,
+  "span": 31,
+  "regions_covered": 0,
+  "regions_total": 31
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanDecl",
+  "count": 10,
+  "start": 183,
+  "end": 228,
+  "span": 46,
+  "regions_covered": 11,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanComment",
+  "count": 0,
+  "start": 146,
+  "end": 177,
+  "span": 32,
+  "regions_covered": 0,
+  "regions_total": 28
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanPi",
+  "count": 2,
+  "start": 277,
+  "end": 333,
+  "span": 57,
+  "regions_covered": 22,
+  "regions_total": 68
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_checkPiTarget",
+  "count": 2,
+  "start": 232,
+  "end": 271,
+  "span": 40,
+  "regions_covered": 11,
+  "regions_total": 19
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanPercent",
+  "count": 0,
+  "start": 924,
+  "end": 950,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 41
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanPoundName",
+  "count": 4,
+  "start": 954,
+  "end": 980,
+  "span": 27,
+  "regions_covered": 15,
+  "regions_total": 43
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_contentTok",
+  "count": 43,
+  "start": 824,
+  "end": 918,
+  "span": 95,
+  "regions_covered": 30,
+  "regions_total": 74
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanLt",
+  "count": 28,
+  "start": 726,
+  "end": 820,
+  "span": 95,
+  "regions_covered": 26,
+  "regions_total": 96
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanCdataSection",
+  "count": 0,
+  "start": 337,
+  "end": 352,
+  "span": 16,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanEndTag",
+  "count": 8,
+  "start": 432,
+  "end": 477,
+  "span": 46,
+  "regions_covered": 16,
+  "regions_total": 49
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanAtts",
+  "count": 2,
+  "start": 573,
+  "end": 720,
+  "span": 148,
+  "regions_covered": 34,
+  "regions_total": 129
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanRef",
+  "count": 0,
+  "start": 545,
+  "end": 567,
+  "span": 23,
+  "regions_covered": 0,
+  "regions_total": 38
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanCharRef",
+  "count": 0,
+  "start": 514,
+  "end": 539,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_scanHexCharRef",
+  "count": 0,
+  "start": 483,
+  "end": 508,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_cdataSectionTok",
+  "count": 0,
+  "start": 356,
+  "end": 426,
+  "span": 71,
+  "regions_covered": 0,
+  "regions_total": 55
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_ignoreSectionTok",
+  "count": 0,
+  "start": 1398,
+  "end": 1444,
+  "span": 47,
+  "regions_covered": 0,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_attributeValueTok",
+  "count": 0,
+  "start": 1262,
+  "end": 1327,
+  "span": 66,
+  "regions_covered": 0,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_entityValueTok",
+  "count": 0,
+  "start": 1331,
+  "end": 1392,
+  "span": 62,
+  "regions_covered": 0,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_nameMatchesAscii",
+  "count": 24,
+  "start": 1715,
+  "end": 1730,
+  "span": 16,
+  "regions_covered": 9,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_nameLength",
+  "count": 25,
+  "start": 1733,
+  "end": 1760,
+  "span": 28,
+  "regions_covered": 10,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_skipS",
+  "count": 0,
+  "start": 1763,
+  "end": 1775,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_getAtts",
+  "count": 15,
+  "start": 1510,
+  "end": 1599,
+  "span": 90,
+  "regions_covered": 24,
+  "regions_total": 65
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_charRefNumber",
+  "count": 0,
+  "start": 1602,
+  "end": 1657,
+  "span": 56,
+  "regions_covered": 0,
+  "regions_total": 37
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_predefinedEntityName",
+  "count": 0,
+  "start": 1661,
+  "end": 1711,
+  "span": 51,
+  "regions_covered": 0,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_updatePosition",
+  "count": 34,
+  "start": 1779,
+  "end": 1809,
+  "span": 31,
+  "regions_covered": 7,
+  "regions_total": 11
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "little2_isPublicId",
+  "count": 0,
+  "start": 1450,
+  "end": 1501,
+  "span": 52,
+  "regions_covered": 0,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok.c",
+  "name": "little2_toUtf8",
+  "count": 69,
+  "start": 568,
+  "end": 640,
+  "span": 73,
+  "regions_covered": 34,
+  "regions_total": 39
+ },
+ {
+  "file": "xmltok.c",
+  "name": "little2_toUtf16",
+  "count": 0,
+  "start": 645,
+  "end": 662,
+  "span": 18,
+  "regions_covered": 0,
+  "regions_total": 15
+ },
+ {
+  "file": "xmltok.c",
+  "name": "getEncodingIndex",
+  "count": 4106,
+  "start": 1428,
+  "end": 1439,
+  "span": 12,
+  "regions_covered": 11,
+  "regions_total": 11
+ },
+ {
+  "file": "xmltok.c",
+  "name": "streqci",
+  "count": 348,
+  "start": 887,
+  "end": 905,
+  "span": 19,
+  "regions_covered": 14,
+  "regions_total": 16
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "initScanProlog",
+  "count": 2000,
+  "start": 69,
+  "end": 72,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "initScan",
+  "count": 2000,
+  "start": 1457,
+  "end": 1565,
+  "span": 109,
+  "regions_covered": 51,
+  "regions_total": 75
+ },
+ {
+  "file": "xmltok.c",
+  "name": "ascii_toUtf8",
+  "count": 2,
+  "start": 506,
+  "end": 515,
+  "span": 10,
+  "regions_covered": 8,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_prologTok",
+  "count": 7,
+  "start": 1018,
+  "end": 1258,
+  "span": 241,
+  "regions_covered": 17,
+  "regions_total": 164
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanLit",
+  "count": 0,
+  "start": 984,
+  "end": 1014,
+  "span": 31,
+  "regions_covered": 0,
+  "regions_total": 31
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanDecl",
+  "count": 0,
+  "start": 183,
+  "end": 228,
+  "span": 46,
+  "regions_covered": 0,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanComment",
+  "count": 0,
+  "start": 146,
+  "end": 177,
+  "span": 32,
+  "regions_covered": 0,
+  "regions_total": 28
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanPi",
+  "count": 2,
+  "start": 277,
+  "end": 333,
+  "span": 57,
+  "regions_covered": 21,
+  "regions_total": 68
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_checkPiTarget",
+  "count": 2,
+  "start": 232,
+  "end": 271,
+  "span": 40,
+  "regions_covered": 11,
+  "regions_total": 19
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanPercent",
+  "count": 0,
+  "start": 924,
+  "end": 950,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 41
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanPoundName",
+  "count": 0,
+  "start": 954,
+  "end": 980,
+  "span": 27,
+  "regions_covered": 0,
+  "regions_total": 43
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_contentTok",
+  "count": 6,
+  "start": 824,
+  "end": 918,
+  "span": 95,
+  "regions_covered": 18,
+  "regions_total": 74
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanLt",
+  "count": 4,
+  "start": 726,
+  "end": 820,
+  "span": 95,
+  "regions_covered": 15,
+  "regions_total": 96
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanCdataSection",
+  "count": 0,
+  "start": 337,
+  "end": 352,
+  "span": 16,
+  "regions_covered": 0,
+  "regions_total": 8
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanEndTag",
+  "count": 2,
+  "start": 432,
+  "end": 477,
+  "span": 46,
+  "regions_covered": 6,
+  "regions_total": 49
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanAtts",
+  "count": 1,
+  "start": 573,
+  "end": 720,
+  "span": 148,
+  "regions_covered": 19,
+  "regions_total": 129
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanRef",
+  "count": 0,
+  "start": 545,
+  "end": 567,
+  "span": 23,
+  "regions_covered": 0,
+  "regions_total": 38
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanCharRef",
+  "count": 0,
+  "start": 514,
+  "end": 539,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_scanHexCharRef",
+  "count": 0,
+  "start": 483,
+  "end": 508,
+  "span": 26,
+  "regions_covered": 0,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_cdataSectionTok",
+  "count": 0,
+  "start": 356,
+  "end": 426,
+  "span": 71,
+  "regions_covered": 0,
+  "regions_total": 55
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_ignoreSectionTok",
+  "count": 0,
+  "start": 1398,
+  "end": 1444,
+  "span": 47,
+  "regions_covered": 0,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_attributeValueTok",
+  "count": 0,
+  "start": 1262,
+  "end": 1327,
+  "span": 66,
+  "regions_covered": 0,
+  "regions_total": 35
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_entityValueTok",
+  "count": 0,
+  "start": 1331,
+  "end": 1392,
+  "span": 62,
+  "regions_covered": 0,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_nameMatchesAscii",
+  "count": 6,
+  "start": 1715,
+  "end": 1730,
+  "span": 16,
+  "regions_covered": 8,
+  "regions_total": 10
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_nameLength",
+  "count": 6,
+  "start": 1733,
+  "end": 1760,
+  "span": 28,
+  "regions_covered": 9,
+  "regions_total": 13
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_skipS",
+  "count": 0,
+  "start": 1763,
+  "end": 1775,
+  "span": 13,
+  "regions_covered": 0,
+  "regions_total": 6
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_getAtts",
+  "count": 2,
+  "start": 1510,
+  "end": 1599,
+  "span": 90,
+  "regions_covered": 23,
+  "regions_total": 65
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_charRefNumber",
+  "count": 0,
+  "start": 1602,
+  "end": 1657,
+  "span": 56,
+  "regions_covered": 0,
+  "regions_total": 37
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_predefinedEntityName",
+  "count": 0,
+  "start": 1661,
+  "end": 1711,
+  "span": 51,
+  "regions_covered": 0,
+  "regions_total": 23
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_updatePosition",
+  "count": 4,
+  "start": 1779,
+  "end": 1809,
+  "span": 31,
+  "regions_covered": 3,
+  "regions_total": 11
+ },
+ {
+  "file": "xmltok_impl.c",
+  "name": "big2_isPublicId",
+  "count": 0,
+  "start": 1450,
+  "end": 1501,
+  "span": 52,
+  "regions_covered": 0,
+  "regions_total": 36
+ },
+ {
+  "file": "xmltok.c",
+  "name": "big2_toUtf8",
+  "count": 92,
+  "start": 568,
+  "end": 640,
+  "span": 73,
+  "regions_covered": 26,
+  "regions_total": 39
+ },
+ {
+  "file": "xmltok.c",
+  "name": "big2_toUtf16",
+  "count": 0,
+  "start": 645,
+  "end": 662,
+  "span": 18,
+  "regions_covered": 0,
+  "regions_total": 15
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "initScanContent",
+  "count": 0,
+  "start": 76,
+  "end": 79,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "initUpdatePosition",
+  "count": 10,
+  "start": 909,
+  "end": 912,
+  "span": 4,
+  "regions_covered": 1,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok.c",
+  "name": "doParseXmlDecl",
+  "count": 361,
+  "start": 1065,
+  "end": 1154,
+  "span": 90,
+  "regions_covered": 69,
+  "regions_total": 72
+ },
+ {
+  "file": "xmltok.c",
+  "name": "parsePseudoAttribute",
+  "count": 802,
+  "start": 943,
+  "end": 1015,
+  "span": 73,
+  "regions_covered": 63,
+  "regions_total": 64
+ },
+ {
+  "file": "xmltok.c",
+  "name": "checkXmlDeclVersionNum",
+  "count": 335,
+  "start": 1043,
+  "end": 1057,
+  "span": 15,
+  "regions_covered": 19,
+  "regions_total": 21
+ },
+ {
+  "file": "xmltok.c",
+  "name": "toAscii",
+  "count": 8768,
+  "start": 915,
+  "end": 923,
+  "span": 9,
+  "regions_covered": 4,
+  "regions_total": 4
+ },
+ {
+  "file": "xmltok.c",
+  "name": "isSpace",
+  "count": 5337,
+  "start": 926,
+  "end": 935,
+  "span": 10,
+  "regions_covered": 6,
+  "regions_total": 6
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "findEncoding",
+  "count": 108,
+  "start": 97,
+  "end": 112,
+  "span": 16,
+  "regions_covered": 12,
+  "regions_total": 14
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "initScanPrologNS",
+  "count": 0,
+  "start": 69,
+  "end": 72,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "initScanContentNS",
+  "count": 0,
+  "start": 76,
+  "end": 79,
+  "span": 4,
+  "regions_covered": 0,
+  "regions_total": 1
+ },
+ {
+  "file": "xmltok_ns.c",
+  "name": "findEncodingNS",
+  "count": 0,
+  "start": 97,
+  "end": 112,
+  "span": 16,
+  "regions_covered": 0,
+  "regions_total": 14
+ }
+]
