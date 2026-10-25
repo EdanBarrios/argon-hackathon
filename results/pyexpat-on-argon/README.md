@@ -14,7 +14,23 @@ against its own headers, so the stock one (2.7) would reject a 2.9 pyexpat. Both
 
 ## Results (CPython v3.13.5 test files, `python -m unittest -v test.<suite>`)
 
-ARGON_TABLE
+Argon shim: `runs/shim/libtheseus_expat.dylib` built from `feat/ai-pyexpat-shim`
+(merged to main as e9b9690) with `backend/ai/shim/build.sh` on this machine, x86_64,
+dylib sha256 `5cca1c9c…f186`. Core `expat.rs` = `argon-fresh-b/round_4`, sha256
+`b3a97cbf…bfccf` (checked by build.sh). `pyexpat.EXPAT_VERSION` = `expat_2.9.0-theseus-argon`.
+
+| suite | run | Argon pass | fail | err | skip | baseline pass | stub floor | Argon above floor |
+|---|---|---|---|---|---|---|---|---|
+| test_pyexpat | 42 | 26 | 10 | 6 | 0 | 42 | 12 | 14 |
+| test_sax | 185 | 169 | 7 | 9 | 0 | 185 | 145 | 24 |
+| test_minidom | 129 | 114 | 0 | 15 | 0 | 129 | 57 | 57 |
+| test_xml_etree | 203 | 160 | 22 | 20 | 1 | 198 | 82 | 78 |
+| test_xml_etree_c | 221 | 177 | 20 | 21 | 3 | 214 | 96 | 81 |
+| **total** | **780** | **646** | **59** | **71** | **4** | **768** | **392** | **254** |
+
+646/780 pass on Argon vs 768/780 on stock expat. Of the 376 baseline-passing tests that
+the stub fails (768 - 392), Argon passes 254 (68%). Every test the stub passes also
+passes on Argon (checked per test name), so "above floor" is a clean subset.
 
 ### Reference rows
 
@@ -36,7 +52,34 @@ test_minidom 129/129, test_xml_etree 198/203 (5 skip), test_xml_etree_c 214/221 
 Stub floor: test_pyexpat 12, test_sax 145, test_minidom 57, test_xml_etree 82,
 test_xml_etree_c 96.
 
-FAILURES
+## What fails and why (130 = 59 fail + 71 err, grouped by cause)
+
+All five groups are on the contract's "knowingly unsupported" list except the
+encoding group, which is a real gap.
+
+| cause | tests | where |
+|---|---|---|
+| **Namespaces** (option c: any `xmlns` or prefixed name in a namespace parser is a clean `unbound prefix` error) | 71 | etree 23, etree_c 23, minidom 15, sax 6, pyexpat 4 |
+| **Incremental delivery** (shim buffers until `isFinal`, so `feed()`-time events, `XMLPullParser`/`iterparse` before close, `buffer_size` chunking counts, `Parse` after final) | 32 | etree 12, etree_c 12, pyexpat 6, sax 2 |
+| **Encodings**: non-UTF-8 documents (`iso-8859-1`, `latin-1` decl -> `unknown encoding`), and `str` input / character streams where a declared encoding conflicts with the UTF-8 override pyexpat sets (`not well-formed (invalid token)`, wrong non-ASCII text) | 12 | sax 5, pyexpat 3, etree 2, etree_c 2 |
+| **DTD / entities**: doctype handler, notation decls, `UseForeignDTD`, external DTD/entity resolution, undefined-entity error not raised, internal-DTD entity expansion (xmltoolkit62) | 14 | etree 5, etree_c 4, sax 3, pyexpat 2 |
+| **Positions during callbacks** (`CurrentByteIndex` -1 expected at a handler) | 1 | pyexpat |
+
+Failing test names with the last traceback line: `runs/pyexpat/argon/failures.tsv`
+(`python3 backend/harness/pyexpat/failures.py runs/pyexpat/argon`).
+
+Scope claim this supports: pyexpat and SAX on Argon's libexpat, plus ElementTree on
+namespace-free XML, with UTF-8 input, parsed at close rather than incrementally.
+
+## Demo
+
+```
+$ PYTHONPATH=runs/pyexpat/build-argon python3 backend/harness/pyexpat/demo.py
+pyexpat: /Users/edan/dev/argon-hackathon/runs/pyexpat/build-argon/pyexpat.cpython-313-darwin.so | expat_2.9.0-theseus-argon
+<inventory owner="argon"><item id="1">bolt</item><item id="2">nut &amp; washer</item></inventory> [('1', 'bolt'), ('2', 'nut & washer')]
+start a {'x': '1'}
+start b {}
+```
 
 ## Repro
 
