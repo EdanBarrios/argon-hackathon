@@ -1,0 +1,5 @@
+{
+  "ok": false,
+  "errors": "error: the range pattern here has ambiguous interpretation\n   --> src/cjson.rs:367:19\n    |\n367 |             Some(&b'0'..=b'9')\n    |                   ^^^^^^^^^^^\n    |\nhelp: add parentheses to clarify the precedence\n    |\n367 |             Some(&(b'0'..=b'9'))\n    |                   +           +\n\nerror: could not compile `theseus_cjson` (bin \"theseus_cjson\") due to 1 previous error",
+  "build_seconds": 1
+}

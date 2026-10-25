@@ -1,0 +1,45 @@
+{
+  "model": "gemini-4-argon",
+  "target": "expat",
+  "rounds_budget": 4,
+  "rounds_run": 2,
+  "inputs": "<repo>/runs/ai/expat-inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": null,
+  "rounds_to_100": null,
+  "total_model_seconds": 1089.4,
+  "total_tokens": {
+    "total_input_tokens": 815566,
+    "total_output_tokens": 73653,
+    "total_thought_tokens": 57767,
+    "total_cached_tokens": 0
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "translate",
+      "interaction_id": "v1_ChdZVlhlYW9EQk5JYlVfdU1QN0oyb29RYxIXWVZYZWFvREJOSWJVX3VNUDdKMm9vUWM",
+      "seconds": 1089.4,
+      "usage": {
+        "total_input_tokens": 815566,
+        "total_output_tokens": 73653,
+        "total_thought_tokens": 57767,
+        "total_cached_tokens": 0,
+        "total_tokens": 946986
+      },
+      "thinking_level": "high",
+      "notes": [],
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 1,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 2,
+      "kind": "repair",
+      "error": "interaction v1_ChdZVlhlYW9EQk5JYlVfdU1QN0oyb29RYxIXb2xuZWFwQ2xOdmVtc09JUGtjYU1pUTA ended with status 'failed' after 505.5s, usage {'total_input_tokens': 337997, 'total_output_tokens': 65416, 'total_thought_tokens': 120, 'total_cached_tokens': 0, 'total_tokens': 403533}: [Error(code='INVALID_ARGUMENT', message='There was a problem processing your request. You will only be charged for tokens successfully generated.')]"
+    }
+  ]
+}
