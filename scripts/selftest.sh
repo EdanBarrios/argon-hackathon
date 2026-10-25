@@ -66,7 +66,7 @@ r = json.load(open(sys.argv[1]))
 c = r["counts"]
 print("O1_vs_O0 match=%d/%d counts=%s" % (c["match"], r["behaviors_tested"], c))
 print("report: %s" % sys.argv[1])
-bad = [e["file"] for k in ("divergences", "crashes", "timeouts") for e in r[k]]
+bad = [e["file"] for k in ("divergences", "crashes", "timeouts", "infra_failures") for e in r[k]]
 ok = c["match"] == r["behaviors_tested"] > 0
 if not ok:
     print("SELFTEST FAILED: -O1 and -O0 C drivers differ (optimiser-dependent"

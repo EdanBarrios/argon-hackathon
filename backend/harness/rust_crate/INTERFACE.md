@@ -28,6 +28,7 @@ This matches `backend/harness/drivers/cjson_driver.c` byte for byte. That driver
 ## Rules
 
 - No unsafe code. The crate has `#![forbid(unsafe_code)]`, and the build script rejects any file containing the word `unsafe`, even in comments.
+- No escape hatches. The build script also rejects `std::process`, `std::fs`, `std::net`, `std::env`, `std::os`, `Command`, `include!`/`include_str!`/`include_bytes!`, `extern crate`, `#[path]` and out-of-line `mod name;` (outside comments). The module must translate cJSON, not run the C driver or read files. Fixtures in `fixtures/` are checked by `scripts/test_build_guard.sh`.
 - No external crates, no FFI. std only, builds offline.
 - Nesting limit 1000, mirroring `CJSON_NESTING_LIMIT`. Deeper input is a parse error, never a stack overflow.
 - Never panic. A panic or abort counts as a crash.

@@ -15,6 +15,11 @@ stderr, exit code, signal and timeout separately, then classify the input:
                       report (a side that printed a report and then ran
                       out of time, e.g. while symbolizing, counts as
                       crashed, flagged timed_out_after_report)
+  infra_failure       neither crashed, but a side could not be spawned or
+                      exited nonzero. Both drivers always exit 0 (a parse
+                      error is a normal stdout line), and exit 2 only when
+                      stdin could not be read, so a clean nonzero exit is a
+                      harness problem, never a match even if both sides agree.
 
 stdout is compared as raw bytes. It is never decoded or normalized through a
 JSON library, because formatting differences ARE the behavior under test.
@@ -47,6 +52,7 @@ SANITIZER_MARKERS = (
 )
 RUST_PANIC_MARKERS = (b"panicked at", b"thread 'main' has overflowed its stack")
 RUST_PANIC_EXIT = 101
+DRIVER_OK_EXIT = 0  # both drivers exit 0 on success AND on parse errors
 
 
 def child_env():
@@ -125,6 +131,8 @@ def reported_then_timed_out(res):
 
 
 def classify(c, r):
+    if c["spawn_error"] or r["spawn_error"]:
+        return "infra_failure"
     if any(x["timed_out"] and not reported_then_timed_out(x) for x in (c, r)):
         return "timeout"
     c_bad, r_bad = crashed(c, "c"), crashed(r, "rust")
@@ -134,6 +142,8 @@ def classify(c, r):
         return "safety_improvement"
     if r_bad:
         return "rust_crash"
+    if c["exit_code"] != DRIVER_OK_EXIT or r["exit_code"] != DRIVER_OK_EXIT:
+        return "infra_failure"
     if c["stdout"] == r["stdout"] and c["exit_code"] == r["exit_code"]:
         return "match"
     return "divergence"
@@ -191,8 +201,10 @@ def list_inputs(directory, max_bytes):
         path = os.path.join(directory, name)
         if not os.path.isfile(path) or name.startswith("."):
             continue
-        if os.path.getsize(path) > max_bytes:
-            skipped.append(name)
+        size = os.path.getsize(path)
+        if size > max_bytes:
+            skipped.append({"file": name, "bytes": size,
+                            "reason": "larger than --max-bytes %d" % max_bytes})
             continue
         files.append(path)
     return files, skipped
@@ -265,8 +277,9 @@ def main(argv=None):
         results = list(pool.map(work, files))  # map keeps sorted input order
 
     counts = dict.fromkeys(
-        ["match", "divergence", "safety_improvement", "rust_crash", "both_crash", "timeout"], 0)
-    divergences, crashes, timeouts = [], [], []
+        ["match", "divergence", "safety_improvement", "rust_crash", "both_crash", "timeout",
+         "infra_failure"], 0)
+    divergences, crashes, timeouts, infra = [], [], [], []
     for path, data, c, r, cls in results:
         counts[cls] += 1
         name = os.path.basename(path)
@@ -275,6 +288,7 @@ def main(argv=None):
                 "input": show(data), "file": name,
                 "c_output": show_output(c), "rust_output": show_output(r),
                 "c_exit": c["exit_code"], "rust_exit": r["exit_code"],
+                "c_stderr": first_lines(c["stderr"]), "rust_stderr": first_lines(r["stderr"]),
                 "function": None,
             })
         elif cls in ("safety_improvement", "rust_crash", "both_crash"):
@@ -285,16 +299,24 @@ def main(argv=None):
                 "sanitizer_report": crash_report(report_src),
                 "rust_behavior": behavior_summary(r),
                 "timed_out_after_report": c["timed_out"] or r["timed_out"],
+                "c_stderr": first_lines(c["stderr"]), "rust_stderr": first_lines(r["stderr"]),
             })
         elif cls == "timeout":
             timeouts.append({"input": show(data), "file": name,
                              "c": describe_exit(c), "rust": describe_exit(r)})
+        elif cls == "infra_failure":
+            infra.append({"input": show(data), "file": name,
+                          "c": describe_exit(c), "rust": describe_exit(r),
+                          "c_stderr": first_lines(c["stderr"]),
+                          "rust_stderr": first_lines(r["stderr"])})
 
-    # match_rate = match / (match + divergence + rust_crash + both_crash + timeout)
+    # match_rate = match / (match + divergence + rust_crash + both_crash
+    #                       + timeout + infra_failure)
     # safety_improvement is excluded from the denominator: C crashing where
     # Rust exits cleanly is an intended improvement, not a behavior mismatch.
+    # infra_failure is included so a broken run can never read as 100%.
     denom = (counts["match"] + counts["divergence"] + counts["rust_crash"]
-             + counts["both_crash"] + counts["timeout"])
+             + counts["both_crash"] + counts["timeout"] + counts["infra_failure"])
     match_rate = (counts["match"] / denom) if denom else None
 
     report = {
@@ -304,8 +326,28 @@ def main(argv=None):
         "divergences": divergences[:MAX_LISTED],
         "crashes": crashes[:MAX_LISTED],
         "timeouts": timeouts[:MAX_LISTED],
-        "truncated_lists": any(len(x) > MAX_LISTED for x in (divergences, crashes, timeouts)),
-        "skipped_inputs": skipped,
+        "infra_failures": infra[:MAX_LISTED],
+        "truncated_lists": any(len(x) > MAX_LISTED
+                               for x in (divergences, crashes, timeouts, infra)),
+        # Explicit accounting, so a match_rate is never read against the
+        # wrong number of inputs. attempted = every input run on both sides;
+        # scored = the match_rate denominator (attempted - safety_improvements).
+        "summary": {
+            "inputs_found": len(results) + len(skipped),
+            "attempted": len(results),
+            "scored": denom,
+            "matched": counts["match"],
+            "diverged": counts["divergence"],
+            "rust_crashes": counts["rust_crash"],
+            "both_crashes": counts["both_crash"],
+            "timeouts": counts["timeout"],
+            "infra_failures": counts["infra_failure"],
+            "safety_improvements": counts["safety_improvement"],
+            "skipped": len(skipped),
+            "skipped_reasons": sorted({s["reason"] for s in skipped}),
+        },
+        "skipped_inputs": [s["file"] for s in skipped],
+        "skipped_details": skipped[:MAX_LISTED],
         "config": {
             "c": args.c, "rust": args.rust, "inputs": os.path.abspath(args.inputs),
             "timeout": args.timeout, "max_bytes": args.max_bytes,
