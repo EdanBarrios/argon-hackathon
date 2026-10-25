@@ -5,7 +5,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import cost, harness, pipeline, pr, remote_runs, try_input
+from . import cost, expat_results, harness, pipeline, pr, remote_runs, try_input
 from .models import ApproveRequest, CreateJobRequest, Event, Job, JobCost, TryRequest
 from .store import JobNotFound, JobStore
 
@@ -126,6 +126,26 @@ def get_cost(job_id: str) -> dict:
     return cost.job_cost(job_id)
 
 
+TRY_LIBRARIES = ("cjson", "expat")
+
+
+@app.get("/try/presets")
+def try_presets(library: str = Query("expat")) -> list[dict[str, str]]:
+    """Example inputs for the /try box: [{id, title, description, input}]."""
+    if library not in expat_results.PRESETS:
+        raise HTTPException(status_code=400, detail=f"no presets for library {library!r}")
+    return expat_results.PRESETS[library]
+
+
+@app.get("/results/libexpat")
+def results_libexpat() -> dict[str, Any]:
+    """Recorded libexpat numbers, read from committed result files."""
+    try:
+        return expat_results.results()
+    except (OSError, KeyError, IndexError, ValueError) as exc:
+        raise HTTPException(status_code=503, detail=f"libexpat results unreadable: {exc}") from None
+
+
 @app.post("/try")
 def try_one(body: TryRequest) -> dict[str, Any]:
     """Run one input through C v1.7.19, the current Rust binary and (for CVE inputs) old C v1.7.17.
@@ -133,8 +153,12 @@ def try_one(body: TryRequest) -> dict[str, Any]:
     Plain `def`, so FastAPI runs it in its threadpool; it takes about 0.3 s, or about
     5 s when an ASan report has to be symbolized.
     """
-    if body.library != "cjson":
-        raise HTTPException(status_code=400, detail=f"/try supports library 'cjson' only, got {body.library!r}")
+    if body.library not in TRY_LIBRARIES:
+        raise HTTPException(
+            status_code=400, detail=f"/try supports library 'cjson' or 'expat', got {body.library!r}"
+        )
+    if body.library == "expat" and body.compare_old:
+        raise HTTPException(status_code=400, detail="compare_old is cjson only")
     if (body.input is None) == (body.input_b64 is None):
         raise HTTPException(status_code=400, detail="send exactly one of input or input_b64")
     if body.input is not None:
@@ -149,6 +173,6 @@ def try_one(body: TryRequest) -> dict[str, Any]:
             status_code=413, detail=f"input is {len(data)} bytes; the limit is {try_input.MAX_INPUT_BYTES}"
         )
     try:
-        return try_input.run_try(data, compare_old=body.compare_old)
+        return try_input.run_try(data, compare_old=body.compare_old, library=body.library)
     except harness.HarnessError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from None

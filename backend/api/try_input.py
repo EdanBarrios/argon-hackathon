@@ -93,9 +93,45 @@ def side_view(res: dict[str, Any], side: str, label: str, version: str, binary: 
     }
 
 
-def run_try(data: bytes, compare_old: bool = False, rust: tuple[Path, str] | None = None) -> dict[str, Any]:
+def first_difference(c_out: bytes, r_out: bytes) -> dict[str, Any] | None:
+    """Where C and Rust stdout first differ (byte offset, 1-based line), None if identical."""
+    if c_out == r_out:
+        return None
+    i = next((k for k, (a, b) in enumerate(zip(c_out, r_out)) if a != b), min(len(c_out), len(r_out)))
+    return {"offset": i, "line": c_out[:i].count(b"\n") + 1, "c_bytes": len(c_out), "rust_bytes": len(r_out)}
+
+
+def run_expat(data: bytes) -> dict[str, Any]:
+    """libexpat 2.9.0 C driver (ASan+UBSan) vs Argon's Rust port. No old-C / CVE side."""
+    v = harness.verify_module()
+    c_bin = harness.ensure_expat_c_driver()
+    r_bin, r_label = harness.expat_rust_binary()
+    env = v.child_env()
+    jobs = {"c": [str(c_bin)], "rust": [str(r_bin)]}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        futures = {k: pool.submit(v.run_one, argv, data, TIMEOUT_SECONDS, env) for k, argv in jobs.items()}
+        raw = {k: f.result() for k, f in futures.items()}
+    return {
+        "library": "expat",
+        "input_bytes": len(data),
+        "input": data.decode("utf-8", errors="backslashreplace"),
+        "input_hex": None if _printable(data) else data.hex(" "),
+        "cve": None,
+        "c": side_view(raw["c"], "c", "C (libexpat, ASan+UBSan)", harness.EXPAT_C_VERSION, c_bin),
+        "rust": side_view(raw["rust"], "rust", r_label, "safe Rust", r_bin),
+        "old_c": None,
+        "verdict": v.classify(raw["c"], raw["rust"]),
+        "old_verdict": None,
+        "first_difference": first_difference(raw["c"]["stdout"], raw["rust"]["stdout"]),
+    }
+
+
+def run_try(data: bytes, compare_old: bool = False, rust: tuple[Path, str] | None = None,
+            library: str = "cjson") -> dict[str, Any]:
     if len(data) > MAX_INPUT_BYTES:
         raise ValueError(f"input is {len(data)} bytes; the limit is {MAX_INPUT_BYTES}")
+    if library == "expat":
+        return run_expat(data)
     v = harness.verify_module()
     c_bin = harness.ensure_c_driver()
     r_bin, r_label = rust or rust_binary()
@@ -121,6 +157,7 @@ def run_try(data: bytes, compare_old: bool = False, rust: tuple[Path, str] | Non
         "old_c": None,
         "verdict": v.classify(raw["c"], raw["rust"]),
         "old_verdict": None,
+        "first_difference": first_difference(raw["c"]["stdout"], raw["rust"]["stdout"]),
     }
     if use_old:
         result["old_c"] = side_view(raw["old_c"], "c", "C (old, vulnerable)", harness.OLD_C_VERSION,

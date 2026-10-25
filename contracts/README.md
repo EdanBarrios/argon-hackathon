@@ -15,7 +15,9 @@ Base URL: `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`). All bodies ar
 | `POST` | `/jobs/{id}/approve` | Job with `approval.approved_by` and `approval.pr_url` set | |
 | `GET` | `/jobs` | Jobs this server has run, newest first (in memory; for "Load pre-run") | |
 | `GET` | `/jobs/{id}/cost` | Token usage and USD per model for the job | |
-| `POST` | `/try` | One input run through C, the current Rust binary, and old C for CVE inputs | |
+| `POST` | `/try` | One input run through C, the current Rust binary, and old C for CVE inputs (`library`: `cjson` \| `expat`) | |
+| `GET` | `/try/presets?library=expat` | Example inputs for the /try box | |
+| `GET` | `/results/libexpat` | Recorded libexpat numbers, read from committed result files | |
 | `GET` | `/remote-runs` | Managed-agent sandbox runs: sandbox claim vs host re-verify vs held-out (`?include_stubs=true` adds dev stubs) | |
 
 `POST /jobs` body: `{"library": "cjson", "modules": ["lexer"]}` (`modules` optional; omit for the whole library).
@@ -73,6 +75,37 @@ Response:
   "old_verdict": "safety_improvement" // old C vs Rust, null when old C did not run
 }
 ```
+
+`first_difference` (both libraries): `null` when C and Rust stdout are identical, else `{"offset", "line", "c_bytes", "rust_bytes"}` (first differing byte offset, its 1-based line in C's stdout, and each side's stdout length).
+
+#### `POST /try` with `library: "expat"`
+
+Body: `{"library": "expat", "input": "<xml>"}` (or `input_b64`). Same limits (64 KiB, 413 above), same response shape, with `library: "expat"`, `cve: null`, `old_c: null`, `old_verdict: null` (`compare_old: true` is a 400). C side: libexpat 2.9.0 driver under ASan+UBSan (`c.version` = `"libexpat 2.9.0 (R_2_9_0)"`). Rust side: Argon's port (`argon-fresh-a/round_3/expat.rs`), binary from `THESEUS_EXPAT_RUST_BIN`, else `runs/build-expat/edan-reverify-a/`, else built on first use. `stdout` is the driver's event lines (`START "a" "x"="1"`, `TEXT "..."`, ..., then `OK`) or a single `ERROR <code> line <L> col <C>`. Timeout 20 s per side; billion laughs takes about 1 s for C under ASan.
+
+#### `GET /try/presets?library=expat`
+
+`[{"id", "title", "description", "input"}]`. For `expat`: `rich` (XML decl, internal DTD with an entity and ATTLIST default, attributes, comment, PI, CDATA, entity reference; matches event for event, 26 lines) and `billion_laughs` (9 levels; both sides print `ERROR 43 line 14 col 6`). `library=cjson` returns `[]`; anything else is 400. Send `input` as-is to `POST /try`.
+
+#### `GET /results/libexpat`
+
+```json
+{
+  "library": "expat", "c_version": "libexpat 2.9.0 (R_2_9_0)",
+  "c_lines": 18494, "c_files": 36, "c_lines_source": "wc -l of .../lib/*.c *.h (vendored R_2_9_0)",
+  "rust_lines": 6555, "rust_lines_translate": 6554, "model": "gemini-4-argon",
+  "translate_seconds": 1089.4, "translate_output_tokens": 73653,
+  "compile_fix_rounds": 2, "repair_seconds": 1170.7,
+  "lines_changed_after_translate": {"added": 3, "removed": 2, "hunks": 2},
+  "loop":          {"matched": 747,  "tested": 747,  "match_rate": 1.0, "seed": 1},
+  "holdout":       {"matched": 1253, "tested": 1253, "match_rate": 1.0, "seed": 1001},
+  "host_reverify": {"matched": 2000, "tested": 2000, "match_rate": 1.0, "seed": 4242},
+  "flash_result": {"model": "gemini-3.8-flash", "status": "failed", "file": null, "reason": "<error text>"},
+  "sources": {"translate", "repair_and_holdout", "loop_verify", "holdout_verify", "diff",
+              "host_reverify", "host_reverify_readme", "flash", "rust_source"}   // repo-relative paths
+}
+```
+
+Values shown are what the committed files hold today; every one is read from `sources` at request time. `c_lines_source` falls back to `backend/harness/expat/README.md` when the vendored source is not fetched. 503 if a file is unreadable. Say "N tested behaviors preserved", never "equivalent".
 
 `verdict` / `old_verdict` are verify.py classes: `match`, `divergence`, `safety_improvement`, `rust_crash`, `both_crash`, `timeout`. `stdout` is raw (invalid UTF-8 as `\x` escapes); `stdout_hex` is set only when stdout is not printable.
 

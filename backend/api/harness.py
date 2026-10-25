@@ -246,3 +246,48 @@ def load_c_source() -> str:
     from ai import prompts  # noqa: PLC0415
 
     return prompts.load_cjson_source(VENDOR)
+
+
+# ---------------------------------------------------------------- libexpat
+
+EXPAT_HARNESS = HARNESS / "expat"
+EXPAT_C_DRIVER = EXPAT_HARNESS / "build" / "expat_driver"
+EXPAT_VENDOR_LIB = EXPAT_HARNESS / "vendor" / "libexpat" / "expat" / "lib"
+BUILD_RUST_EXPAT = ROOT / "scripts" / "build_rust_expat.sh"
+EXPAT_RESULTS = ROOT / "backend" / "ai" / "results" / "expat-long-decode"
+EXPAT_REVERIFY = ROOT / "results" / "libexpat-host-reverify"
+# Argon's port that passed 747/747, 1,253/1,253 held out and 2,000/2,000 on the host re-verify.
+EXPAT_RUST_SRC = EXPAT_RESULTS / "argon-fresh-a" / "round_3" / "expat.rs"
+EXPAT_RUST_BIN = ROOT / "runs" / "build-expat" / "edan-reverify-a" / "target" / "release" / "theseus_expat"
+EXPAT_C_VERSION = "libexpat 2.9.0 (R_2_9_0)"
+
+_expat_lock = threading.Lock()
+
+
+def ensure_expat_c_driver() -> Path:
+    with _expat_lock:
+        if not os.access(EXPAT_C_DRIVER, os.X_OK):
+            if not (EXPAT_VENDOR_LIB / "xmlparse.c").is_file():
+                subprocess.run([str(EXPAT_HARNESS / "fetch_expat.sh")], capture_output=True, timeout=600)
+            subprocess.run([str(EXPAT_HARNESS / "build_expat.sh")], capture_output=True, timeout=600)
+        if not os.access(EXPAT_C_DRIVER, os.X_OK):
+            raise HarnessError(f"{EXPAT_C_DRIVER} is not built (bash backend/harness/expat/build_expat.sh)")
+    return EXPAT_C_DRIVER
+
+
+def expat_rust_binary() -> tuple[Path, str]:
+    """THESEUS_EXPAT_RUST_BIN, else the re-verified build, else build Argon's port once."""
+    label = "Argon's libexpat port (argon-fresh-a round 3)"
+    env = os.environ.get("THESEUS_EXPAT_RUST_BIN")
+    if env:
+        if not os.access(env, os.X_OK):
+            raise HarnessError(f"THESEUS_EXPAT_RUST_BIN={env} is not an executable file")
+        return Path(env), "THESEUS_EXPAT_RUST_BIN"
+    with _expat_lock:
+        if os.access(EXPAT_RUST_BIN, os.X_OK):
+            return EXPAT_RUST_BIN, label
+        res, raw = run_json([str(BUILD_RUST_EXPAT), str(EXPAT_RUST_SRC), "edan-reverify-a"], timeout=600)
+    if res is None or not res.get("ok") or not os.access(res.get("binary", ""), os.X_OK):
+        detail = (res or {}).get("errors") or raw
+        raise HarnessError(f"cannot build Argon's libexpat port: {str(detail)[-1000:]}")
+    return Path(res["binary"]), label

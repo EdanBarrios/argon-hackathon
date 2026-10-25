@@ -76,7 +76,7 @@ def test_try_rejects_bad_requests(client, drivers):
     assert client.post("/try", json={}).status_code == 400
     assert client.post("/try", json={"input": "a", "input_b64": "YQ=="}).status_code == 400
     assert client.post("/try", json={"input_b64": "!!!"}).status_code == 400
-    assert client.post("/try", json={"library": "expat", "input": "a"}).status_code == 400
+    assert client.post("/try", json={"library": "zlib", "input": "a"}).status_code == 400
     big = "x" * (try_input.MAX_INPUT_BYTES + 1)
     assert client.post("/try", json={"input": big}).status_code == 413
 
