@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import prompts
-from .feedback_patterns import divergence_pattern, expat_divergence_pattern
+from .feedback_patterns import divergence_pattern, expat_divergence_pattern, lua_divergence_pattern
 
 
 @dataclass(frozen=True)
@@ -106,4 +106,35 @@ EXPAT = Target(
     max_wait_seconds=3 * 3600,
 )
 
-TARGETS: dict[str, Target] = {CJSON.name: CJSON, EXPAT.name: EXPAT}
+def _lua_gen(root: Path, seed: int, count: int, out: Path) -> list[str]:
+    return [sys.executable, "-I", str(root / "backend/harness/lua/gen_inputs_lua.py"),
+            "--seed", str(seed), "--count", str(count), "--out", str(out)]
+
+
+# Lua 5.4.7 in scope is 271,891 input tokens by count_tokens (libexpat: ~196K), so the
+# Rust port is expected at 2-3x libexpat's 74K output tokens. Harness paths are the
+# proposed ones in backend/ai/lua/HARNESS_SPEC.md (C's lane); the loop refuses to run
+# until vendor_check and the driver exist.
+LUA = Target(
+    name="lua",
+    rust_file="lua.rs",
+    system_instruction=prompts.LUA_SYSTEM_INSTRUCTION,
+    load_source=prompts.load_lua_source,
+    translate_input=prompts.lua_translate_input,
+    repair_input=prompts.lua_repair_input,
+    vendor="backend/harness/lua/vendor/lua-5.4.7",
+    vendor_check="src/lvm.c",
+    c_driver="backend/harness/lua/build/lua_driver",
+    build_c="backend/harness/lua/build_lua.sh",
+    build_rust="scripts/build_rust_lua.sh",
+    crate_template="backend/harness/lua/rust_crate",
+    gen_inputs=_lua_gen,
+    divergence_pattern=lua_divergence_pattern,
+    diff_context=True,
+    inputs_prefix="lua-inputs",
+    max_output_tokens=1048576,
+    max_wait_seconds=3 * 3600,
+    polish_rounds=3,
+)
+
+TARGETS: dict[str, Target] = {CJSON.name: CJSON, EXPAT.name: EXPAT, LUA.name: LUA}
