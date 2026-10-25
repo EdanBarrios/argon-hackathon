@@ -41,14 +41,14 @@ How to say it: "Argon translated the whole of libexpat (18.5K lines of C) into 6
 
 How it ran: round 1 = `gemini-4-argon/round_1/expat.rs` (`--start-from`, no new model call). Each repair is a new conversation (`--fresh-repair`) with the C source, the previous file and the compiler output, thinking medium. Continuation off. Rounds 2 and 3 each fixed one compile error (rustc reports borrow errors only after type checking passes).
 
-Same settings, run `argon-fresh-b`: round 2 returned the file unchanged (0 thought tokens at medium); its later rounds are reported as they land.
+**Repeat, same settings, run `argon-fresh-b`: also 747/747 and 1,253/1,253 held-out**, in round 4 (round 2 returned the file unchanged at 0 thought tokens; round 3 fixed the E0282; round 4 fixed the E0505). It made the **same two compile fixes independently**, plus one extra change (`argon-fresh-b/round1_to_round4.diff`): `self.tag_stack.pop().unwrap()` became a `let ... else { return XML_ERROR_ASYNC_ENTITY }`, which removes a panic site on a path no input reaches. So n = 2 repair runs from the one-pass file, both 1.0 on every input set.
 
 Checks before quoting: no `std::process`, `std::fs`, `std::env` or `std::net` in the file; the C side is libexpat R_2_9_0 under ASan + UBSan (`backend/harness/expat`).
 
 How to say it: "Argon read all of libexpat, the XML parser inside Python, 18.5K lines of C, and wrote 6.5K lines of safe Rust in one 18-minute reply. After two one-line compile fixes, it matches the C library on 2,000 tested behaviors, including the W3C conformance suite and 1,253 inputs it never saw. Flash could not produce a file." Say "N tested behaviors preserved", never "equivalent".
 
 Open questions, recorded as reported:
-- Usage for Argon's round 1 reports **815,566 input tokens** for a prompt of about 204K tokens. We have not explained the 4x.
+- Usage for Argon's round 1 reports **815,566 input tokens** for a prompt Flash counted as 207,813. The interaction's own `steps` record (`interactions.get`) shows the reply was produced in **3 thought → model_output segments**; a cJSON call with 1 segment reports exactly its prompt (33,733), and a 2-segment libexpat repair reports about 2x its prompt (626,150, of which 554,740 cached). So reported input grows with the number of generation segments, consistent with the context being re-read for each segment. That is our reading of the usage record, not confirmed by Google; see `QA.md`.
 - The repair turn failed at 65,416 output tokens, close to 65,536. Suspected: a follow-up turn (`previous_interaction_id`) has a lower output cap than a fresh call. Not confirmed.
 
 ## cJSON v1.7.19: quality gate (`cjson-quality/`)
