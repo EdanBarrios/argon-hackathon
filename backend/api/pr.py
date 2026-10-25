@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -68,6 +69,12 @@ def write_release_dir(job_id: str, model: str | None) -> Path:
         usage["total_cached_tokens"] += m["cached_tokens"]
     rel = out_dir / "release"
     rel.mkdir(exist_ok=True)
+    # Per-round verify.sh reports, in the layout open_pr reads for the "fixed per round" table.
+    work = rel / "sandbox_work"
+    work.mkdir(exist_ok=True)
+    for vf in out_dir.glob("round_*/verify.json"):
+        shutil.copyfile(vf, work / f"verify_{vf.parent.name.split('_')[1]}.json")
+    inputs_dir = next((t.get("inputs_dir") for t in saved.get("timings") or [] if t.get("stage") == "inputs"), None)
     result = {
         "model": model,
         "rust_source": str((rdir / "cjson.rs").resolve()),
@@ -84,6 +91,8 @@ def write_release_dir(job_id: str, model: str | None) -> Path:
         "seconds": None,
         "interaction_id": None,
         "environment_id": None,
+        "verify_label": f"Host verify, live job {job_id} ({Path(inputs_dir).name if inputs_dir else 'generated inputs'})",
+        "rounds_label": "verify.sh reports from the live job",
         "source_job": job_id,
         "source_round": rdir.name,
     }

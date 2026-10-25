@@ -592,10 +592,13 @@ class RealPipeline:
         honest local dry run: status "dry_run", pr_url None, plus what would be pushed."""
         from . import pr
 
-        model = None
+        origin, repairer = None, None
         for e in self.store.events(job.id):
-            if e.type in ("translate", "repair") and e.data.get("phase") in ("done", "loaded"):
-                model = e.data.get("source_model") or e.data.get("model") or model
+            if e.type == "translate" and e.data.get("phase") in ("done", "loaded"):
+                origin = e.data.get("source_model") or e.data.get("model")
+            elif e.type == "repair" and e.data.get("phase") == "started":
+                repairer = e.data.get("model")
+        model = origin if not repairer or repairer == origin else f"{origin}, repaired by {repairer}"
         return pr.open_pr_for_job(job.id, approved_by, model)
 
 

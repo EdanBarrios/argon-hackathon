@@ -119,6 +119,8 @@ def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str
     held = result.get("holdout_verify") or {}
     lc, hc = local.get("counts") or {}, held.get("counts") or {}
     rows = _round_rows(jd, result)
+    verify_label = result.get("verify_label") or (
+        f"Host re-verify, seed {_spec(jd).get('seed', '?')} (same inputs as the sandbox)")
     cve = _cve_check((result.get("local_build") or {}).get("binary"))
     usage = result.get("usage") or {}
     lines = [
@@ -131,8 +133,8 @@ def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str
         "",
         "| | match rate | behaviors tested | divergences | Rust crashes | timeouts |",
         "|---|---|---|---|---|---|",
-        f"| Host re-verify, seed {_spec(jd).get('seed', '?')} "
-        f"(same inputs as the sandbox) | {_rate(local.get('match_rate'))} | {local.get('behaviors_tested')} | "
+        f"| {verify_label} "
+        f"| {_rate(local.get('match_rate'))} | {local.get('behaviors_tested')} | "
         f"{lc.get('divergence')} | {lc.get('rust_crash')} | {lc.get('timeout')} |",
         f"| Host held-out, seed {held.get('seed')} (inputs the agent never saw, {held.get('overlap_removed')} overlaps removed) | "
         f"{_rate(held.get('match_rate'))} | {held.get('behaviors_tested')} | {hc.get('divergence')} | "
@@ -141,7 +143,7 @@ def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str
         "",
         f"Sandbox claim and host re-verify agree: **{result.get('match_rates_agree')}**.",
         "",
-        "## Divergences found and fixed, per round (sandbox verify.sh reports)",
+        f"## Divergences found and fixed, per round ({result.get('rounds_label') or 'sandbox verify.sh reports'})",
         "",
         "| round | build | match rate | divergent inputs | Rust crashes |",
         "|---|---|---|---|---|",
