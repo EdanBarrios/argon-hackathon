@@ -53,7 +53,7 @@ All numbers come from `results/cjson-flash-vs-argon/README.md`, `docs/FRICTION-L
 | Generated inputs | 2,000/2,000 | 2,000/2,000 (flash-2, after an automatic retry at thinking medium) |
 | Time to a working port | 333 s, 355 s | 838 s (failed attempt + retry) |
 | Total tokens | 66K, 71K | 189K |
-| Targeted edge inputs | 980/980 | 961/980: 19 divergences, one root cause |
+| Targeted edge inputs | 980/980 (this port; 1 of 4 Argon ports) | 961/980: 19 divergences, one root cause |
 | Inputs Argon wrote to break the port | 225/225 | 225/225 |
 
 Argon was about 2.5x faster end to end with about 2.7x fewer tokens. Argon's port also agreed on 20,000 extra fuzz inputs. Flash's 19 divergences all come from one cJSON quirk: on `"\uZ\t\\"` C prints `OK\t""` and Flash's port prints `PARSE_ERROR at 7`. Details in `results/cjson-flash-vs-argon/README.md`.
@@ -87,7 +87,7 @@ Why we expect libexpat to separate the models (a prediction, not a result): Flas
 
 - Agreement covers parse-and-print output and exit status through our driver, not every cJSON function or performance.
 - Embedded NUL bytes in strings are compared only up to the NUL.
-- n = 2 runs per model on cJSON. Flash's one divergence is one port, one quirk.
+- n = 2 runs per model on cJSON. Across all saved ports (DECISIONS 12:27): Argon 1 of 4 ports at 980/980, 3 of 4 at 961/980; Flash 2 of 2 at 961/980; all 19 misses are the same `str_straddle_*` inputs. So this quirk is hard for both models, not a model difference. Argon's quality-gate run (backend/ai/results/cjson-quality/argon-full) reached 980/980 with 0 clippy and 0 panic lints.
 
 ## How Theseus uses Managed Agents
 

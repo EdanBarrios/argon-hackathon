@@ -12,7 +12,7 @@ Copied from `runs/` (gitignored) so the whole team can read them. Same prompts, 
 | Total tokens | 66K, 71K | 189K (both attempts billed) |
 | Thinking tokens | 26K, 31K | 112K |
 | Rust lines (`cjson.rs`) | 735, 714 | 734 |
-| Targeted adversarial inputs | 980/980 | **961/980 (98.06%), 19 divergences** |
+| Targeted adversarial inputs | 980/980 (argon-1; see note) | **961/980 (98.06%), 19 divergences** |
 | Argon-written adversarial inputs | 225/225 | 225/225 |
 | Divergences | 0 | 19, one root cause (below) |
 
@@ -26,7 +26,7 @@ Numbers from 12:09 re-run; an earlier 958-input run had 32 inputs silently overw
 
 ## How to say it
 
-- On the 2,000 generated inputs both models score 100%. On targeted edge inputs, Argon is 980/980 and Flash 961/980. One real behavior difference, n=1 port each. Do not claim Flash "can't".
+- On the 2,000 generated inputs both models score 100%. On targeted edge inputs these two ports split 980 vs 961, but that is one sample. Across all saved ports (DECISIONS 12:27): Argon 1 of 4 ports at 980/980, 3 of 4 at 961/980; Flash 2 of 2 at 961/980; all 19 misses are the same `str_straddle_*` inputs. So this quirk is hard for both models, not a model difference. Argon's quality-gate run (backend/ai/results/cjson-quality/argon-full) reached 980/980 with 0 clippy and 0 panic lints. Do not claim Flash "can't" and do not claim Argon reliably gets this quirk right.
 - The difference: Argon did it in one pass at full thinking, about 2.5x faster end to end with about 2.7x fewer tokens. Flash hit its 64K output ceiling at high thinking and only finished by thinking less.
 - Calling flash-1 a "failure" invites "just give it more room". It hit a token cap, not a translation mistake.
 - The originality claim (bigger libraries need Argon) is a prediction until the libexpat runs exist.
