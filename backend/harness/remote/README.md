@@ -26,6 +26,11 @@ rs = run_parallel([RemoteSpec(model="gemini-4-argon"), RemoteSpec(model="gemini-
 url = open_pr_remote(r.job_dir, approved_by="Edan", dry_run=False)   # only after a human clicks
 ```
 
+Both run the verifier preflight gate (`scripts/preflight.sh <lib>`) before any model call:
+`run_module_remote` returns status "error" with a `PREFLIGHT:` message, `run_parallel` raises
+`PreflightError`. Pass `skip_preflight=True` only if the caller already ran it.
+`open_pr_remote` also runs it and records the result in the certificate.
+
 `run_module_remote` never raises for agent, build or verify failures: check `status`, `error`
 and `local_match_rate`. `rounds` is total rounds (1 translate + rounds-1 repairs), the team
 convention. `resume_remote(interaction_id, job_dir)` re-attaches if the client process dies.
@@ -56,10 +61,15 @@ sandbox's own `verify_<N>.json` and `cjson.rs`), `verify_local.json`, `verify_ho
    locally on the same seed (`local_match_rate`, must equal the sandbox claim; a mismatch is
    flagged `MISMATCH`) and on a held-out seed the agent never saw (`holdout_match_rate`, the
    number to quote).
-4. **PR only after human approval.** `open_pr_remote` refuses without `approved_by` or a local
+4. **The PR is a migration certificate.** `migrated/cjson/` gets the crate, `EVIDENCE.md`,
+   `certificate.json` (scope, model and interaction ids, harness commit, pinned C commit, the
+   verify reports' `summary` counts for the same-seed and held-out sets, sandbox claim vs host
+   re-verify, preflight status, known limitations) and `reproduce.sh` (one command from a fresh
+   clone: fetch and build the C, build the crate, regenerate the same inputs, verify, compare).
+5. **PR only after human approval.** `open_pr_remote` refuses without `approved_by` or a local
    match rate of 1.0. The host builds the crate and `EVIDENCE.md` from verified files and mounts
    them as inline sources; the agent only runs git and curl.
-5. **Credentials at the proxy.** `GITHUB_TOKEN` is registered with `client.credentials.create`
+6. **Credentials at the proxy.** `GITHUB_TOKEN` is registered with `client.credentials.create`
    (github.com: Basic `x-oauth-basic:<token>`; api.github.com: Bearer) and attached to allowlist
    rules. The allowlist is github.com and api.github.com only. The token never enters the
    prompt or the sandbox, and the credentials are deleted when the step ends.

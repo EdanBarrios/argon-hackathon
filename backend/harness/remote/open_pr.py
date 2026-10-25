@@ -31,6 +31,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from . import certificate as cert_mod
 from ._common import (
     AGENT,
     HARNESS,
@@ -45,6 +46,8 @@ from ._common import (
     poll,
     usage_dict,
     write_transcript,
+    PreflightError,
+    run_preflight,
 )
 
 CRED_GIT = "theseus-github-git"
@@ -114,7 +117,9 @@ def _rate(x) -> str:
     return "n/a" if x is None else f"{x:.4f}"
 
 
-def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str:
+def build_evidence(jd: Path, result: dict, approved_by: str, branch: str, cert: dict | None = None) -> str:
+    cert = cert or cert_mod.build_certificate(jd, result, approved_by, branch)
+    cert_head, cert_tail = cert_mod.evidence_sections(cert)
     local = result.get("local_verify") or {}
     held = result.get("holdout_verify") or {}
     lc, hc = local.get("counts") or {}, held.get("counts") or {}
@@ -128,7 +133,9 @@ def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str
         "",
         "Every number below was produced by `backend/harness/verify.sh` (differential: same input bytes to the",
         "ASan/UBSan C driver and the Rust driver, raw stdout compared). The model did not grade itself.",
+        "Agreement on the tested inputs below is evidence, not a proof of equivalence.",
         "",
+        *cert_head,
         "## Result",
         "",
         "| | match rate | behaviors tested | divergences | Rust crashes | timeouts |",
@@ -177,22 +184,32 @@ def build_evidence(jd: Path, result: dict, approved_by: str, branch: str) -> str
         f"- cjson.rs sha256 `{hashlib.sha256(Path(result['rust_source']).read_bytes()).hexdigest()}`",
         f"- Approved by **{approved_by}** at {datetime.now().isoformat(timespec='seconds')}; branch `{branch}`",
         "",
-        "Reproduce: `scripts/build_rust.sh migrated/cjson/src/cjson.rs` then",
-        "`backend/harness/verify.sh --c backend/harness/build/cjson_driver --rust <binary> --inputs <dir> --timeout 20`.",
-        "",
+        *cert_tail,
     ]
     return "\n".join(lines)
 
 
 def build_payload(jd: Path, result: dict, approved_by: str, branch: str) -> dict[str, bytes]:
+    """The migrated/cjson/ files: crate, EVIDENCE.md, certificate.json and (when the
+    job's inputs come from a seed) reproduce.sh. Cheap and deterministic: reads files only."""
     crate = HARNESS / "rust_crate"
+    cert = cert_mod.build_certificate(jd, result, approved_by, branch)
+    try:
+        script = cert_mod.reproduce_script(cert)
+    except ValueError as exc:
+        script = None
+        cert["reproduce"] = None
+        cert["reproduce_unavailable"] = str(exc)
     files = {
         "Cargo.toml": (crate / "Cargo.toml").read_bytes(),
         "src/main.rs": (crate / "src/main.rs").read_bytes(),
         "src/cjson.rs": Path(result["rust_source"]).read_bytes(),
         ".gitignore": b"target/\n",
-        "EVIDENCE.md": build_evidence(jd, result, approved_by, branch).encode(),
+        "EVIDENCE.md": build_evidence(jd, result, approved_by, branch, cert).encode(),
+        "certificate.json": (json.dumps(cert, indent=2) + "\n").encode(),
     }
+    if script:
+        files["reproduce.sh"] = script.encode()
     if (crate / "Cargo.lock").exists():
         files["Cargo.lock"] = (crate / "Cargo.lock").read_bytes()
     return files
@@ -250,7 +267,7 @@ output verbatim. Do not edit any file content: every file you commit is already 
 {PAYLOAD}/ and was verified by the host. Set GIT_TERMINAL_PROMPT=0 for every git command.
 
 1. `git clone {PUBLIC_REPO_URL} /workspace/pr && cd /workspace/pr && git checkout -b {branch}`
-2. `mkdir -p migrated/cjson && cp -R {PAYLOAD}/crate/. migrated/cjson/`
+2. `mkdir -p migrated/cjson && cp -R {PAYLOAD}/crate/. migrated/cjson/ && (test ! -f migrated/cjson/reproduce.sh || chmod +x migrated/cjson/reproduce.sh)`
 3. `git add migrated/cjson && git -c user.name='Theseus agent' -c user.email='theseus-agent@users.noreply.github.com' commit -q -m '{title}' -m 'Approved-by: {approved_by}'`
 4. `git log -1 --stat && sha256sum migrated/cjson/src/cjson.rs && git rev-parse HEAD`
 {finish}
@@ -299,6 +316,8 @@ def open_pr_remote(
     model: str = "gemini-4-argon",
     allow_partial: bool = False,
     on_event: Event | None = None,
+    skip_preflight: bool = False,
+    refresh_reports: bool = True,
 ) -> str:
     """Push migrated/cjson/ (crate + EVIDENCE.md) on branch theseus/<job> and open a PR against main.
 
@@ -320,6 +339,27 @@ def open_pr_remote(
     token = env_value("GITHUB_TOKEN")
     if not dry_run and not token:
         raise PRError("GITHUB_TOKEN is not set (fine-grained token on this repo: Contents RW, Pull requests RW)")
+
+    # The certificate records whether the verifier itself was healthy when we signed off.
+    if not skip_preflight:
+        try:
+            pf = run_preflight(result.get("library") or "cjson", on_event=on_event)
+        except PreflightError as exc:
+            raise PRError(str(exc)) from None
+        (jd / "preflight-pr.json").write_text(json.dumps(pf, indent=2))
+    # Older host reports predate verify.py's `summary` object: re-run the host verify
+    # (same seed, same held-out rule) so the certificate's counts come from a real report.
+    if refresh_reports and (jd / "inputs").is_dir() and (jd / "spec.json").exists():
+        stale = [n for n in ("verify_local.json", "verify_holdout.json")
+                 if not (cert_mod._read_json(jd / n) or {}).get("summary")]
+        if stale:
+            from .run_remote import reverify_job
+
+            emit(on_event, f"[pr] {', '.join(stale)} has no summary object: re-running host verify")
+            reverify_job(jd)
+            result = json.loads((jd / "result.json").read_text())
+            if result.get("local_match_rate") != 1.0 and not allow_partial:
+                raise PRError(f"host re-verify gave match_rate {result.get('local_match_rate')}, not 1.0")
 
     job = re.sub(r"[^A-Za-z0-9._-]+", "-", f"{jd.parent.name}-{jd.name}").strip("-")
     branch = f"theseus/{job}"
