@@ -1,0 +1,126 @@
+{
+  "model": "gemini-4-argon",
+  "target": "expat",
+  "rounds_budget": 4,
+  "start_from": "../backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs",
+  "fresh_repair": true,
+  "rounds_run": 4,
+  "inputs": "<repo>/runs/ai/expat-inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": 1.0,
+  "best_round": 4,
+  "best_match_rate": 1.0,
+  "rounds_to_100": 4,
+  "total_model_seconds": 1746.5,
+  "total_tokens": {
+    "total_input_tokens": 1877549,
+    "total_output_tokens": 221002,
+    "total_thought_tokens": 463,
+    "total_cached_tokens": 835085
+  },
+  "usd": 4.3831,
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "start_from",
+      "start_from": "<repo>/backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs",
+      "interaction_id": "",
+      "seconds": 0.0,
+      "usage": {},
+      "thinking_level": null,
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 0,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 2,
+      "kind": "repair",
+      "interaction_id": "v1_ChZNRnplYXVfaUxQTEJzT0lQOFpIMVNBEhZNRnplYXVfaUxQTEJzT0lQOFpIMVNB",
+      "seconds": 570.1,
+      "usage": {
+        "total_input_tokens": 625596,
+        "total_output_tokens": 73653,
+        "total_thought_tokens": 0,
+        "total_cached_tokens": 279557,
+        "total_tokens": 699249
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 1,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 3,
+      "kind": "repair",
+      "interaction_id": "v1_ChdhbDdlYXZxMUw4SFYxTWtQMnBuSjZROBIXYWw3ZWF2cTFMOEhWMU1rUDJwbko2UTg",
+      "seconds": 592.7,
+      "usage": {
+        "total_input_tokens": 625800,
+        "total_output_tokens": 73658,
+        "total_thought_tokens": 180,
+        "total_cached_tokens": 552570,
+        "total_tokens": 699638
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6554,
+      "compile_ok": false,
+      "build_seconds": 1,
+      "match_rate": null,
+      "divergences": null,
+      "crashes": null
+    },
+    {
+      "round": 4,
+      "kind": "repair",
+      "interaction_id": "v1_Chd2V0RlYXZ5NUo4V3MxTWtQeHBDbmdRYxIXdldEZWF2eTVKOFdzMU1rUHhwQ25nUWM",
+      "seconds": 583.7,
+      "usage": {
+        "total_input_tokens": 626153,
+        "total_output_tokens": 73691,
+        "total_thought_tokens": 283,
+        "total_cached_tokens": 2958,
+        "total_tokens": 700127
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6557,
+      "compile_ok": true,
+      "build_seconds": 2,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 747
+    }
+  ],
+  "holdout": {
+    "seed": 1001,
+    "inputs": "<repo>/runs/ai/holdout-c2000-s1001-minus-expat-inputs-c300-s1",
+    "overlap_removed": 747,
+    "behaviors_tested": 1253,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 1253,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    }
+  }
+}

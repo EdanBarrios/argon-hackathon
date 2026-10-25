@@ -1,0 +1,15 @@
+5504c5504,5506
+<                     let tag = self.tag_stack.pop().unwrap();
+---
+>                     let Some(tag) = self.tag_stack.pop() else {
+>                         return XML_ERROR_ASYNC_ENTITY;
+>                     };
+5958c5960
+<         let mut used_att_ids = Vec::with_capacity(raw_atts.len());
+---
+>         let mut used_att_ids: Vec<usize> = Vec::with_capacity(raw_atts.len());
+5960c5962,5963
+<         for curr_att in &raw_atts {
+---
+>         for i in 0..raw_atts.len() {
+>             let curr_att = raw_atts[i];
