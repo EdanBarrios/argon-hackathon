@@ -36,7 +36,7 @@ export function Evidence({
   for (const c of crashes) checks.push({ ok: true, text: `${c.cve ?? "Crash input"}: C ${c.kind}, Rust ${c.rust_behavior}` });
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {checks.length ? (
         <ul className="flex flex-col gap-2">
           {checks.map((c, i) => (
@@ -49,12 +49,10 @@ export function Evidence({
       ) : (
         <p className="text-lg text-dim">Evidence appears as the verifier reports.</p>
       )}
+      <ApprovalPanel job={job} source={source} onJob={onJob} />
       <p className="text-sm text-dim">
         A human approves before anything is pushed. The model never grades its own work.
       </p>
-      <div className="mt-auto">
-        <ApprovalPanel job={job} source={source} onJob={onJob} />
-      </div>
     </div>
   );
 }
