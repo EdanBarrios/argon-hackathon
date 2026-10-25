@@ -25,9 +25,13 @@ from typing import Any
 from google import genai
 
 from . import prompts
+from .feedback_patterns import divergence_pattern, expat_divergence_pattern  # noqa: F401 (re-export)
+from .targets import CJSON, Target
 
 DEFAULT_MODEL = "gemini-4-argon"
 POLL_SECONDS = 5
+# Wall-clock cap per interaction, so a stuck agent cannot hang a run forever.
+MAX_WAIT_SECONDS = 45 * 60
 # parse + print in Rust is ~20K output tokens; thinking also counts toward the cap.
 # Above 65,536 requires background=True, which we always use.
 MAX_OUTPUT_TOKENS = 131072
@@ -61,6 +65,8 @@ class TranslateResult:
     # Extras with defaults, so the five fields above stay the contract.
     thinking_level: str | None = None
     notes: list[str] = field(default_factory=list)
+    # Follow-up turns used because the first reply hit the output cap (0 = single pass).
+    continuations: int = 0
 
 
 # ---------------------------------------------------------------- client
@@ -115,10 +121,10 @@ def _is_param_error(exc: Exception, word: str) -> bool:
     return word in text and any(s in text for s in ("400", "invalid", "not supported", "unsupported"))
 
 
-def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: list[str]):
+def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: list[str],
+            max_tokens: int = MAX_OUTPUT_TOKENS):
     """interactions.create, stepping down thinking_level / max_output_tokens if the model rejects them."""
     levels = [thinking] + THINKING_FALLBACK.get(thinking or "", [])
-    max_tokens = MAX_OUTPUT_TOKENS
     last: Exception | None = None
     for _ in range(8):
         cfg: dict = {"max_output_tokens": max_tokens}
@@ -140,10 +146,17 @@ def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: lis
     raise TranslateError(f"interactions.create kept failing for {kwargs['model']}: {last}")
 
 
-def _wait(client: genai.Client, interaction: Any) -> Any:
-    """Poll interactions.get every POLL_SECONDS until the interaction leaves queued/in_progress."""
+def _wait(client: genai.Client, interaction: Any, max_seconds: float = MAX_WAIT_SECONDS) -> Any:
+    """Poll interactions.get every POLL_SECONDS until the interaction leaves queued/in_progress.
+
+    Raises TranslateError after max_seconds of wall clock."""
     transient = 0
+    deadline = time.monotonic() + max_seconds
     while getattr(interaction, "status", None) in ("queued", "in_progress", None):
+        if time.monotonic() > deadline:
+            raise TranslateError(
+                f"interaction {interaction.id} still {getattr(interaction, 'status', None)!r} after {max_seconds:.0f}s"
+            )
         time.sleep(POLL_SECONDS)
         try:
             interaction = client.interactions.get(interaction.id)
@@ -171,7 +184,37 @@ def extract_rust(text: str | None, notes: list[str] | None = None) -> str:
     return blocks[0].rstrip() + "\n"
 
 
-def _run(model: str, input_text: str, thinking: str, previous_id: str | None) -> TranslateResult:
+_LEADING_FENCE = re.compile(r"\A\s*```[ \t]*(?:rust|rs)?[ \t]*\r?\n", re.IGNORECASE)
+
+
+def _continue(client: genai.Client, kwargs: dict, interaction: Any, level: str | None,
+              notes: list[str], usage: dict, target: Target) -> tuple[Any, str, int]:
+    """Resume a reply cut off at the output cap, on the same conversation.
+
+    Returns (last interaction, joined text, continuation turns used). Raises
+    TranslateError if the reply is still cut off after target.continue_turns turns.
+    """
+    text = getattr(interaction, "output_text", None) or ""
+    for turn in range(1, target.continue_turns + 1):
+        notes.append(f"{kwargs['model']} interaction {interaction.id} hit the output cap "
+                     f"({len(text)} chars so far); continuation turn {turn}")
+        print(f"[ai.translate] {notes[-1]}", file=sys.stderr, flush=True)
+        cont = dict(kwargs, input=prompts.CONTINUE_INPUT, previous_interaction_id=interaction.id)
+        interaction, _ = _create(client, cont, level, notes, target.max_output_tokens)
+        interaction = _wait(client, interaction, target.max_wait_seconds)
+        for k, v in _usage_dict(interaction).items():
+            usage[k] += v
+        text += _LEADING_FENCE.sub("", getattr(interaction, "output_text", None) or "", count=1)
+        status = getattr(interaction, "status", None)
+        if status == "completed":
+            return interaction, text, turn
+        if status != "incomplete":
+            raise TranslateError(f"continuation {interaction.id} ended with status {status!r}, usage {usage}")
+    raise TranslateError(f"reply still cut off after {target.continue_turns} continuation turns, usage {usage}")
+
+
+def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
+         target: Target = CJSON) -> TranslateResult:
     """One logical call. If the model runs out of output budget (status "incomplete"),
     retry once at the next lower thinking level. Observed: gemini-3.8-flash at "high"
     spent ~63K thought tokens and stopped at the 65,536 output cap mid-file, even
@@ -181,7 +224,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
     kwargs: dict = {
         "model": model,
         "input": input_text,
-        "system_instruction": prompts.SYSTEM_INSTRUCTION,
+        "system_instruction": target.system_instruction,
         "background": True,
     }
     if previous_id:
@@ -189,13 +232,18 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
     started = time.monotonic()
     usage = dict.fromkeys(USAGE_FIELDS, 0)
     level: str | None = thinking
+    text: str | None = None
+    continuations = 0
     for attempt in (1, 2):
-        interaction, used_level = _create(client, kwargs, level, notes)
-        interaction = _wait(client, interaction)
+        interaction, used_level = _create(client, kwargs, level, notes, target.max_output_tokens)
+        interaction = _wait(client, interaction, target.max_wait_seconds)
         status = getattr(interaction, "status", None)
         for k, v in _usage_dict(interaction).items():
             usage[k] += v
         if status == "completed":
+            break
+        if status == "incomplete" and target.continue_turns:
+            interaction, text, continuations = _continue(client, kwargs, interaction, used_level, notes, usage, target)
             break
         seconds = round(time.monotonic() - started, 1)
         lower = (THINKING_FALLBACK.get(used_level or "") or [None])[0]
@@ -215,7 +263,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
             + (f": {errors}" if errors else "")
         )
     seconds = round(time.monotonic() - started, 1)
-    rust = extract_rust(getattr(interaction, "output_text", None), notes)
+    rust = extract_rust(text if text is not None else getattr(interaction, "output_text", None), notes)
     for note in notes:
         print(f"[ai.translate] {note}", file=sys.stderr)
     return TranslateResult(
@@ -226,66 +274,14 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
         model=model,
         thinking_level=used_level,
         notes=notes,
+        continuations=continuations,
     )
 
 
 # ---------------------------------------------------------------- feedback
 
 
-def _kind(line: str | None) -> str:
-    line = line or ""
-    if line.startswith("OK\t"):
-        return "OK"
-    if line.startswith("PARSE_ERROR at"):
-        return "ERR_AT"
-    if line == "PARSE_ERROR":
-        return "ERR"
-    if line == "TIMEOUT":
-        return "TIMEOUT"
-    return "OTHER"
-
-
-def _char_class(ch: str) -> str:
-    if ch == "":
-        return "end"
-    if ch.isdigit() or ch in "+-.eE":
-        return "num"
-    if ch == '"':
-        return "quote"
-    if ch == "\\":
-        return "backslash"
-    if ch in "{}[],:":
-        return ch
-    if ch.isalpha():
-        return "alpha"
-    return "punct"
-
-
-def divergence_pattern(d: dict) -> str:
-    """Coarse signature of a divergence, so 50 copies of one bug count as one pattern."""
-    c, r = d.get("c_output") or "", d.get("rust_output") or ""
-    kc, kr = _kind(c), _kind(r)
-    if kc == "OK" and kr == "OK":
-        i = next((j for j, (a, b) in enumerate(zip(c, r)) if a != b), min(len(c), len(r)))
-        before = c[max(0, i - 1):i]
-        in_string = c[:i].replace("\\\\", "").replace('\\"', "").count('"') % 2 == 1
-        where = "string" if in_string else ("number" if before and _char_class(before) == "num" else "structure")
-        return f"OK/OK print differs in {where}: C next={_char_class(c[i:i+1])} Rust next={_char_class(r[i:i+1])}"
-    inp = d.get("input") or ""
-    if kc == "ERR_AT" and kr == "ERR_AT":
-        try:
-            oc, orr = int(c.rsplit(" ", 1)[1]), int(r.rsplit(" ", 1)[1])
-            side = "earlier" if orr < oc else "later"
-        except ValueError:
-            oc, side = 0, "?"
-        # Byte class at C's error offset (approximate: the report input is text).
-        return f"both reject, Rust error offset {side} than C, C stops at {_char_class(inp[oc:oc+1])}"
-    # Accept/reject disagreements: split by what the document starts with.
-    first = inp.lstrip(" \t\r\n")[:1]
-    return f"C {kc} vs Rust {kr}, input starts with {_char_class(first)}"
-
-
-def trim_feedback(feedback: dict) -> dict:
+def trim_feedback(feedback: dict, pattern=divergence_pattern) -> dict:
     """Cut a raw verify.sh report (plus compile_errors) down to what goes in the prompt.
 
     Compile errors in full. Divergences deduped by pattern, the shortest input per
@@ -302,7 +298,7 @@ def trim_feedback(feedback: dict) -> dict:
         }
     groups: dict[str, list[dict]] = {}
     for d in feedback.get("divergences") or []:
-        groups.setdefault(divergence_pattern(d), []).append(d)
+        groups.setdefault(pattern(d), []).append(d)
     ranked = sorted(groups.items(), key=lambda kv: -len(kv[1]))
     picked = []
     for pattern, items in ranked[:MAX_DIVERGENCES]:
@@ -314,6 +310,7 @@ def trim_feedback(feedback: dict) -> dict:
             "file": best.get("file"),
             "pattern": pattern,
             "pattern_count": len(items),
+            **({"first_diff": best["first_diff"]} if best.get("first_diff") else {}),
         })
     out["divergences"] = picked
     out["divergence_total"] = (feedback.get("counts") or {}).get("divergence") or len(feedback.get("divergences") or [])
@@ -327,17 +324,18 @@ def trim_feedback(feedback: dict) -> dict:
 # ---------------------------------------------------------------- public API
 
 
-def translate(c_source: str, model: str = DEFAULT_MODEL) -> TranslateResult:
-    """One-shot translation of cJSON parse + print into a complete cjson.rs (thinking high)."""
-    return _run(model, prompts.translate_input(c_source), "high", previous_id=None)
+def translate(c_source: str, model: str = DEFAULT_MODEL, target: Target = CJSON) -> TranslateResult:
+    """One-shot translation of the target (default cJSON parse + print) into one complete Rust file (thinking high)."""
+    return _run(model, target.translate_input(c_source), "high", previous_id=None, target=target)
 
 
-def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL) -> TranslateResult:
+def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
+           target: Target = CJSON) -> TranslateResult:
     """Continue prev's conversation with verifier feedback; returns a full new cjson.rs (thinking medium).
 
     feedback is {"compile_errors": str | None, "divergences": [...], "crashes": [...]}
     in the shape of verify.sh output (extra verify.sh keys such as counts are used
     for the summary if present).
     """
-    text = prompts.format_feedback(trim_feedback(feedback))
-    return _run(model, prompts.repair_input(text), "medium", previous_id=prev.interaction_id)
+    text = prompts.format_feedback(trim_feedback(feedback, target.divergence_pattern))
+    return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)

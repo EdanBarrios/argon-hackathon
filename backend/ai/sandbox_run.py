@@ -95,10 +95,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--count", type=int, default=300)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--holdout-seed", type=int, help="default: --seed + 1000")
+    ap.add_argument("--holdout-count", type=int, default=1000,
+                    help="inputs generated for the held-out check before overlap removal (236 are fixed seeds shared by every seed)")
     ap.add_argument("--branch", default="main", help="branch of the public repo the sandbox clones")
     ap.add_argument("--environment", help="existing sandbox environment id to reuse")
     ap.add_argument("--root", help="harness root (default: auto, as in ai.loop)")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("--max-wait", type=float, default=90 * 60, help="seconds before giving up on the agent")
     ap.add_argument("--dry-run", action="store_true", help="print the request and exit; no API call")
     args = ap.parse_args(argv)
 
@@ -125,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
     started = time.monotonic()
     client = _get_client()
     try:
-        interaction = _wait(client, client.interactions.create(**kwargs))
+        interaction = _wait(client, client.interactions.create(**kwargs), max_seconds=args.max_wait)
     except Exception as exc:  # noqa: BLE001 - record any API failure in the summary
         summary["error"] = f"{type(exc).__name__}: {exc}"
         write_json(out / "summary.json", summary)
@@ -168,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
     c_driver = ensure_c_driver(root)
     same = ensure_inputs(root, args.count, args.seed)
     seed = args.holdout_seed if args.holdout_seed is not None else args.seed + 1000
-    held_dir, overlap = holdout_inputs(root, args.count, seed, same)
+    held_dir, overlap = holdout_inputs(root, args.holdout_count, seed, same)
     for key, inputs in (("host_same_seed", same), ("host_holdout", held_dir)):
         report = host_verify(verify_sh, c_driver, build["binary"], inputs, args.jobs)
         write_json(out / f"{key}_verify.json", report)

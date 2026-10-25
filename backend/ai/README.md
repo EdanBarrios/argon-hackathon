@@ -8,12 +8,14 @@ Owner: **A (ai)**. Lead Argon planner, managed-agent prompts, repair prompts. Se
 | `translate.py` | `translate()` / `repair()` through the Interactions API (background + poll) and feedback trimming |
 | `loop.py` | Local translate → build → verify → repair loop, then a held-out check |
 | `sandbox_run.py` | The same loop run by a managed agent in a remote sandbox, re-verified on the host |
+| `report.py` | One table of every run's `summary.json`: held-out, adversarial, seconds, USD, grouped for repeats |
 
 ```bash
 cd backend
 uv run python -m ai.loop --model gemini-4-argon --rounds 5          # local (live demo)
 uv run python -m ai.sandbox_run --model gemini-4-argon --rounds 5   # managed-agent pre-run
 uv run python -m ai.sandbox_run --dry-run                           # show the request, no API call
+uv run python -m ai.report                                          # every run in one table
 uv run pytest -q ai/tests                                           # offline tests
 ```
 
@@ -22,3 +24,7 @@ uv run pytest -q ai/tests                                           # offline te
 input the loop saw removed, and the model never sees their results. The per-round rates
 are on the inputs that repair feedback came from. In a sandbox run they are the agent's
 own claims; `claim_holds` says whether the host reproduced the final one.
+
+For cJSON, `summary.json` → `adversarial` also has the best build's rate on the committed
+targeted and Argon-written corpora (C's `adversarial/run.sh`). Generated inputs give 1.0
+for every port so far; the targeted corpus is what separates them. Quote both, with n.

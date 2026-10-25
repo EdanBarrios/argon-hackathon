@@ -62,7 +62,7 @@ def test_holdout_removes_inputs_the_loop_saw(tmp_path, monkeypatch):
     (generated / "x.json").write_bytes(b"[1]")  # same bytes as a.json, different name
     (generated / "y.json").write_bytes(b"[2]")
     (generated / "z.json").write_bytes(b"{}")
-    monkeypatch.setattr(loop, "ensure_inputs", lambda root, count, seed: generated)
+    monkeypatch.setattr(loop, "ensure_inputs", lambda root, count, seed, target=None: generated)
 
     out, removed = loop.holdout_inputs(tmp_path, 3, 1001, seen)
     assert removed == 2
@@ -87,3 +87,67 @@ def test_dry_run_makes_no_api_call(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert '"agent": "antigravity-preview-09-2026"' in out
     assert "--branch feat/x" in out
+
+
+def test_wait_gives_up_after_max_seconds(monkeypatch):
+    import types
+
+    import pytest
+
+    from ai import translate
+
+    stuck = types.SimpleNamespace(id="i-1", status="in_progress")
+    client = types.SimpleNamespace(interactions=types.SimpleNamespace(get=lambda _id: stuck))
+    monkeypatch.setattr(translate, "POLL_SECONDS", 0)
+    with pytest.raises(translate.TranslateError, match="still 'in_progress'"):
+        translate._wait(client, stuck, max_seconds=0.05)
+
+
+def test_cjson_target_keeps_the_original_prompt_words():
+    from ai.targets import CJSON
+
+    assert CJSON.system_instruction == prompts.SYSTEM_INSTRUCTION
+    assert CJSON.translate_input("C") == prompts.translate_input("C")
+    assert CJSON.repair_input("fb") == prompts.repair_input("fb")
+
+
+def test_first_diff_and_expat_patterns():
+    from ai.feedback_patterns import expat_divergence_pattern
+
+    assert loop.first_diff(b"START \"a\"\nTEXT \"x\"\nOK\n", b"START \"a\"\nTEXT \"y\"\nOK\n") == \
+        {"line": 2, "c": 'TEXT "x"', "rust": 'TEXT "y"'}
+    assert loop.first_diff(b"A\nOK\n", b"A\n")["c"] == "OK"
+    pat = expat_divergence_pattern
+    assert pat({"c_output": "ERROR 4 line 1 col 2", "rust_output": "ERROR 2 line 1 col 0"}) == \
+        "both reject: C ERROR 4, Rust ERROR 2"
+    assert pat({"c_output": "ERROR 7 line 2 col 5", "rust_output": "ERROR 7 line 2 col 4"}) == \
+        "both reject with ERROR 7, line/col differ"
+    assert pat({"c_output": "START \"a\"", "rust_output": "ERROR 2 line 1 col 0"}) == "C events vs Rust ERROR 2"
+    assert pat({"c_output": "START", "rust_output": "START",
+                "first_diff": {"line": 3, "c": "END \"a\"", "rust": "TEXT \"b\""}}) == \
+        "both accept, first differing line: C END vs Rust TEXT"
+
+
+def test_continuation_joins_a_cut_off_reply(monkeypatch):
+    import dataclasses
+    import types
+
+    from ai import translate
+    from ai.targets import EXPAT
+
+    replies = iter([
+        types.SimpleNamespace(id="i1", status="incomplete", output_text="```rust\nfn a() {}\nfn b(", usage=None),
+        types.SimpleNamespace(id="i2", status="completed", output_text="```rust\n) {}\n```\n", usage=None),
+    ])
+    sent = []
+
+    def create(**kw):
+        sent.append(kw)
+        return next(replies)
+
+    client = types.SimpleNamespace(interactions=types.SimpleNamespace(create=create, get=None))
+    monkeypatch.setattr(translate, "_get_client", lambda: client)
+    res = translate._run("m", "go", "high", None, target=dataclasses.replace(EXPAT, continue_turns=2))
+    assert res.rust_source == "fn a() {}\nfn b() {}\n"
+    assert res.continuations == 1 and res.interaction_id == "i2"
+    assert sent[1]["previous_interaction_id"] == "i1" and sent[1]["input"] == prompts.CONTINUE_INPUT

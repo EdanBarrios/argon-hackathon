@@ -218,6 +218,10 @@ def format_feedback(fb: dict) -> str:
                 + f"input: {json.dumps(d.get('input'), ensure_ascii=False)}\n"
                 + f"c_output:    {json.dumps(d.get('c_output'), ensure_ascii=False)}\n"
                 + f"rust_output: {json.dumps(d.get('rust_output'), ensure_ascii=False)}"
+                + (f"\nfirst_diff: output line {d['first_diff']['line']}: "
+                   f"C {json.dumps(d['first_diff'].get('c'), ensure_ascii=False)} vs "
+                   f"Rust {json.dumps(d['first_diff'].get('rust'), ensure_ascii=False)}"
+                   if d.get("first_diff") else "")
             )
     crashes = fb.get("crashes") or []
     if crashes:
@@ -237,3 +241,161 @@ def format_feedback(fb: dict) -> str:
     if not lines:
         lines.append("No problems reported.")
     return "\n\n".join(lines)
+
+
+CONTINUE_INPUT = (
+    "Your reply was cut off by the output limit. Continue the file from the exact "
+    "character where it stopped: do not repeat anything, do not restart the code "
+    "block, and do not add commentary. Close the ```rust block when the file is complete."
+)
+
+
+# ---------------------------------------------------------------- libexpat
+
+EXPAT_DIR = REPO_ROOT / "backend" / "harness" / "expat"
+EXPAT_CRATE_DIR = EXPAT_DIR / "rust_crate"
+EXPAT_DRIVER_C = EXPAT_DIR / "drivers" / "expat_driver.c"
+
+EXPAT_SYSTEM_INSTRUCTION = """\
+You are translating C to safe Rust for Theseus, a C to Rust migration tool whose \
+output is checked by a deterministic differential verifier, not by you.
+
+Task: translate libexpat R_2_9_0 (the whole expat/lib library you are given: \
+xmlparse.c, xmlrole.c, xmltok.c, xmltok_impl.c, xmltok_ns.c, xcs.c and their \
+headers) into ONE safe-Rust file, `expat.rs`, that implements INTERFACE.md exactly, \
+for the configuration in the C driver: XML_ParserCreate(NULL) (no namespaces), a fixed \
+zero hash salt, no external entities, parameter entity parsing NEVER, one \
+XML_Parse(isFinal=1) call on the whole input. The file replaces `src/expat.rs` in a \
+fixed crate whose `src/main.rs` you are given and cannot change.
+
+Hard rules:
+1. Match the C output byte for byte: the same events with the same bytes on success, \
+and on failure the same XML_Error code, line and column. The verifier compares raw \
+stdout of the C driver and your Rust driver on thousands of inputs.
+2. No unsafe code. The build rejects any file containing the word "unsafe", even in \
+a comment or string, so never write that word at all.
+3. std only. No external crates, no FFI, no build scripts. It must build offline.
+4. Never panic: no unwrap on input-dependent values, no unchecked indexing, no \
+arithmetic overflow (use checked or wrapping ops where C relies on wrap). A panic \
+counts as a crash.
+5. No recursion per element or per entity level. Keep the open-element stack and the \
+open-entity stack on the heap, as expat 2.7+ does; inputs nest 100,000 deep. A stack \
+overflow counts as a crash.
+6. Keep the public API from INTERFACE.md and the template: `pub enum Event` and \
+`pub struct XmlError` with exactly the given variants and fields, and \
+`pub fn parse(input: &[u8]) -> Result<Vec<Event>, XmlError>`.
+
+How to structure the port. Translate the C structure, not your own XML parser: the \
+verifier will find every place you deviate. Port xmltok (the encoding tables, the \
+byte-type classification, the content/prolog/attribute-value/entity-value \
+tokenizers for UTF-8, UTF-16LE/BE, Latin-1 and US-ASCII, and position tracking), \
+xmlrole (the prolog state machine), and the xmlparse processors (prologProcessor, \
+contentProcessor, doContent, storeAtts, entity storage and expansion, \
+epilogProcessor, cdata handling) as state machines over byte offsets. Generic code \
+over an encoding trait or enum is fine. Omit what is out of scope: namespaces, \
+external entity parsing, suspend/resume, XML_GetBuffer/ParseBuffer, reparse deferral, \
+custom memory suites, the allocation tracker, unknown-encoding handlers.
+
+Known traps:
+- Error codes are the enum XML_Error numbers in expat.h. Which code a document gets \
+depends on which processor and tokenizer state sees the problem first; follow the C \
+control flow, including XML_ERROR_NO_ELEMENTS (3) for empty or whitespace-only input, \
+JUNK_AFTER_DOC_ELEMENT (9), UNCLOSED_TOKEN (5) versus PARTIAL_CHAR (6) at end of \
+input, and INVALID_TOKEN (4).
+- Error position: line is 1-based, column 0-based in characters of the input \
+encoding (not bytes). expat reports the position of eventPtr, usually the start of \
+the offending token, updated by the encoding's updatePosition (CR, LF and CRLF are \
+one line break each). Reproduce where eventPtr points on every error path, including \
+errors raised inside entity expansion (where the position is the reference in the \
+document, not inside the entity text).
+- Encoding detection: BOM sniffing and the encoding in the XML declaration, \
+UTF-16 without BOM detected from the first bytes, Latin-1 and US-ASCII converted to \
+UTF-8 for callbacks, any other name fails with UNKNOWN_ENCODING (18), a declaration \
+that contradicts the detected encoding fails with INCORRECT_ENCODING (19). Callbacks \
+always receive UTF-8. Invalid UTF-8 bytes are INVALID_TOKEN, and surrogates and \
+non-characters follow xmltok's tables exactly.
+- Character data: newline normalization (CR and CRLF become LF in text and in \
+attribute values before normalization), character references, predefined entities, \
+internal general entities expanded in content (events from the replacement text, \
+markup included) and in attribute values. Text chunking does not matter.
+- Attributes: duplicate attributes fail with DUPLICATE_ATTRIBUTE (8); values are \
+normalized (whitespace characters to spaces; non-CDATA types declared in ATTLIST also \
+collapse and trim spaces); defaulted attributes from ATTLIST come after the specified \
+ones, in declaration order; the first ATTLIST declaration of an attribute wins.
+- DTD: entity declarations (first declaration wins; EntityDecl events are reported \
+for every declaration as expat does), the value after character-reference processing \
+with entity references left as written, comments and PIs inside the DTD are reported \
+through the same handlers, `<!ELEMENT>` and notation declarations are parsed without \
+events. Undefined entity references: UNDEFINED_ENTITY (11) in a standalone document \
+or one without external subset, or Skipped events where expat skips them. Follow \
+expat's dtd->hasParamEntityRefs / standalone / keepProcessing logic.
+- Recursive entity references fail with RECURSIVE_ENTITY_REF (12). Entity text \
+must be properly nested (ASYNC_ENTITY, 13).
+- Billion-laughs protection is required: port accountingDiffTolerated, \
+accountingOnAbort, entityTrackingOnOpen/Close and every call site that accounts \
+direct and indirect bytes, with the defaults from internal.h (maximum amplification \
+100.0, activation threshold 8388608 bytes). A 9-level billion-laughs document must \
+fail with AMPLIFICATION_LIMIT_BREACH (43) at the same line and column as C, and \
+smaller expansions must succeed.
+- `<a/>` gives Start then End. The XML declaration gives XmlDecl with standalone -1, \
+0 or 1. A doctype gives DoctypeStart (has_internal_subset true when there is a [...] \
+subset) and DoctypeEnd.
+
+Reply format: think as long as you need, then reply with exactly one fenced code block \
+tagged rust that contains the complete expat.rs, from the first line to the last. No \
+other code blocks. Write compact code without long doc comments; this file is large. \
+Never elide code with comments like "rest unchanged" or "same as above"; the block is \
+compiled as is.
+"""
+
+# Library files sent to the model: expat/lib minus the platform entropy shims
+# (the driver fixes the hash salt) and the Windows config.
+_EXPAT_SKIP_PREFIXES = ("random_", "winconfig")
+
+
+def load_expat_source(vendor_dir: Path) -> str:
+    """expat/lib *.h then *.c as one labeled text blob. vendor_dir is vendor/libexpat."""
+    lib = vendor_dir / "expat" / "lib"
+    files = sorted(p for p in lib.iterdir()
+                   if p.suffix in (".h", ".c") and not p.name.startswith(_EXPAT_SKIP_PREFIXES))
+    files.sort(key=lambda p: (p.suffix != ".h", p.name))
+    return "\n".join(_fence("c", f"expat/lib/{p.name}", p.read_text(encoding="utf-8", errors="replace"))
+                     for p in files)
+
+
+def _expat_reference(c_source: str) -> list[str]:
+    interface = (EXPAT_CRATE_DIR / "INTERFACE.md").read_text(encoding="utf-8")
+    main_rs = (EXPAT_CRATE_DIR / "src" / "main.rs").read_text(encoding="utf-8")
+    stub_rs = (EXPAT_CRATE_DIR / "src" / "expat.rs").read_text(encoding="utf-8")
+    driver_c = EXPAT_DRIVER_C.read_text(encoding="utf-8")
+    return [
+        "Translate libexpat into expat.rs.\n",
+        "Below: the full expat/lib source, the Rust interface contract, the fixed Rust "
+        "driver, the C driver it must match, and the template expat.rs (keep its Event "
+        "and XmlError definitions).\n",
+        c_source,
+        _fence("markdown", "backend/harness/expat/rust_crate/INTERFACE.md", interface),
+        _fence("rust", "backend/harness/expat/rust_crate/src/main.rs (fixed, do not change)", main_rs),
+        _fence("c", "backend/harness/expat/drivers/expat_driver.c (the C side)", driver_c),
+        _fence("rust", "backend/harness/expat/rust_crate/src/expat.rs (template to replace)", stub_rs),
+    ]
+
+
+def expat_translate_input(c_source: str) -> str:
+    return "\n".join(_expat_reference(c_source) + [
+        "Now write the complete expat.rs. Reply with exactly one ```rust block "
+        "containing the whole file."
+    ])
+
+
+def expat_repair_input(feedback_text: str) -> str:
+    return (
+        "The verifier ran your previous expat.rs against the C build. Results below. "
+        "Fix every reported problem. Each divergence is one representative of a "
+        "distinct failure pattern; where shown, first_diff is the first output line "
+        "where the C and Rust drivers differ. Fix the root cause in the ported C logic, "
+        "not only that input. Do not break behavior that already matches.\n\n"
+        + feedback_text
+        + "\n\nReply with exactly one ```rust block containing the complete corrected "
+        "expat.rs, the whole file."
+    )
