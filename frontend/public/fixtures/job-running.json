@@ -1,0 +1,41 @@
+{
+  "id": "job_7f3a2c",
+  "library": "cjson",
+  "status": "verifying",
+  "created_at": "2026-10-25T12:20:04-07:00",
+  "updated_at": "2026-10-25T12:24:51-07:00",
+  "runner": "local",
+  "agents": [
+    {
+      "id": "agent_lexer",
+      "module": "lexer",
+      "status": "completed",
+      "iteration": 3,
+      "match_rate": 1.0,
+      "interaction_id": "int_01JB8X4K2Q"
+    },
+    {
+      "id": "agent_parser",
+      "module": "parser",
+      "status": "verifying",
+      "iteration": 2,
+      "match_rate": 0.87,
+      "interaction_id": "int_01JB8X4M7T"
+    },
+    {
+      "id": "agent_printer",
+      "module": "printer",
+      "status": "running",
+      "iteration": 1,
+      "match_rate": 0.64,
+      "interaction_id": "int_01JB8X4P9W"
+    }
+  ],
+  "result": null,
+  "approval": {
+    "required": true,
+    "approved_by": null,
+    "pr_url": null
+  },
+  "error": null
+}
