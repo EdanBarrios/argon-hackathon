@@ -79,3 +79,33 @@ def expat_divergence_pattern(d: dict) -> str:
     if fd:
         return f"both accept, first differing line: C {first(fd.get('c'))} vs Rust {first(fd.get('rust'))}"
     return "both accept, events differ"
+
+
+def _lua_last(out: str) -> str:
+    """Kind of the driver's last line: the error class if the script failed, else output."""
+    if out == "TIMEOUT":
+        return "TIMEOUT"
+    last = out.rstrip("\n").rsplit("\n", 1)[-1]
+    if not last.startswith("ERROR "):
+        return "output"
+    msg = last[len("ERROR "):]
+    if msg.startswith("input:"):
+        msg = msg.split(": ", 1)[-1]
+    # First few words name the error class ("attempt to index", "'=' expected near").
+    return "ERROR " + " ".join(msg.split()[:3])
+
+
+def lua_divergence_pattern(d: dict) -> str:
+    """Lua signature: the error class when either side fails, else the first differing line's start."""
+    kc, kr = _lua_last(d.get("c_output") or ""), _lua_last(d.get("rust_output") or "")
+    if kc != kr:
+        return f"C {kc} vs Rust {kr}"
+    if kc == "TIMEOUT":
+        return "both TIMEOUT"
+    if kc.startswith("ERROR"):
+        return f"both fail with {kc}, output before or message tail differs"
+    fd = d.get("first_diff") or {}
+    first = lambda line: (line or "<end of output>")[:12]
+    if fd:
+        return f"both succeed, first differing line: C {first(fd.get('c'))!r} vs Rust {first(fd.get('rust'))!r}"
+    return "both succeed, output differs"
