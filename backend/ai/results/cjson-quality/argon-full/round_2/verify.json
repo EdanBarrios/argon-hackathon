@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 300,
+  "counts": {
+    "match": 300,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 300,
+    "attempted": 300,
+    "scored": 300,
+    "matched": 300,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "<repo>/backend/harness/build/cjson_driver",
+    "rust": "<repo>/runs/build/ai-20261025-130456-gemini-4-argon-r2/target/release/theseus_cjson",
+    "inputs": "<repo>/runs/ai/inputs-c300-s1",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "<repo>/backend/harness/build/cjson_driver",
+      "sha256": "caa5285ec6e7cf342c366269190b6be5172017164292dac1a3b245beeda2538e"
+    },
+    "rust": {
+      "executable": "<repo>/runs/build/ai-20261025-130456-gemini-4-argon-r2/target/release/theseus_cjson",
+      "sha256": "b2cdf5f0d5a6155aaad4535a4bdc0d9de01560275fe4aa833be59210e6528b73"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 1.63
+}

@@ -1,0 +1,191 @@
+{
+  "model": "gemini-4-argon",
+  "target": "cjson",
+  "rounds_budget": 6,
+  "start_from": null,
+  "fresh_repair": false,
+  "rounds_run": 2,
+  "inputs": "<repo>/runs/ai/inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": 1.0,
+  "best_round": 2,
+  "best_match_rate": 1.0,
+  "best_host_fixed": false,
+  "best_file": "<repo>/runs/ai/quality-full-argon/best/cjson.rs",
+  "rounds_to_100": 1,
+  "polish_rounds_run": 1,
+  "quality": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 0,
+    "panic_lints": 0,
+    "arithmetic_side_effects": 40,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 40
+    },
+    "host_fixed": false,
+    "clean": true
+  },
+  "quality_first_build": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 2,
+    "panic_lints": 0,
+    "arithmetic_side_effects": 40,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 40,
+      "clippy::same_item_push": 2
+    }
+  },
+  "total_model_seconds": 407.0,
+  "total_tokens": {
+    "total_input_tokens": 112647,
+    "total_output_tokens": 13124,
+    "total_thought_tokens": 31286,
+    "total_cached_tokens": 1310
+  },
+  "usd": 0.6669,
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "translate",
+      "interaction_id": "v1_Chc2V0RlYXJLNkM4Q2I5TW9QekxfYjZRcxIXNldEZWFySzZDOENiOU1vUHpMX2I2UXM",
+      "seconds": 352.5,
+      "usage": {
+        "total_input_tokens": 33949,
+        "total_output_tokens": 6565,
+        "total_thought_tokens": 30976,
+        "total_cached_tokens": 0,
+        "total_tokens": 71490
+      },
+      "thinking_level": "high",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 700,
+      "compile_ok": true,
+      "build_seconds": 2,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 300,
+      "quality": {
+        "fmt_ok": true,
+        "fmt_diff_lines": 0,
+        "clippy_errors": 0,
+        "clippy_warnings": 2,
+        "panic_lints": 0,
+        "arithmetic_side_effects": 40,
+        "by_lint": {
+          "clippy::arithmetic_side_effects": 40,
+          "clippy::same_item_push": 2
+        }
+      },
+      "host_fix": {
+        "clippy_fix_ok": true,
+        "fmt_ok": true,
+        "changed": false,
+        "applied": false
+      }
+    },
+    {
+      "round": 2,
+      "kind": "polish",
+      "polish_of_round": 1,
+      "interaction_id": "v1_Chc2V0RlYXJLNkM4Q2I5TW9QekxfYjZRcxIXVG1MZWF1LU5NY0NiOU1vUHpMX2I2UXM",
+      "seconds": 54.5,
+      "usage": {
+        "total_input_tokens": 78698,
+        "total_output_tokens": 6559,
+        "total_thought_tokens": 310,
+        "total_cached_tokens": 1310,
+        "total_tokens": 85567
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 696,
+      "compile_ok": true,
+      "build_seconds": 2,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 300,
+      "quality": {
+        "fmt_ok": true,
+        "fmt_diff_lines": 0,
+        "clippy_errors": 0,
+        "clippy_warnings": 0,
+        "panic_lints": 0,
+        "arithmetic_side_effects": 40,
+        "by_lint": {
+          "clippy::arithmetic_side_effects": 40
+        }
+      },
+      "host_fix": {
+        "clippy_fix_ok": true,
+        "fmt_ok": true,
+        "changed": false,
+        "applied": false
+      }
+    }
+  ],
+  "holdout": {
+    "seed": 1001,
+    "inputs": "<repo>/runs/ai/holdout-c1000-s1001-minus-inputs-c300-s1",
+    "overlap_removed": 237,
+    "behaviors_tested": 763,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 763,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    }
+  },
+  "adversarial": {
+    "targeted": {
+      "match_rate": 1.0,
+      "behaviors_tested": 980,
+      "counts": {
+        "match": 980,
+        "divergence": 0,
+        "safety_improvement": 0,
+        "rust_crash": 0,
+        "both_crash": 0,
+        "timeout": 0,
+        "infra_failure": 0
+      },
+      "report": "<repo>/runs/adversarial/loop-quality-full-argon-targeted.json"
+    },
+    "argon": {
+      "match_rate": 1.0,
+      "behaviors_tested": 225,
+      "counts": {
+        "match": 225,
+        "divergence": 0,
+        "safety_improvement": 0,
+        "rust_crash": 0,
+        "both_crash": 0,
+        "timeout": 0,
+        "infra_failure": 0
+      },
+      "report": "<repo>/runs/adversarial/loop-quality-full-argon-argon.json"
+    }
+  },
+  "panics": {
+    "loop": 0,
+    "holdout": 0,
+    "targeted": 0,
+    "argon": 0,
+    "total": 0
+  }
+}

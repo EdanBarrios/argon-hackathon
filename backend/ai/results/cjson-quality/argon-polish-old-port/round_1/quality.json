@@ -1,0 +1,766 @@
+{
+  "model": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 3,
+    "panic_lints": 41,
+    "arithmetic_side_effects": 62,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 62,
+      "clippy::indexing_slicing": 41,
+      "clippy::same_item_push": 2,
+      "clippy::needless_range_loop": 1
+    }
+  },
+  "host_fix": {
+    "clippy_fix_ok": true,
+    "fmt_ok": true,
+    "changed": false,
+    "applied": false
+  },
+  "diagnostics": [
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 57,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n  --> src/cjson.rs:57:9\n   |\n57 |         self.content[self.offset + index]\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using `.get(n)` or `.get_mut(n)` instead\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n   = note: requested on the command line with `-W clippy::indexing-slicing`\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 57,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:57:22\n   |\n57 |         self.content[self.offset + index]\n   |                      ^^^^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n   = note: requested on the command line with `-W clippy::arithmetic-side-effects`\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 62,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n  --> src/cjson.rs:62:10\n   |\n62 |         &self.content[self.offset..self.length]\n   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 72,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:72:9\n   |\n72 |         buffer.offset += 3;\n   |         ^^^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 83,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:83:9\n   |\n83 |         buffer.offset += 1;\n   |         ^^^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 87,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:87:9\n   |\n87 |         buffer.offset -= 1;\n   |         ^^^^^^^^^^^^^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 96,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n  --> src/cjson.rs:96:18\n   |\n96 |     if i < n && (s[i] == b'+' || s[i] == b'-') {\n   |                  ^^^^\n   |\n   = help: consider using `.get(n)` or `.get_mut(n)` instead\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 96,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n  --> src/cjson.rs:96:34\n   |\n96 |     if i < n && (s[i] == b'+' || s[i] == b'-') {\n   |                                  ^^^^\n   |\n   = help: consider using `.get(n)` or `.get_mut(n)` instead\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 97,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n  --> src/cjson.rs:97:9\n   |\n97 |         i += 1;\n   |         ^^^^^^\n   |\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 101,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:101:20\n    |\n101 |     while i < n && s[i].is_ascii_digit() {\n    |                    ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 102,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:102:9\n    |\n102 |         digits += 1;\n    |         ^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 103,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:103:9\n    |\n103 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 106,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:106:17\n    |\n106 |     if i < n && s[i] == b'.' {\n    |                 ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 107,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:107:9\n    |\n107 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 108,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:108:24\n    |\n108 |         while i < n && s[i].is_ascii_digit() {\n    |                        ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 109,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:109:13\n    |\n109 |             digits += 1;\n    |             ^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 110,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:110:13\n    |\n110 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 119,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:119:18\n    |\n119 |     if i < n && (s[i] == b'e' || s[i] == b'E') {\n    |                  ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 119,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:119:34\n    |\n119 |     if i < n && (s[i] == b'e' || s[i] == b'E') {\n    |                                  ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 120,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:120:9\n    |\n120 |         i += 1;\n    |         ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 121,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:121:22\n    |\n121 |         if i < n && (s[i] == b'+' || s[i] == b'-') {\n    |                      ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 121,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:121:38\n    |\n121 |         if i < n && (s[i] == b'+' || s[i] == b'-') {\n    |                                      ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 122,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:122:13\n    |\n122 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 125,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:125:24\n    |\n125 |         while i < n && s[i].is_ascii_digit() {\n    |                        ^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 126,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:126:13\n    |\n126 |             exp_digits += 1;\n    |             ^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 127,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:127:13\n    |\n127 |             i += 1;\n    |             ^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 144,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:144:17\n    |\n144 |                 number_string_length += 1;\n    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 151,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:151:22\n    |\n151 |     let candidate = &input_buffer.content[start..start + number_string_length];\n    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 151,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:151:50\n    |\n151 |     let candidate = &input_buffer.content[start..start + number_string_length];\n    |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 157,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:157:43\n    |\n157 |     let prefix_str = std::str::from_utf8(&candidate[..consumed]).ok()?;\n    |                                           ^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 160,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:160:5\n    |\n160 |     input_buffer.offset += consumed;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::needless_range_loop",
+      "line": 167,
+      "message": "the loop variable `i` is used to index `input`",
+      "rendered": "warning: the loop variable `i` is used to index `input`\n   --> src/cjson.rs:167:14\n    |\n167 |     for i in 0..4 {\n    |              ^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop\n    = note: `#[warn(clippy::needless_range_loop)]` on by default\nhelp: consider using an iterator and enumerate()\n    |\n167 -     for i in 0..4 {\n167 +     for (i, <item>) in input.iter().enumerate().take(4) {\n    |\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 168,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:168:17\n    |\n168 |         let b = input[i];\n    |                 ^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 170,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:170:13\n    |\n170 |             h += (b - b'0') as u32;\n    |             ^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 172,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:172:13\n    |\n172 |             h += 10 + (b - b'A') as u32;\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 174,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:174:13\n    |\n174 |             h += 10 + (b - b'a') as u32;\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 193,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:193:34\n    |\n193 |     let first_code = parse_hex4(&input[2..6]);\n    |                                  ^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 202,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:202:12\n    |\n202 |         if input[6] != b'\\\\' || input[7] != b'u' {\n    |            ^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 202,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:202:33\n    |\n202 |         if input[6] != b'\\\\' || input[7] != b'u' {\n    |                                 ^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 205,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:205:39\n    |\n205 |         let second_code = parse_hex4(&input[8..12]);\n    |                                       ^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 209,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:209:18\n    |\n209 |         let cp = 0x10000 + (((first_code & 0x3FF) << 10) | (second_code & 0x3FF));\n    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 230,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:230:9\n    |\n230 |         encoded[pos] = ((cp | 0x80) & 0xBF) as u8;\n    |         ^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 239,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:239:31\n    |\n239 |     output.extend_from_slice(&encoded[..utf8_length]);\n    |                               ^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 245,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:245:29\n    |\n245 |     let mut input_pointer = input_buffer.offset + 1;\n    |                             ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 246,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:246:25\n    |\n246 |     let mut input_end = input_buffer.offset + 1;\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 254,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:254:46\n    |\n254 |     while input_end < input_buffer.length && input_buffer.content[input_end] != b'\"' {\n    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 255,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:255:12\n    |\n255 |         if input_buffer.content[input_end] == b'\\\\' {\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 256,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:256:16\n    |\n256 |             if input_end + 1 >= input_buffer.length {\n    |                ^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 260,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:260:13\n    |\n260 |             skipped_bytes += 1;\n    |             ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 261,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:261:13\n    |\n261 |             input_end += 1;\n    |             ^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 263,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:263:9\n    |\n263 |         input_end += 1;\n    |         ^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 266,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:266:44\n    |\n266 |     if input_end >= input_buffer.length || input_buffer.content[input_end] != b'\"' {\n    |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 271,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:271:29\n    |\n271 |     let allocation_length = (input_end - input_buffer.offset).saturating_sub(skipped_bytes);\n    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 275,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:275:17\n    |\n275 |         let b = input_buffer.content[input_pointer];\n    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 278,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:278:13\n    |\n278 |             input_pointer += 1;\n    |             ^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 280,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:280:16\n    |\n280 |             if input_end - input_pointer < 2 {\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 284,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:284:23\n    |\n284 |             let esc = input_buffer.content[input_pointer + 1];\n    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 284,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:284:44\n    |\n284 |             let esc = input_buffer.content[input_pointer + 1];\n    |                                            ^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 295,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:295:26\n    |\n295 |                         &input_buffer.content[input_pointer..input_end],\n    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 308,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:308:13\n    |\n308 |             input_pointer += sequence_length;\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 312,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:312:27\n    |\n312 |     input_buffer.offset = input_end + 1;\n    |                           ^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 321,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:321:5\n    |\n321 |     input_buffer.depth += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 327,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:327:5\n    |\n327 |     input_buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 330,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:330:9\n    |\n330 |         input_buffer.depth -= 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 331,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:331:9\n    |\n331 |         input_buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 336,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:336:9\n    |\n336 |         input_buffer.offset -= 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 340,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:340:5\n    |\n340 |     input_buffer.offset -= 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 343,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:343:9\n    |\n343 |         input_buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 358,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:358:5\n    |\n358 |     input_buffer.depth -= 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 359,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:359:5\n    |\n359 |     input_buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 368,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:368:5\n    |\n368 |     input_buffer.depth += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 374,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:374:5\n    |\n374 |     input_buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 377,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:377:9\n    |\n377 |         input_buffer.depth -= 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 378,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:378:9\n    |\n378 |         input_buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 383,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:383:9\n    |\n383 |         input_buffer.offset -= 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 387,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:387:5\n    |\n387 |     input_buffer.offset -= 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 394,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:394:9\n    |\n394 |         input_buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 403,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:403:9\n    |\n403 |         input_buffer.offset += 1;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 418,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:418:5\n    |\n418 |     input_buffer.depth -= 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 419,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:419:5\n    |\n419 |     input_buffer.offset += 1;\n    |     ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 426,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:426:9\n    |\n426 |         input_buffer.offset += 4;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 430,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:430:9\n    |\n430 |         input_buffer.offset += 5;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 434,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:434:9\n    |\n434 |         input_buffer.offset += 4;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 459,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:459:42\n    |\n459 |     let mut content = Vec::with_capacity(input.len() + 1);\n    |                                          ^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 500,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:500:33\n    |\n500 |     let sci = format!(\"{:.*e}\", precision - 1, d);\n    |                                 ^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 503,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:503:56\n    |\n503 |     let (negative, rest) = if !sci_bytes.is_empty() && sci_bytes[0] == b'-' {\n    |                                                        ^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 504,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:504:17\n    |\n504 |         (true, &sci_bytes[1..])\n    |                 ^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..)` or .get_mut(n..)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 510,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:510:21\n    |\n510 |     let mantissa = &rest[..e_pos];\n    |                     ^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 511,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:511:40\n    |\n511 |     let exp_str = std::str::from_utf8(&rest[e_pos + 1..]).unwrap_or(\"0\");\n    |                                        ^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..)` or .get_mut(n..)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 511,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:511:45\n    |\n511 |     let exp_str = std::str::from_utf8(&rest[e_pos + 1..]).unwrap_or(\"0\");\n    |                                             ^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 533,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:533:18\n    |\n533 |         out.push(digits[0]);\n    |                  ^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 536,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:536:36\n    |\n536 |             out.extend_from_slice(&digits[1..sig_len]);\n    |                                    ^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 547,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:547:22\n    |\n547 |             out.push(b'0' + (abs_exp as u8));\n    |                      ^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 553,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:553:21\n    |\n553 |         let zeros = (-exp - 1) as usize;\n    |                     ^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::same_item_push",
+      "line": 555,
+      "message": "it looks like the same item is being pushed into this `Vec`",
+      "rendered": "warning: it looks like the same item is being pushed into this `Vec`\n   --> src/cjson.rs:555:13\n    |\n555 |             out.push(b'0');\n    |             ^^^\n    |\n    = help: consider using `vec![b'0';SIZE]`\n    = help: or `out.extend(std::iter::repeat_n(b'0', SIZE))`\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#same_item_push\n    = note: `#[warn(clippy::same_item_push)]` on by default\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 557,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:557:32\n    |\n557 |         out.extend_from_slice(&digits[..sig_len]);\n    |                                ^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 559,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:559:26\n    |\n559 |         let int_digits = (exp + 1) as usize;\n    |                          ^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 561,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:561:36\n    |\n561 |             out.extend_from_slice(&digits[..sig_len]);\n    |                                    ^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::same_item_push",
+      "line": 563,
+      "message": "it looks like the same item is being pushed into this `Vec`",
+      "rendered": "warning: it looks like the same item is being pushed into this `Vec`\n   --> src/cjson.rs:563:17\n    |\n563 |                 out.push(b'0');\n    |                 ^^^\n    |\n    = help: consider using `vec![b'0';SIZE]`\n    = help: or `out.extend(std::iter::repeat_n(b'0', SIZE))`\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#same_item_push\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::arithmetic_side_effects",
+      "line": 562,
+      "message": "arithmetic operation that can potentially result in unexpected side-effects",
+      "rendered": "warning: arithmetic operation that can potentially result in unexpected side-effects\n   --> src/cjson.rs:562:25\n    |\n562 |             for _ in 0..(int_digits - sig_len) {\n    |                         ^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 566,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:566:36\n    |\n566 |             out.extend_from_slice(&digits[..int_digits]);\n    |                                    ^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 568,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:568:36\n    |\n568 |             out.extend_from_slice(&digits[int_digits..sig_len]);\n    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 612,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:612:18\n    |\n612 |     let slice = &input[..nul_pos];\n    |                  ^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 633,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:633:30\n    |\n633 |                     out.push(HEX[((b >> 4) & 0x0F) as usize]);\n    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 634,
+      "message": "indexing may panic",
+      "rendered": "warning: indexing may panic\n   --> src/cjson.rs:634:30\n    |\n634 |                     out.push(HEX[(b & 0x0F) as usize]);\n    |                              ^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(n)` or `.get_mut(n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    },
+    {
+      "level": "warning",
+      "lint": "clippy::indexing_slicing",
+      "line": 650,
+      "message": "slicing may panic",
+      "rendered": "warning: slicing may panic\n   --> src/cjson.rs:650:36\n    |\n650 |             out.extend_from_slice(&raw[..nul_pos]);\n    |                                    ^^^^^^^^^^^^^^\n    |\n    = help: consider using `.get(..n)`or `.get_mut(..n)` instead\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing\n\n"
+    }
+  ]
+}

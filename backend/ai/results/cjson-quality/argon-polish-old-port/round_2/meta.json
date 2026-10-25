@@ -1,0 +1,64 @@
+{
+  "round": 2,
+  "kind": "polish",
+  "polish_of_round": 1,
+  "interaction_id": "v1_ChdVbURlYXFuTEtMdjFqckVQd1lmUndBTRIXVW1EZWFxbkxLTHYxanJFUHdZZlJ3QU0",
+  "seconds": 60.9,
+  "usage": {
+    "total_input_tokens": 41649,
+    "total_output_tokens": 7011,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 0,
+    "total_tokens": 48660
+  },
+  "thinking_level": "medium",
+  "notes": [],
+  "continuations": 0,
+  "rust_lines": 716,
+  "compile_ok": true,
+  "build_seconds": 0,
+  "match_rate": 0.98,
+  "divergences": 6,
+  "crashes": 0,
+  "timeouts": 0,
+  "safety_improvements": 0,
+  "behaviors_tested": 300,
+  "quality": {
+    "fmt_ok": false,
+    "fmt_diff_lines": 12,
+    "clippy_errors": 0,
+    "clippy_warnings": 0,
+    "panic_lints": 0,
+    "arithmetic_side_effects": 63,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 63
+    }
+  },
+  "host_fix": {
+    "clippy_fix_ok": true,
+    "fmt_ok": true,
+    "changed": true,
+    "applied": true,
+    "compile_ok": true,
+    "match_rate": 0.98,
+    "counts": {
+      "match": 294,
+      "divergence": 6,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0
+    },
+    "quality": {
+      "fmt_ok": true,
+      "fmt_diff_lines": 0,
+      "clippy_errors": 0,
+      "clippy_warnings": 0,
+      "panic_lints": 0,
+      "arithmetic_side_effects": 63,
+      "by_lint": {
+        "clippy::arithmetic_side_effects": 63
+      }
+    }
+  }
+}
