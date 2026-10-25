@@ -48,3 +48,16 @@ Things that surprised us, in plain language. Newest at the bottom. Use these for
 - With a load average of about 240 from parallel agents, one ASan build of `xmlparse.c` took 4 minutes, and the full self-test (2000 inputs, run twice) took 9.6 minutes. `build_expat.sh` now skips the rebuild when the binary is up to date.
 - The billion-laughs input (`edge_bl_breach`) takes about 2 s per side under ASan before it fails with code 43. Use `--timeout 20`.
 - The interface `Result<Vec<Event>, XmlError>` means events emitted before an error are not compared. Only the error code and position are. That is a deliberate trade for a simpler port. Error positions still pin where expat failed.
+
+## 12:09: Adversarial inputs could not break Argon's port, but found a real bug in Flash's
+
+**What we did.** Argon's first cJSON translation scored 100% on our 2,000 generated inputs, but those are mostly cJSON's own tests plus mutations, which a memorized port would pass. So we built two corpora aimed at it (`backend/harness/adversarial/`): 980 targeted inputs (number formatting boundaries, every control character and escape, surrogate pairs, raw invalid UTF-8, nesting 997..1003, every whitespace byte including `\v` and `\f`, BOMs, trailing bytes, NULs, literal truncations, plus 80 batch files that pack about 100 random numbers or 50 random strings each), and 225 inputs written by gemini-4-argon itself after reading cJSON.c (682 s call). The verifier alone judged them.
+
+**Result.** Argon round 1: 980/980 targeted and 225/225 Argon-written, zero divergences, crashes or timeouts. A further 20,000-input scratch fuzz against a non-ASan C build also found nothing for Argon. That is the evidence behind "tested behaviors preserved".
+
+**Top findings.**
+1. **Flash diverges on an escape that straddles the closing quote.** Input `"\uZ\t\\"` (9 bytes). C prints `OK\t""`, gemini-3.8-flash's port prints `PARSE_ERROR at 7`. In `parse_string`, the length pass pairs `\u`, `\t`, `\\` and finds the closing quote. The decode pass then lets `\u` eat six bytes (`parse_hex4` returns 0 for invalid hex, so it decodes as U+0000) and lands on the last backslash, whose "escaped" character is the closing quote itself. C only checks `input_end - input_pointer < 1`, so it accepts; Flash wrote `< 2`, which looks safer but is not what C does. 19 of 980 targeted inputs hit this. C is the reference, so Flash is the one to repair.
+2. **cJSON accepts invalid `\u` hex as U+0000.** `"\uZZZZ"` parses and prints `""`, because the NUL truncates the printed string. Both ports copied this, which is the behavior a "cleaner" port would most likely drop.
+3. **A BOM needs at least one byte after it.** `skip_utf8_bom` requires `can_access_at_index(buffer, 4)`, so a BOM followed by one byte is skipped, but a bare BOM is not. Argon guessed this would trip a port; both ports match C on it.
+
+**Harness gotcha.** macOS is case-insensitive, so `str_ctrl_u_0a` and `str_ctrl_U_0a` silently became one file and 32 inputs vanished. The generator now asserts names are unique ignoring case. Also, `verify.py` feeds every non-dot file to both sides, so `adversarial/run.sh` stages only real inputs, never READMEs.
