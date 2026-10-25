@@ -23,10 +23,7 @@ Complements docs/PLAN.md section 6. Interactions API only.
 - Implicit caching is automatic: 95% discount on cached input tokens. Do not call `cached_content`.
 - $2 / 1M input, $10 / 1M output through Nov 30, 2026.
 - Usage fields: `interaction.usage.total_input_tokens`, `total_output_tokens`, `total_thought_tokens`, `total_cached_tokens`.
-
-## Remove legacy params
-
-`thinking_budget`, `temperature`, `top_p`, `top_k`, `cached_content`.
+- Remove legacy params: `thinking_budget`, `temperature`, `top_p`, `top_k`, `cached_content`.
 
 ## Managed agents
 
