@@ -11,3 +11,4 @@ Anyone may add rows. Newest at the bottom.
 | pending (11:15) | Sandbox (remote) vs local runner | Depends on A's smoke test | A + C |
 | pending | Backend host | | C |
 | 10:31 | Repair loops use thinking_level medium, lead planner high | Organizer guide; speed for live demo | C |
+| 10:44 | Target: cJSON v1.7.19 core, parse+print first; fallback inih if not 100% by 12:30 | Security history, clean 3-module split shows whole-library planning; inih is one function | Team |
