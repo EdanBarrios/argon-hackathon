@@ -243,3 +243,81 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* Run banner: while a run works, the C (blue) and Rust (orange) plates slide past each
+   other on one track; when it completes, they snap into a single agreement line. */
+.run-track {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  background: var(--color-line);
+}
+.run-track::before,
+.run-track::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 38%;
+  mix-blend-mode: screen;
+}
+.run-track::before {
+  background: var(--color-clang);
+  animation: plate-c 2.4s ease-in-out infinite;
+}
+.run-track::after {
+  background: var(--color-rust);
+  animation: plate-r 2.4s ease-in-out infinite;
+}
+@keyframes plate-c {
+  0% { left: -40%; }
+  50% { left: 70%; }
+  100% { left: -40%; }
+}
+@keyframes plate-r {
+  0% { left: 102%; }
+  50% { left: -8%; }
+  100% { left: 102%; }
+}
+.run-done {
+  position: relative;
+  height: 3px;
+  background: var(--color-match);
+}
+.run-done-partial {
+  background: var(--color-dim);
+}
+.run-done-snap::before,
+.run-done-snap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: both;
+}
+.run-done-snap::before {
+  background: var(--color-clang);
+  animation-name: snap-c;
+}
+.run-done-snap::after {
+  background: var(--color-rust);
+  animation-name: snap-r;
+}
+.run-done-snap {
+  animation: snap-line 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes snap-c {
+  from { transform: translateX(-30%); opacity: 1; }
+  to { transform: translateX(0); opacity: 0; }
+}
+@keyframes snap-r {
+  from { transform: translateX(30%); opacity: 1; }
+  to { transform: translateX(0); opacity: 0; }
+}
+@keyframes snap-line {
+  from { background: transparent; }
+  60% { background: transparent; }
+  to { background: var(--color-match); }
+}
