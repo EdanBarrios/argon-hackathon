@@ -9,3 +9,15 @@ Independent check by the systems side (C) of the port in `backend/ai/results/exp
 - Argon's changes after its one-pass translation: 3 lines, both compile fixes (`argon-fresh-a/round1_to_round3.diff`).
 
 Say: "N tested behaviors preserved, including the W3C conformance suite", never "equivalent".
+
+Ran on a local runner, not in a managed sandbox. n = 1 per model.
+
+## Known limitations
+
+- Scope: libexpat 2.9.0 parser core under one configuration: `XML_ParserCreate(NULL)`, no namespaces, no external entities, one `XML_Parse` call, events before an error not compared (`backend/harness/expat/README.md`). Not the full public API, not incremental parsing, not a drop-in replacement.
+- 1,659 of the 2,000 inputs are compared only on error code, line and column.
+- Hash-flooding protection is untested: the hash salt is fixed for determinism, so the class of attack behind CVE-2012-0876 is not exercised.
+- Possible training exposure: an experimental Rust `expat` crate exists. Mitigated only by the port having to match our own driver interface and exact error positions.
+- n = 1: one Argon port, one fresh seed.
+- The banned-API guard is a text scan of the source, not AST analysis and not a sandbox.
+

@@ -33,7 +33,7 @@ The Rust code in any results was written by Gemini 4 Argon or Gemini 3.8 Flash d
 ## Architecture
 
 1. **Translate.** Argon reads the C module and writes one safe-Rust file against a fixed driver interface.
-2. **Build gate.** `scripts/build_rust.sh` compiles it in a crate with `#![forbid(unsafe_code)]` and no dependencies, and rejects any use of process, filesystem, network or environment APIs, so the Rust cannot shell out to the C.
+2. **Build gate.** `scripts/build_rust.sh` compiles it in a crate with `#![forbid(unsafe_code)]` and no dependencies, and a text scan of the source (not AST analysis, not a sandbox) rejects any use of process, filesystem, network or environment APIs, so the Rust cannot simply shell out to the C.
 3. **Verify.** `verify.sh` feeds the same bytes to the C driver (built with AddressSanitizer and UBSan) and the Rust driver and compares raw stdout and exit status. Every input lands in one class: match, divergence, Rust crash, timeout, infra failure, or safety improvement (C crashed, Rust exited cleanly). Infra failures never count as matches, and the report states its counts explicitly.
 4. **Repair.** Divergences go back to Argon with the exact input and both outputs. Repeat until everything matches or the round budget runs out.
 5. **Held-out check.** The final build is verified again on inputs the repair loop never saw.
@@ -43,9 +43,25 @@ The verifier is checked in both directions: C against C must match on every inpu
 
 ## Results
 
-All numbers come from `results/cjson-flash-vs-argon/README.md`, `docs/FRICTION-LOG.md`, `backend/harness/expat/README.md` and run artifacts under `runs/`. Target: cJSON v1.7.19, parse and print.
+All numbers come from `results/cjson-flash-vs-argon/README.md`, `results/libexpat-host-reverify/README.md`, `backend/ai/results/README.md`, `docs/FRICTION-LOG.md`, `backend/harness/expat/README.md` and run artifacts under `runs/`. Targets: libexpat 2.9.0 parser core (one configuration, below) and cJSON v1.7.19 parse and print.
 
-### Argon vs Flash, same prompts and verifier (n = 2 runs per model)
+### libexpat: Argon's port, independently re-verified
+
+In one reply, Argon translated libexpat's parser core, about 18,500 lines of C, into 6,554 lines of safe Rust. After two compile-only fixes (3 lines changed, no behavior fixes), independent host testing found agreement on all 2,000 fresh XML inputs: 341 compared event by event, including 215 valid W3C conformance documents, and 1,659 on exact error code, line and column. Flash produced no file in our tested configuration.
+
+| | Gemini 4 Argon | Gemini 3.8 Flash |
+|---|---|---|
+| Translate at thinking high | Completed in one reply: 1,089 s, 6,554 lines of `expat.rs`, one compile error | Stopped `incomplete`: hit its 65,536 thinking + output cap after 2,620 output tokens (459 s) |
+| After translation | Two fresh repair calls, each fixing one compile error (E0282 type annotation, E0505 borrow); 3 lines changed, no behavior repaired | Retry at thinking medium ended `DEADLINE_EXCEEDED`, which may be infrastructure, so we don't count it as a capability result |
+| Repair loop inputs (seed 1) | 747/747: 599 W3C conformance documents + 148 edge cases (deep nesting, billion laughs, UTF-16, invalid UTF-8) | no file |
+| Held-out inputs (seed 1001, minus every input the loop saw) | 1,253/1,253 | no file |
+| Host re-verify on a fresh seed (4242) | 2,000/2,000: 0 divergences, 0 crashes, 0 timeouts, 0 infra failures | no file |
+
+n = 1 per model. libexpat ran on a local runner, not in a managed sandbox. The C side is libexpat R_2_9_0 under ASan + UBSan. libexpat is the XML parser Python and Firefox use; our port covers its parser core under one configuration, not the full library. Details: `backend/ai/results/README.md` and `results/libexpat-host-reverify/README.md`.
+
+Scope: libexpat 2.9.0 parser core with `XML_ParserCreate(NULL)`, no namespaces, no external entities, one `XML_Parse` call on the whole input, default billion-laughs limits, fixed hash salt. On a parse error only the error code, line and column are compared; events before the error are not. It is not the full public API, not incremental parsing, and not a drop-in replacement.
+
+### cJSON: Argon vs Flash (same prompts and verifier, n = 2 runs per model)
 
 | | Gemini 4 Argon | Gemini 3.8 Flash |
 |---|---|---|
@@ -53,10 +69,10 @@ All numbers come from `results/cjson-flash-vs-argon/README.md`, `docs/FRICTION-L
 | Generated inputs | 2,000/2,000 | 2,000/2,000 (flash-2, after an automatic retry at thinking medium) |
 | Time to a working port | 333 s, 355 s | 838 s (failed attempt + retry) |
 | Total tokens | 66K, 71K | 189K |
-| Targeted edge inputs | 980/980 (this port; 1 of 4 Argon ports) | 961/980: 19 divergences, one root cause |
+| Targeted edge inputs | 980/980 in this port; across all 4 saved Argon ports, 1 at 980/980 and 3 at 961/980 | 961/980 in 2 of 2 ports: 19 divergences, one root cause |
 | Inputs Argon wrote to break the port | 225/225 | 225/225 |
 
-Argon was about 2.5x faster end to end with about 2.7x fewer tokens. Argon's port also agreed on 20,000 extra fuzz inputs. Flash's 19 divergences all come from one cJSON quirk: on `"\uZ\t\\"` C prints `OK\t""` and Flash's port prints `PARSE_ERROR at 7`. Details in `results/cjson-flash-vs-argon/README.md`.
+Argon was about 2.5x faster end to end with about 2.7x fewer tokens. Argon's port also agreed on 20,000 extra fuzz inputs. The targeted split is one sample, not a model difference: Argon missed the same 19 inputs in 3 of its 4 ports. Those 19 divergences all come from one cJSON quirk: on `"\uZ\t\\"` C prints `OK\t""` and Flash's port prints `PARSE_ERROR at 7`. Details in `results/cjson-flash-vs-argon/README.md`.
 
 ### Live repair of Flash's port
 
@@ -77,15 +93,15 @@ cJSON v1.7.17 has CVE-2023-53154: the 7 bytes `{"1":1,` cause a heap buffer over
 
 The held-out set was only 64 inputs because most of a 300-input set is cJSON's fixed test files, shared across seeds. The live pipeline now uses at least 300 generated inputs for the held-out check.
 
-### libexpat (moonshot)
+### Known limitations
 
-libexpat R_2_9_0 is 18,494 lines, 204,211 Gemini tokens. The harness is built and self-tested: C against C matches on 2,000 of 2,000 inputs, and a stub that rejects everything matches 33 of 2,000 (0.0165). **Model results: pending.** No Argon or Flash port of libexpat has been measured yet.
-
-Why we expect libexpat to separate the models (a prediction, not a result): Flash caps thinking + output at 65,536 tokens, and we estimate a full safe-Rust port of libexpat needs 100K+ output tokens. Argon reads the whole 204K-token library in one context. Until the runs exist, the cJSON numbers above are our only evidence.
-
-### Limits
-
-- Agreement covers parse-and-print output and exit status through our driver, not every cJSON function or performance.
+- libexpat scope: the 2.9.0 parser core under one configuration (`XML_ParserCreate(NULL)`, no namespaces, no external entities, one `XML_Parse` call). Not the full public API, not incremental parsing, not a drop-in replacement.
+- libexpat: 1,659 of the 2,000 host re-verify inputs end in a parse error and are compared only on error code, line and column; events before the error are not compared.
+- libexpat hash-flooding protection is untested: the hash salt is fixed for determinism, so the class of attack behind CVE-2012-0876 is not exercised.
+- Possible training exposure: an experimental Rust `expat` crate exists. Our only mitigation is that the port had to match our own driver interface and exact error positions.
+- n = 1 per model on libexpat.
+- The banned-API guard is a text scan of the generated source, not AST analysis and not a sandbox.
+- cJSON agreement covers parse-and-print output and exit status through our driver, not every cJSON function or performance.
 - Embedded NUL bytes in strings are compared only up to the NUL.
 - n = 2 runs per model on cJSON. Across all saved ports (DECISIONS 12:27): Argon 1 of 4 ports at 980/980, 3 of 4 at 961/980; Flash 2 of 2 at 961/980; all 19 misses are the same `str_straddle_*` inputs. So this quirk is hard for both models, not a model difference. Argon's quality-gate run (backend/ai/results/cjson-quality/argon-full) reached 980/980 with 0 clippy and 0 panic lints.
 
