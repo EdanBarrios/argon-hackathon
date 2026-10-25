@@ -21,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
 
+from harness.remote._common import PreflightError, run_preflight  # noqa: E402
 from harness.remote.run_remote import RemoteSpec, resume_remote, run_parallel  # noqa: E402
 
 
@@ -59,7 +60,20 @@ def main() -> int:
     ap.add_argument("--max-wait", type=float, default=90 * 60, help="seconds per sandbox before giving up")
     ap.add_argument("--resume", metavar="INTERACTION_ID", help="re-attach to an existing sandbox run")
     ap.add_argument("--job-dir", help="with --resume: the job directory to write into")
+    ap.add_argument("--skip-preflight", action="store_true",
+                    help="do NOT run scripts/preflight.sh before the model call (not recommended)")
     args = ap.parse_args()
+
+    if not args.resume:
+        if args.skip_preflight:
+            log("WARNING: --skip-preflight: the verifier gate was not run; match rates are unchecked")
+        else:
+            for lib in dict.fromkeys(args.library.split(",")):
+                try:
+                    run_preflight(lib, on_event=log)
+                except PreflightError as exc:
+                    print(f"\n!! {exc}", file=sys.stderr)
+                    return 3
 
     t0 = time.monotonic()
     if args.resume:
@@ -74,7 +88,8 @@ def main() -> int:
                  for lib in args.library.split(",") for m in args.models.split(",")]
         root = ROOT / "runs" / "remote" / datetime.now().strftime("%Y%m%d-%H%M%S")
         log(f"{len(specs)} sandbox job(s) in parallel, saving to {root}")
-        results = run_parallel(specs, job_root=root, on_event=log, max_wait=args.max_wait)
+        results = run_parallel(specs, job_root=root, on_event=log, max_wait=args.max_wait,
+                               skip_preflight=True)  # gate already ran above (or was skipped explicitly)
 
     summary = {"wall_seconds": round(time.monotonic() - t0, 1), "results": [r.to_dict() for r in results]}
     root.mkdir(parents=True, exist_ok=True)

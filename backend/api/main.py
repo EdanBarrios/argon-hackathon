@@ -5,7 +5,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import cost, harness, pipeline, try_input
+from . import cost, harness, pipeline, pr, remote_runs, try_input
 from .models import ApproveRequest, CreateJobRequest, Event, Job, JobCost, TryRequest
 from .store import JobNotFound, JobStore
 
@@ -44,6 +44,12 @@ def create_job(
         pipe = pipeline.get_pipeline(store, scenario=scenario)
     except ValueError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from None
+    if pipeline.mode() == "real":
+        try:
+            for spec in request.extra_inputs:
+                harness.corpus_files(spec)
+        except harness.HarnessError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from None
     if pipeline.mode() == "real" and request.start_from != "fresh":
         try:
             harness.load_candidate(request.start_from)
@@ -58,6 +64,12 @@ def create_job(
 def list_jobs() -> list[Job]:
     """Jobs this server has run, newest first (in memory; lets the UI load a pre-run)."""
     return store.all_jobs()
+
+
+@app.get("/remote-runs")
+def list_remote_runs(include_stubs: bool = False) -> list[dict[str, Any]]:
+    """Managed-agent sandbox runs: sandbox claim vs host re-verify vs held-out, newest first."""
+    return remote_runs.list_runs(include_stubs)
 
 
 @app.get("/jobs/{job_id}", response_model=Job)
@@ -92,10 +104,19 @@ def approve(job_id: str, body: ApproveRequest) -> Job:
         raise HTTPException(status_code=409, detail=f"job {job_id} already approved")
     pipe = pipeline.get_pipeline(store)
     try:
-        pr_url = pipe.open_pr(job, body.approved_by)
+        out = pipe.open_pr(job, body.approved_by)
     except NotImplementedError as exc:
         raise HTTPException(status_code=501, detail=str(exc)) from None
-    store.emit(job_id, "approved", None, {"approved_by": body.approved_by, "pr_url": pr_url})
+    except pr.PRStepError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+    except Exception as exc:  # noqa: BLE001 - managed agent or network failure
+        raise HTTPException(status_code=502, detail=f"PR step failed: {type(exc).__name__}: {exc}") from None
+    # Mock returns a URL string; real mode returns {"status", "pr_url", "branch", "files", "detail"}.
+    data = {"pr_url": out, "pr_status": "opened"} if isinstance(out, str) else {
+        "pr_url": out.get("pr_url"), "pr_status": out.get("status"), "pr_branch": out.get("branch"),
+        "pr_detail": out.get("detail"), "pr_files": out.get("files"),
+    }
+    store.emit(job_id, "approved", None, {"approved_by": body.approved_by, **data})
     return store.get(job_id)
 
 

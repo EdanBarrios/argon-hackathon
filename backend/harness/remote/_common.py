@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -103,6 +104,39 @@ def poll(
             emit(on_event, f"{tag}status {interaction.status} at {time.monotonic() - started:.0f}s")
             last = interaction.status
     return interaction
+
+
+class PreflightError(RuntimeError):
+    """The verifier preflight gate failed: no match rate from this harness can be trusted."""
+
+
+PREFLIGHT_LIBS = {"cjson": "cjson", "expat": "expat", "libexpat": "expat"}
+
+
+def run_preflight(library: str, *, on_event: Event | None = None, extra_args: list[str] | None = None) -> dict:
+    """Run scripts/preflight.sh for `library` and return its JSON summary.
+
+    Raises PreflightError (with a clear message) if any check fails. Called
+    before any model call; skip only with an explicit skip_preflight=True.
+    """
+    target = PREFLIGHT_LIBS.get(library)
+    if target is None:
+        raise PreflightError(f"no preflight gate for library {library!r}")
+    emit(on_event, f"[preflight] {target}: canary, C vs C, reject-everything stub")
+    p = subprocess.run([str(REPO_ROOT / "scripts/preflight.sh"), target, *(extra_args or [])],
+                       capture_output=True, text=True, timeout=1800)
+    line = (p.stdout.strip().splitlines() or [""])[-1]
+    try:
+        summary = json.loads(line)
+    except json.JSONDecodeError:
+        raise PreflightError(f"preflight {target} printed no JSON (exit {p.returncode}): {p.stderr[-800:]}") from None
+    if p.returncode != 0 or not summary.get("ok"):
+        why = summary.get("error") or ", ".join(summary.get("failed") or []) or f"exit {p.returncode}"
+        raise PreflightError(
+            f"verifier preflight FAILED for {target} ({why}); refusing to call a model. The verifier "
+            f"cannot be trusted until scripts/preflight.sh {target} passes. Details: {summary.get('work_dir')}")
+    emit(on_event, f"[preflight] {target} ok in {summary.get('seconds')}s")
+    return summary
 
 
 def emit(on_event: Event | None, msg: str) -> None:

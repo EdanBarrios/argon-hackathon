@@ -74,18 +74,20 @@ def test_create_and_poll_until_completed(client):
 
 def test_agent_lanes_move_during_replay(client, monkeypatch):
     monkeypatch.setenv("THESEUS_MOCK_DURATION", "1.0")
+    # The fixture is a real recorded run, so read the agent and its first verify rate from it.
+    first = next(e for e in fixture("job-events.json") if e["type"] == "verify")
     job_id = client.post("/jobs", json={"library": "cjson"}).json()["id"]
-    printer_rates = set()
+    rates = set()
     deadline = time.monotonic() + 7
     while time.monotonic() < deadline:
         job = client.get(f"/jobs/{job_id}").json()
-        printer = next(a for a in job["agents"] if a["id"] == "agent_printer")
-        printer_rates.add(printer["match_rate"])
+        agent = next(a for a in job["agents"] if a["id"] == first["agent_id"])
+        rates.add(agent["match_rate"])
         if job["status"] == "completed":
             break
         time.sleep(0.01)
-    assert 0.64 in printer_rates
-    assert 1.0 in printer_rates
+    assert first["data"]["match_rate"] in rates
+    assert 1.0 in rates
 
 
 def test_events_after(client):
@@ -207,3 +209,30 @@ def test_list_jobs(client):
     job_id = client.post("/jobs", json={"library": "cjson"}).json()["id"]
     ids = [j["id"] for j in client.get("/jobs").json()]
     assert ids[0] == job_id
+
+
+def test_remote_runs_lists_claim_vs_host(client, monkeypatch, tmp_path):
+    import json
+
+    from api import remote_runs
+
+    run = tmp_path / "20261025-115152" / "cjson-gemini-4-argon"
+    run.mkdir(parents=True)
+    (run / "result.json").write_text(json.dumps({
+        "library": "cjson", "model": "gemini-4-argon", "status": "completed", "seconds": 517.2,
+        "sandbox_match_rate": 1.0, "local_match_rate": 1.0, "holdout_match_rate": 1.0,
+        "match_rates_agree": True, "sandbox_verify": {"behaviors_tested": 300},
+        "local_verify": {"behaviors_tested": 300}, "holdout_verify": {"behaviors_tested": 64, "seed": 1001},
+    }))
+    stub = tmp_path / "devtest" / "cjson-stub"
+    stub.mkdir(parents=True)
+    (stub / "result.json").write_text(json.dumps({"model": "stub"}))
+    monkeypatch.setattr(remote_runs, "RUNS_REMOTE", tmp_path)
+    rows = client.get("/remote-runs").json()
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["run_id"] == "20261025-115152/cjson-gemini-4-argon"
+    assert (row["sandbox_match_rate"], row["host_match_rate"], row["holdout_match_rate"]) == (1.0, 1.0, 1.0)
+    assert (row["sandbox_behaviors"], row["host_behaviors"], row["holdout_behaviors"]) == (300, 300, 64)
+    assert row["match_rates_agree"] is True
+    assert len(client.get("/remote-runs?include_stubs=true").json()) == 2

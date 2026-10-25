@@ -45,6 +45,10 @@ export interface Approval {
   required: boolean;
   approved_by: string | null;
   pr_url: string | null;
+  // Real mode only: "dry_run" means no PR was opened (no GITHUB_TOKEN); pr_detail says what would be pushed.
+  pr_status?: "opened" | "dry_run" | null;
+  pr_branch?: string | null;
+  pr_detail?: string | null;
 }
 
 export interface JobError {
@@ -142,6 +146,8 @@ export interface CreateJobBody {
   start_from?: StartFrom | string;
   holdout?: boolean;
   cve_check?: boolean;
+  // Adversarial corpora added to the verify set, e.g. ["targeted:str_"] (contracts/README.md).
+  extra_inputs?: string[];
 }
 
 // ---------- POST /try ----------

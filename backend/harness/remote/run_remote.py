@@ -53,7 +53,8 @@ from ai.loop import ensure_c_driver, run_json
 from ai.sandbox_run import AGENT, ENVIRONMENT, host_verify, parse_claims
 from ai.translate import TranslateError, extract_rust
 
-from ._common import REPO_ROOT, Event, cost_usd, emit, get_client, poll, step_types, usage_dict, write_transcript
+from ._common import (REPO_ROOT, Event, PreflightError, cost_usd, emit, get_client, poll, run_preflight, step_types,
+                      usage_dict, write_transcript)
 
 SUPPORTED = {"cjson"}
 DEFAULT_MAX_WAIT = 90 * 60
@@ -213,12 +214,17 @@ def run_module_remote(
     job_dir: str | Path | None = None,
     on_event: Event | None = None,
     max_wait: float = DEFAULT_MAX_WAIT,
+    skip_preflight: bool = False,
 ) -> RemoteResult:
     """One module translate-and-verify in a fresh managed-agent sandbox, then local re-verify.
 
     Blocking (tens of minutes). Never raises for agent, build or verify failures:
     check result.status, result.error, result.local_match_rate. on_event(msg)
     receives short progress lines for a UI event log.
+
+    Runs the verifier preflight gate (scripts/preflight.sh) before the model
+    call; if it fails, returns status "error" with a PREFLIGHT message and makes
+    no model call. skip_preflight=True only when the caller already ran it.
     """
     spec = RemoteSpec(library, model, rounds, inputs, seed, branch)
     if library not in SUPPORTED:
@@ -226,6 +232,12 @@ def run_module_remote(
     jd = _job_dir(spec, job_dir)
     tag = f"[{library}/{model}] "
     started = time.monotonic()
+    if not skip_preflight:
+        try:
+            pf = run_preflight(library, on_event=on_event)
+            (jd / "preflight.json").write_text(json.dumps(pf, indent=2))
+        except PreflightError as exc:
+            return _error_result(spec, jd, time.monotonic() - started, f"PREFLIGHT: {exc}")
     try:
         kwargs = build_request(spec)
     except Exception as exc:
@@ -422,11 +434,20 @@ def _save(res: RemoteResult) -> None:
 
 
 def run_parallel(specs: list[RemoteSpec | dict], job_root: str | Path | None = None,
-                 on_event: Event | None = None, max_wait: float = DEFAULT_MAX_WAIT) -> list[RemoteResult]:
-    """Several sandbox jobs at once (one thread and one sandbox each). Results keep the order of specs."""
+                 on_event: Event | None = None, max_wait: float = DEFAULT_MAX_WAIT,
+                 skip_preflight: bool = False) -> list[RemoteResult]:
+    """Several sandbox jobs at once (one thread and one sandbox each). Results keep the order of specs.
+
+    Runs the verifier preflight gate once per library before any sandbox starts
+    and raises PreflightError if it fails (no model call is made).
+    """
     norm = [s if isinstance(s, RemoteSpec) else RemoteSpec(**s) for s in specs]
     root = Path(job_root) if job_root else REPO_ROOT / "runs/remote" / datetime.now().strftime("%Y%m%d-%H%M%S")
     root.mkdir(parents=True, exist_ok=True)
+    if not skip_preflight:
+        for lib in dict.fromkeys(s.library for s in norm):
+            pf = run_preflight(lib, on_event=on_event)
+            (root / f"preflight-{lib}.json").write_text(json.dumps(pf, indent=2))
     names = [f"{s.library}-{s.model}" for s in norm]
     dirs = [root / (n if names.count(n) == 1 else f"{n}-{i}") for i, n in enumerate(names)]
 
@@ -434,7 +455,8 @@ def run_parallel(specs: list[RemoteSpec | dict], job_root: str | Path | None = N
         s = norm[i]
         try:
             return run_module_remote(s.library, s.model, s.rounds, s.inputs, seed=s.seed, branch=s.branch,
-                                     job_dir=dirs[i], on_event=on_event, max_wait=max_wait)
+                                     job_dir=dirs[i], on_event=on_event, max_wait=max_wait,
+                                     skip_preflight=True)
         except Exception as exc:
             dirs[i].mkdir(parents=True, exist_ok=True)
             return _error_result(s, dirs[i], 0, f"{type(exc).__name__}: {exc}")

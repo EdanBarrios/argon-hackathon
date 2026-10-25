@@ -35,7 +35,10 @@
   "approval": {
     "required": true,
     "approved_by": null,
-    "pr_url": null
+    "pr_url": null,
+    "pr_status": null,
+    "pr_branch": null,
+    "pr_detail": null
   },
   "error": null
 }

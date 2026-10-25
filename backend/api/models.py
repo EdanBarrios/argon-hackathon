@@ -52,7 +52,10 @@ class Result(BaseModel):
 class Approval(BaseModel):
     required: bool
     approved_by: str | None = None
-    pr_url: str | None = None
+    pr_url: str | None = None  # only ever a real PR URL
+    pr_status: Literal["opened", "dry_run"] | None = None
+    pr_branch: str | None = None
+    pr_detail: str | None = None
 
 
 class Error(BaseModel):
@@ -95,6 +98,9 @@ class CreateJobRequest(BaseModel):
     final_full: bool = False  # also verify the best build on 2000 inputs at the end
     start_from: str = "fresh"  # fresh | argon-1 | argon-2 | flash-2 | path to a cjson.rs
     inputs_dir: str | None = None  # override the generated input set with a directory
+    # Adversarial corpora added to the verify set: "targeted", "argon", "human", or "<corpus>:<prefix>"
+    # such as "targeted:str_" (backend/harness/adversarial/corpus/).
+    extra_inputs: list[str] = Field(default_factory=list)
     holdout: bool = True  # verify the best build on unseen inputs (seed 1001, overlap removed)
     cve_check: bool = True  # run the CVE-2023-53154 input on old C vs the final Rust
 

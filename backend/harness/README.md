@@ -29,9 +29,21 @@ backend/harness/verify.sh --c backend/harness/build/cjson_driver \
 
 Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and exit codes are compared, never re-parsed as JSON. Classes: `match`, `divergence`, `safety_improvement` (C crashed or a sanitizer fired, Rust exited cleanly, not counted as a mismatch), `rust_crash` (signal, sanitizer or panic), `both_crash`, `timeout`. A side that printed a sanitizer report and only then hit `--timeout` (macOS symbolization can take seconds) counts as crashed, not timed out; its crash entry has `timed_out_after_report: true`.
 
-`match_rate = match / (match + divergence + rust_crash + both_crash + timeout)`. `--max-bytes` skips input files larger than the limit (listed under `skipped_inputs`). Commands are split with shell quoting rules, not run through a shell. The report's `provenance` records each side's resolved executable and its sha256 (of `argv[0]`, so an interpreter, not its script, if the command is one), `platform.platform()`, and the vendored cJSON commit read from `vendor/cJSON/.git`.
+`infra_failure`: a side could not be spawned, or neither side crashed but one exited nonzero. Both drivers exit 0 on success and on parse errors, and 2 only when stdin cannot be read, so a clean nonzero exit is a harness problem and never a match, even if both sides agree. These are listed under `infra_failures` with each side's exit and stderr. Divergence and crash entries also carry `c_stderr` and `rust_stderr`.
+
+`match_rate = match / (match + divergence + rust_crash + both_crash + timeout + infra_failure)`. `--max-bytes` skips input files larger than the limit (names under `skipped_inputs`, size and reason under `skipped_details`). The `summary` object states what a match_rate covers: `inputs_found`, `attempted`, `scored` (the denominator), `matched`, `diverged`, `rust_crashes`, `both_crashes`, `timeouts`, `infra_failures`, `safety_improvements`, `skipped`, `skipped_reasons`. `behaviors_tested` is still `attempted`. Commands are split with shell quoting rules, not run through a shell. The report's `provenance` records each side's resolved executable and its sha256 (of `argv[0]`, so an interpreter, not its script, if the command is one), `platform.platform()`, and the vendored cJSON commit read from `vendor/cJSON/.git`.
 
 Speed: each ASan process costs about 0.2 s to start on macOS, so 2000 inputs take about 3 to 4 minutes on 8 cores. Use `--count 300` for repair loops.
+
+## Preflight gate (required before any model call)
+
+```bash
+scripts/preflight.sh cjson            # ~40 s: canary, C vs C == 1.0, reject-everything stub <= 0.05
+scripts/preflight.sh expat            # ~2 min, same checks for libexpat
+scripts/preflight.sh cjson --mutants  # adds the mutant kill check (75 to 400 s)
+```
+
+200 generated inputs (seed 0) in a private dir under `runs/preflight/`, plus `adversarial/corpus/mutant_gaps/` for cjson. Prints one JSON line, exits nonzero on any failure. `backend/harness/remote/` and `scripts/run_remote.py` run it before any model call unless `--skip-preflight` / `skip_preflight=True` is passed.
 
 ## Mutation sensitivity check
 
