@@ -1,74 +1,58 @@
 {
-  "id": "job_7f3a2c",
+  "id": "job_2fc7b6",
   "library": "cjson",
   "status": "completed",
-  "created_at": "2026-10-25T12:20:04-07:00",
-  "updated_at": "2026-10-25T12:31:40-07:00",
+  "created_at": "2026-10-25T12:32:19-07:00",
+  "updated_at": "2026-10-25T12:34:45-07:00",
   "runner": "local",
   "agents": [
     {
-      "id": "agent_lexer",
-      "module": "lexer",
+      "id": "agent_cjson",
+      "module": "cjson parse+print",
       "status": "completed",
-      "iteration": 3,
+      "iteration": 2,
       "match_rate": 1.0,
-      "interaction_id": "int_01JB8X4K2Q"
-    },
-    {
-      "id": "agent_parser",
-      "module": "parser",
-      "status": "completed",
-      "iteration": 4,
-      "match_rate": 1.0,
-      "interaction_id": "int_01JB8X4M7T"
-    },
-    {
-      "id": "agent_printer",
-      "module": "printer",
-      "status": "completed",
-      "iteration": 3,
-      "match_rate": 1.0,
-      "interaction_id": "int_01JB8X4P9W"
+      "interaction_id": "v1_ChdrVW5lYW9taUxZQ3M5TW9Qb1lqTTBBcxIXWUZuZWF1YTRLb1BnX3VNUDJZZjY2QTQ"
     }
   ],
   "result": {
-    "baseline_match_rate": 0.71,
+    "baseline_match_rate": 0.967128027681661,
     "final_match_rate": 1.0,
-    "behaviors_tested": 2048,
+    "behaviors_tested": 578,
     "divergences": [
       {
-        "input": "[1e999]",
-        "c_output": "OK\t[null]",
-        "rust_output": "OK\t[inf]",
-        "function": "print_number",
-        "resolved": true
-      },
-      {
-        "input": "\"\\ud83d\\ude00\"",
-        "c_output": "OK\t\"😀\"",
-        "rust_output": "OK\t\"\\ud83d\\ude00\"",
+        "input": "\"\\uZ\\t\\\\\"",
+        "c_output": "OK\t\"\"",
+        "rust_output": "PARSE_ERROR at 7",
         "function": "parse_string",
         "resolved": true
       },
       {
-        "input": "{\"a\": 1,}",
-        "c_output": "PARSE_ERROR at 9",
-        "rust_output": "OK\t{\"a\":1}",
+        "input": "[\"\\uZ\\t\\\\\",1]",
+        "c_output": "OK\t[\"\",1]",
+        "rust_output": "PARSE_ERROR at 8",
+        "function": "parse_array",
+        "resolved": true
+      },
+      {
+        "input": "{\"\\uZ\\t\\\\\":1}",
+        "c_output": "OK\t{\"\":1}",
+        "rust_output": "PARSE_ERROR at 8",
         "function": "parse_object",
         "resolved": true
       },
       {
-        "input": "\"\\ud800\"",
-        "c_output": "PARSE_ERROR at 1",
-        "rust_output": "OK\t\"�\"",
-        "function": "utf16_literal_to_utf8",
+        "input": "{\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\\u\\xd4\\t\\\\\"",
+        "c_output": "PARSE_ERROR at 58",
+        "rust_output": "PARSE_ERROR at 56",
+        "function": "parse_string",
         "resolved": true
       }
     ],
     "crashes": [
       {
         "input": "{\"1\":1,",
-        "sanitizer_report": "cJSON v1.7.17 (CVE-2023-53154), heap-buffer-overflow\n==NNNNN==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000000d7\nREAD of size 1 at 0x6020000000d7 thread T0\n    #0 in parse_string cJSON.c:786\n    #1 in parse_object cJSON.c:1665\n    #2 in parse_value cJSON.c:1365\n    #3 in cJSON_ParseWithLengthOpts cJSON.c:1125\n0x6020000000d7 is located 0 bytes after 7-byte region\nSUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string",
+        "sanitizer_report": "=================================================================\n==59190==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000000f7 at pc 0x000106d79e03 bp 0x7ff7b91988b0 sp 0x7ff7b91988a8\nREAD of size 1 at 0x6020000000f7 thread T0\n    #0 0x000106d79e02 in parse_string cJSON.c:786\n    #1 0x000106d7f727 in parse_object cJSON.c:1665\n    #2 0x000106d6a714 in parse_value cJSON.c:1365\n    #3 0x000106d6791c in cJSON_ParseWithLengthOpts cJSON.c:1125\n    #4 0x000106d88218 in main cjson_driver_old.c:89\n    #5 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\n0x6020000000f7 is located 0 bytes after 7-byte region [0x6020000000f0,0x6020000000f7)\nallocated by thread T0 here:\n    #0 0x0001072a6b22 in malloc+0x82 (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0x9db22)\n    #1 0x000106d88158 in main cjson_driver_old.c:77\n    #2 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\nSUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string",
         "rust_behavior": "clean error: PARSE_ERROR at 7"
       }
     ]
