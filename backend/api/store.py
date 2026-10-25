@@ -37,6 +37,11 @@ class JobStore:
             self._job(job_id)
             return [e.model_copy(deep=True) for e in self._events[job_id] if e.seq > after]
 
+    def all_jobs(self) -> list[Job]:
+        """All jobs, newest first."""
+        with self._lock:
+            return [j.model_copy(deep=True) for j in reversed(self._jobs.values())]
+
     def exists(self, job_id: str) -> bool:
         with self._lock:
             return job_id in self._jobs

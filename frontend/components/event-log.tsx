@@ -3,6 +3,7 @@ import { clock, pct } from "@/lib/derive";
 
 function summary(e: JobEvent): string {
   const d = e.data;
+  if (typeof d.summary === "string" && e.type !== "repair") return `${e.type}: ${d.summary}`;
   switch (e.type) {
     case "job_status":
       return `job ${d.status ?? ""}${d.plan ? ` plan: ${d.plan.join(", ")}` : ""}`;

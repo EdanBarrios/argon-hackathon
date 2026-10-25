@@ -1,0 +1,25 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 2000,
+  "counts": {
+    "match": 2000,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "truncated_lists": false,
+  "skipped_inputs": [],
+  "config": {
+    "c": "/Users/edan/dev/argon-hackathon/backend/harness/build/cjson_driver",
+    "rust": "/Users/edan/dev/argon-hackathon/runs/build/ai-20261025-111747-gemini-3.8-flash-r1/target/release/theseus_cjson",
+    "inputs": "/Users/edan/dev/argon-hackathon/backend/harness/inputs/cjson",
+    "timeout": 5.0,
+    "max_bytes": 1048576
+  },
+  "elapsed_seconds": 307.74
+}
