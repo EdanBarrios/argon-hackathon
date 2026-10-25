@@ -5,7 +5,8 @@
 Every number in the pitch should trace to a row here. Rates come from verify.sh
 reports the loop saved (held-out, adversarial, sandbox host re-verify), never from
 model text. Cost uses api/cost.py's prices; runs written before summary.json had
-"usd" are priced from their per-round usage.
+"usd" are priced from their per-round usage. Quality columns (fmt, clippy, panic_lints,
+panics) come from ai.quality's tool output in the same summary.json; older runs show "-".
 
 The second table groups runs by (target, model, round budget), so repeated runs
 show n, the mean and minimum held-out rate, and how many reached 1.0.
@@ -65,6 +66,7 @@ def row(path: Path, s: dict) -> dict:
         error, failed_cost = failure(error)
         if failed_cost is not None:
             cost = (cost or 0) + failed_cost
+    q = s.get("quality") or {}
     return {
         "run": str(path.parent),
         "kind": "sandbox" if "agent" in s else "loop",
@@ -72,11 +74,16 @@ def row(path: Path, s: dict) -> dict:
         "model": s.get("model"),
         "budget": s.get("rounds_budget"),
         "rounds": s.get("rounds_run", len(rounds) or None),
-        "loop_rate": s.get("final_match_rate"),
+        "loop_rate": s.get("best_match_rate", s.get("final_match_rate")),
         "holdout_rate": (holdout or {}).get("match_rate"),
         "holdout": _frac(holdout),
         "targeted": _frac(adv.get("targeted")),
         "argon_corpus": _frac(adv.get("argon")),
+        "fmt": {True: "ok", False: "FAIL"}.get(q.get("fmt_ok"), "-"),
+        "clippy": q.get("clippy_warnings"),
+        "panic_lints": q.get("panic_lints"),
+        "panics": (s.get("panics") or {}).get("total"),
+        "host_fixed": q.get("host_fixed"),
         "seconds": s.get("total_model_seconds", s.get("seconds")),
         "usd": round(cost, 2) if cost is not None else None,
         "error": error or "",
@@ -107,6 +114,9 @@ def groups(rows: list[dict]) -> list[dict]:
             "holdout_mean": round(sum(rates) / len(rates), 4) if rates else None,
             "holdout_min": min(rates) if rates else None,
             "reached_1.0": sum(1 for x in rates if x == 1.0),
+            "clippy_max": max((r["clippy"] for r in rs if r["clippy"] is not None), default=None),
+            "panic_lints_max": max((r["panic_lints"] for r in rs if r["panic_lints"] is not None), default=None),
+            "panics_max": max((r["panics"] for r in rs if r["panics"] is not None), default=None),
             "usd": round(sum(r["usd"] or 0 for r in rs), 2),
         })
     return out
@@ -133,10 +143,12 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"runs": rows, "groups": groups(rows)}, indent=2))
         return 0
     print(table(rows, ["run", "kind", "model", "budget", "rounds", "loop_rate", "holdout",
-                       "targeted", "argon_corpus", "seconds", "usd", "error"]))
+                       "targeted", "argon_corpus", "fmt", "clippy", "panic_lints", "panics", "host_fixed",
+                       "seconds", "usd", "error"]))
     print()
     print(table(groups(rows), ["target", "model", "kind", "budget", "n", "failed",
-                               "holdout_mean", "holdout_min", "reached_1.0", "usd"]))
+                               "holdout_mean", "holdout_min", "reached_1.0", "clippy_max", "panic_lints_max",
+                               "panics_max", "usd"]))
     return 0
 
 

@@ -12,6 +12,14 @@ def _result(n):
                            usage={"total_input_tokens": 1_000_000, "total_output_tokens": 100_000})
 
 
+def _no_quality_tools(monkeypatch, q=None):
+    """Stub ai.quality's cargo calls: every file measures as q (default: clean), autofix is a no-op."""
+    q = q or {"fmt_ok": True, "fmt_diff_lines": 0, "clippy_errors": 0, "clippy_warnings": 0, "panic_lints": 0,
+              "arithmetic_side_effects": 0, "by_lint": {}, "diagnostics": []}
+    monkeypatch.setattr(loop.quality, "measure", lambda root, target, src: dict(q))
+    monkeypatch.setattr(loop.quality, "autofix", lambda root, target, src: (src, {"changed": False}))
+
+
 def test_holdout_uses_best_build_not_last(tmp_path, monkeypatch):
     for rel in ("scripts/build_rust.sh", "backend/harness/verify.sh", "backend/harness/vendor/cJSON/cJSON.c",
                 "backend/harness/vendor/cJSON/cJSON.h",
@@ -36,6 +44,7 @@ def test_holdout_uses_best_build_not_last(tmp_path, monkeypatch):
         return {"match_rate": next(rates, 1.0), "counts": {}}, ""
 
     monkeypatch.setattr(loop, "run_json", fake_run_json)
+    _no_quality_tools(monkeypatch)
     final = tmp_path / "final"
     final.mkdir()
     out = tmp_path / "out"

@@ -37,6 +37,11 @@ overflow. A panic counts as a crash.
 `pub struct ParseError { pub offset: Option<usize>, .. }`, \
 `pub fn parse(input: &[u8]) -> Result<Value, ParseError>`, \
 `pub fn print_unformatted(value: &Value) -> Vec<u8>`.
+7. Lint clean. The host also runs rustfmt and `cargo clippy` on cjson.rs, with the \
+default lints plus clippy::indexing_slicing, unwrap_used, expect_used and panic. Write \
+rustfmt layout. Read bytes with .get(i) or .get(a..b) and handle None exactly as C \
+handles reaching the end of its buffer; never unwrap or expect. Rule 1 still comes \
+first: a lint fix that changes any output is a failure.
 
 Known traps. Each one has broken earlier translations:
 - Number printing. cJSON's print_number uses sprintf "%1.15g", then re-parses the \
@@ -263,6 +268,25 @@ def fresh_repair_input(reference_input: str, rust_file: str, prev_rust: str, fee
         + "\n" + feedback_text
         + f"\n\nReply with exactly one ```rust block containing the complete corrected {rust_file}, "
         "the whole file."
+    )
+
+
+def polish_input(rust_file: str, current_rust: str, lint_text: str) -> str:
+    """Polish-turn message: the build already matches on every loop input; clear lints only.
+    The file is sent in full because the host may have reformatted it, so line numbers in
+    the lint report refer to this text, not to the model's last reply."""
+    return (
+        f"Your {rust_file} now matches the C build on every input the verifier ran. Next, make it "
+        "lint clean without changing behavior. Below is the current file (after the host ran "
+        "rustfmt and cargo clippy --fix), then the lints still reported for it, grouped by lint "
+        "with a few example sites each. Fix every site of each lint, not only the examples. For "
+        "indexing_slicing use .get() and take the same path C takes at the end of its buffer. "
+        "Do not change arithmetic to silence lints. If a site cannot be fixed without changing "
+        "output, leave it as it is: the verifier reruns every input, and any changed output "
+        "discards this file.\n\n"
+        + _fence("rust", f"{rust_file} (current)", current_rust)
+        + "\n" + lint_text
+        + f"\n\nReply with exactly one ```rust block containing the complete {rust_file}, the whole file."
     )
 
 
