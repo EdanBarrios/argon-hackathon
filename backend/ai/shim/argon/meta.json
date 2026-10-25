@@ -1,0 +1,15 @@
+{
+  "model": "gemini-4-argon",
+  "interaction_id": "v1_Chc5M1BlYXBfQUotdmVfdU1QbHB5aDhRSRIXOTNQZWFwX0FKLXZlX3VNUGxweWg4UUk",
+  "usage": {
+    "total_input_tokens": 24803,
+    "total_output_tokens": 15873,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 0,
+    "total_tokens": 40676
+  },
+  "seconds": 127.5,
+  "thinking_level": "medium",
+  "notes": [],
+  "lines": 1591
+}
