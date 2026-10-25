@@ -1,0 +1,120 @@
+[
+  {
+    "seq": 1,
+    "at": "2026-10-25T12:20:04-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "queued" }
+  },
+  {
+    "seq": 2,
+    "at": "2026-10-25T12:20:06-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "running", "plan": ["lexer", "parser", "printer"] }
+  },
+  {
+    "seq": 3,
+    "at": "2026-10-25T12:21:30-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": "agent_printer",
+    "type": "translate",
+    "data": { "module": "printer", "iteration": 1, "functions": ["print_number", "print_string_ptr", "print_value"] }
+  },
+  {
+    "seq": 4,
+    "at": "2026-10-25T12:21:31-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "verifying" }
+  },
+  {
+    "seq": 5,
+    "at": "2026-10-25T12:22:02-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": "agent_printer",
+    "type": "verify",
+    "data": { "iteration": 1, "match_rate": 0.64, "behaviors_tested": 512, "divergences": 184, "crashes": 0 }
+  },
+  {
+    "seq": 6,
+    "at": "2026-10-25T12:22:02-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": "agent_printer",
+    "type": "divergence",
+    "data": {
+      "input": "[1e999]",
+      "c_output": "[inf]",
+      "rust_output": "[Infinity]",
+      "function": "print_number"
+    }
+  },
+  {
+    "seq": 7,
+    "at": "2026-10-25T12:22:03-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "running" }
+  },
+  {
+    "seq": 8,
+    "at": "2026-10-25T12:23:15-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": "agent_printer",
+    "type": "repair",
+    "data": {
+      "iteration": 2,
+      "function": "print_number",
+      "summary": "Non-finite doubles now print via the same branch as C (\"inf\"/\"-inf\"/\"nan\") instead of Rust's Display impl."
+    }
+  },
+  {
+    "seq": 9,
+    "at": "2026-10-25T12:23:16-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "verifying" }
+  },
+  {
+    "seq": 10,
+    "at": "2026-10-25T12:23:49-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": "agent_printer",
+    "type": "verify",
+    "data": { "iteration": 2, "match_rate": 1.0, "behaviors_tested": 512, "divergences": 0, "crashes": 0 }
+  },
+  {
+    "seq": 11,
+    "at": "2026-10-25T12:30:58-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "crash",
+    "data": {
+      "input": "[[[[...]]]] (nesting depth 100000)",
+      "side": "c",
+      "sanitizer": "AddressSanitizer: stack-overflow",
+      "rust_behavior": "Err(DepthLimit)"
+    }
+  },
+  {
+    "seq": 12,
+    "at": "2026-10-25T12:31:40-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "job_status",
+    "data": { "status": "completed", "final_match_rate": 1.0, "behaviors_tested": 2048 }
+  },
+  {
+    "seq": 13,
+    "at": "2026-10-25T12:31:40-07:00",
+    "job_id": "job_7f3a2c",
+    "agent_id": null,
+    "type": "approval_required",
+    "data": { "action": "open_pr", "evidence": "/jobs/job_7f3a2c/result" }
+  }
+]

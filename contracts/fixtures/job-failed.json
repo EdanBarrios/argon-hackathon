@@ -1,0 +1,30 @@
+{
+  "id": "job_9b41e0",
+  "library": "cjson",
+  "status": "failed",
+  "created_at": "2026-10-25T13:02:11-07:00",
+  "updated_at": "2026-10-25T13:09:47-07:00",
+  "runner": "remote",
+  "agents": [
+    {
+      "id": "agent_parser",
+      "module": "parser",
+      "status": "failed",
+      "iteration": 5,
+      "match_rate": 0.93,
+      "interaction_id": "int_01JB8ZQ3R1"
+    }
+  ],
+  "result": null,
+  "approval": {
+    "required": true,
+    "approved_by": null,
+    "pr_url": null
+  },
+  "error": {
+    "code": "repair_budget_exhausted",
+    "message": "parser did not reach 100% match within 5 repair rounds (last match rate 0.93, 3 divergences remaining).",
+    "agent_id": "agent_parser",
+    "retryable": true
+  }
+}
