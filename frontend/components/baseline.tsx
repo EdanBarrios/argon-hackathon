@@ -19,9 +19,17 @@ interface ModelResult {
   name: string;
   model: string;
   runs: Run[];
-  adversarial: { run: string; match: number; of: number };
+  adversarial: { run: string; targeted: Score; argon_written: Score };
   footnote?: string;
+  divergence_note?: string;
 }
+
+interface Score {
+  match: number;
+  of: number;
+}
+
+const score = (s: Score) => `${n(s.match)}/${n(s.of)}`;
 
 const n = (x: number) => x.toLocaleString("en-US");
 const k = (x: number) => `${Math.round(x / 1000)}K`;
@@ -35,13 +43,20 @@ function range(vals: (number | null)[], fmt: (x: number) => string, unit = "") {
   return (lo === hi ? lo : `${lo}–${hi}`) + unit;
 }
 
-function Row({ label, value, good }: { label: string; value: string; good?: boolean }) {
+function Row({ label, value, good, bad }: { label: string; value: string; good?: boolean; bad?: boolean }) {
+  const tone = bad ? "text-red-400" : good ? "text-green-400" : "text-white";
   return (
     <div className="flex items-baseline justify-between gap-3 border-t border-neutral-800 py-2">
       <span className="text-base text-neutral-400">{label}</span>
-      <span className={`text-right text-xl font-bold tabular-nums ${good ? "text-green-400" : "text-white"}`}>{value}</span>
+      <span className={`text-right text-xl font-bold tabular-nums ${tone}`}>{value}</span>
     </div>
   );
+}
+
+function ScoreRow({ label, s }: { label: string; s: Score }) {
+  const full = s.match === s.of;
+  const misses = s.of - s.match;
+  return <Row label={label} value={full ? score(s) : `${score(s)} (${misses} divergences)`} good={full} bad={!full} />;
 }
 
 function Column({ m }: { m: ModelResult }) {
@@ -70,11 +85,9 @@ function Column({ m }: { m: ModelResult }) {
       <Row label="Time to working port" value={range(working.map((r) => r.seconds), (x) => String(Math.round(x)), " s")} />
       <Row label="Total tokens" value={range(working.map((r) => r.tokens), k)} />
       <Row label="Thinking tokens" value={range(working.map((r) => r.thought_tokens), k)} />
-      <Row
-        label="Adversarial inputs"
-        value={`${n(m.adversarial.match)}/${n(m.adversarial.of)}`}
-        good={m.adversarial.match === m.adversarial.of}
-      />
+      <ScoreRow label="Targeted edge inputs" s={m.adversarial.targeted} />
+      <ScoreRow label="Argon-written inputs" s={m.adversarial.argon_written} />
+      {m.divergence_note && <p className="mt-2 text-sm leading-snug text-red-200">{m.divergence_note}</p>}
       {m.footnote && <p className="mt-2 text-sm leading-snug text-neutral-400">{m.footnote}</p>}
     </div>
   );

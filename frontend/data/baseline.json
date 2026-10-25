@@ -1,26 +1,80 @@
 {
   "library": "cJSON v1.7.19, parse + print",
-  "source": "results/cjson-flash-vs-argon (summary.json, *verify*.json, adversarial/*.json)",
+  "source": "results/cjson-flash-vs-argon (summary.json, *verify*.json, adversarial/*.json), corrected 12:09 re-run",
   "note": "Same prompts, verifier and inputs. n = 2 runs per model.",
   "models": [
     {
       "name": "Argon",
       "model": "gemini-4-argon",
       "runs": [
-        { "id": "argon-1", "high_thinking": "finished", "match": 2000, "of": 2000, "seconds": 355.0, "tokens": 71338, "thought_tokens": 30544 },
-        { "id": "argon-2", "high_thinking": "finished", "match": 2000, "of": 2000, "seconds": 332.7, "tokens": 66314, "thought_tokens": 25510 }
+        {
+          "id": "argon-1",
+          "high_thinking": "finished",
+          "match": 2000,
+          "of": 2000,
+          "seconds": 355.0,
+          "tokens": 71338,
+          "thought_tokens": 30544
+        },
+        {
+          "id": "argon-2",
+          "high_thinking": "finished",
+          "match": 2000,
+          "of": 2000,
+          "seconds": 332.7,
+          "tokens": 66314,
+          "thought_tokens": 25510
+        }
       ],
-      "adversarial": { "run": "argon-1", "match": 1183, "of": 1183 }
+      "adversarial": {
+        "run": "argon-1",
+        "targeted": {
+          "match": 980,
+          "of": 980
+        },
+        "argon_written": {
+          "match": 225,
+          "of": 225
+        }
+      }
     },
     {
       "name": "Flash",
       "model": "gemini-3.8-flash",
       "runs": [
-        { "id": "flash-1", "high_thinking": "token_cap", "match": null, "of": null, "seconds": null, "tokens": null, "thought_tokens": null },
-        { "id": "flash-2", "high_thinking": "token_cap", "retried_at": "medium", "match": 2000, "of": 2000, "seconds": 837.7, "tokens": 189263, "thought_tokens": 112403 }
+        {
+          "id": "flash-1",
+          "high_thinking": "token_cap",
+          "match": null,
+          "of": null,
+          "seconds": null,
+          "tokens": null,
+          "thought_tokens": null
+        },
+        {
+          "id": "flash-2",
+          "high_thinking": "token_cap",
+          "retried_at": "medium",
+          "match": 2000,
+          "of": 2000,
+          "seconds": 837.7,
+          "tokens": 189263,
+          "thought_tokens": 112403
+        }
       ],
-      "adversarial": { "run": "flash-2", "match": 1183, "of": 1183 },
-      "footnote": "At high thinking Flash hit its 64K output cap mid-file (it spent ~63K on thinking). flash-2 retried at medium thinking and reached 2,000/2,000; its time and tokens include both attempts. flash-1 had no retry."
+      "adversarial": {
+        "run": "flash-2",
+        "targeted": {
+          "match": 961,
+          "of": 980
+        },
+        "argon_written": {
+          "match": 225,
+          "of": 225
+        }
+      },
+      "footnote": "At high thinking Flash hit its 64K output cap mid-file (it spent ~63K on thinking). flash-2 retried at medium thinking and reached 2,000/2,000; its time and tokens include both attempts. flash-1 had no retry.",
+      "divergence_note": "All 19 targeted divergences share one root cause: on input \"\\uZ\\t\\\\\" C prints OK\\t\"\" but Flash's Rust returns PARSE_ERROR. Flash's end-of-string check is stricter than C's; C is the reference, so Flash diverges. Argon matched the quirk."
     }
   ]
 }
