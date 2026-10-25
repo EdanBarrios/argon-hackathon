@@ -1,0 +1,22 @@
+{
+  "model": "gemini-3.8-flash",
+  "rounds_budget": 5,
+  "rounds_run": 1,
+  "inputs": "/Users/edan/dev/argon-hackathon/runs/ai/inputs-c300-s1",
+  "final_match_rate": null,
+  "rounds_to_100": null,
+  "total_model_seconds": 0,
+  "total_tokens": {
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 0
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "translate",
+      "error": "interaction v1_ChdQVVhlYXBibkZmM1ZfdU1QM3JHOHVBVRIXUFVYZWFwYm5GZjNWX3VNUDNyRzh1QVU ended with status 'incomplete' after 479.3s"
+    }
+  ]
+}

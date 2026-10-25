@@ -11,7 +11,10 @@ stderr, exit code, signal and timeout separately, then classify the input:
                       (an error message counts as clean). Not a mismatch.
   rust_crash          Rust crashed (signal, sanitizer or panic), C was clean
   both_crash          both crashed
-  timeout             either side exceeded --timeout
+  timeout             either side exceeded --timeout before any sanitizer
+                      report (a side that printed a report and then ran
+                      out of time, e.g. while symbolizing, counts as
+                      crashed, flagged timed_out_after_report)
 
 stdout is compared as raw bytes. It is never decoded or normalized through a
 JSON library, because formatting differences ARE the behavior under test.
@@ -19,9 +22,12 @@ JSON library, because formatting differences ARE the behavior under test.
 
 import argparse
 import concurrent.futures
+import hashlib
 import json
 import os
+import platform
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -30,6 +36,7 @@ import time
 REPORT_TEXT_LIMIT = 300      # chars of input/output kept per report entry
 SANITIZER_REPORT_LINES = 15  # lines of sanitizer/crash output kept
 MAX_LISTED = 200             # max entries per list in the report
+CJSON_GIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "cJSON", ".git")
 
 SANITIZER_MARKERS = (
     b"ERROR: AddressSanitizer",
@@ -107,8 +114,18 @@ def crashed(res, side):
     return False
 
 
+def reported_then_timed_out(res):
+    """Timed out, but only after a sanitizer report was already on stderr.
+
+    On macOS, symbolizing an ASan report (atos) can take longer than
+    --timeout, so a real crash would otherwise be classified as a timeout.
+    The report is the verdict; the slow symbolizer is not.
+    """
+    return res["timed_out"] and any(m in res["stderr"] for m in SANITIZER_MARKERS)
+
+
 def classify(c, r):
-    if c["timed_out"] or r["timed_out"]:
+    if any(x["timed_out"] and not reported_then_timed_out(x) for x in (c, r)):
         return "timeout"
     c_bad, r_bad = crashed(c, "c"), crashed(r, "rust")
     if c_bad and r_bad:
@@ -181,6 +198,40 @@ def list_inputs(directory, max_bytes):
     return files, skipped
 
 
+def executable_info(argv):
+    """Resolved path and sha256 of the program a side runs (argv[0])."""
+    path = shutil.which(argv[0])
+    if path is None:
+        return {"executable": argv[0], "sha256": None}
+    digest = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    return {"executable": os.path.realpath(path), "sha256": digest.hexdigest()}
+
+
+def cjson_commit():
+    """Commit of the vendored cJSON checkout, read from .git without git."""
+    try:
+        with open(os.path.join(CJSON_GIT, "HEAD"), encoding="ascii") as fh:
+            head = fh.read().strip()
+        if head.startswith("ref: "):
+            with open(os.path.join(CJSON_GIT, head[5:]), encoding="ascii") as fh:
+                head = fh.read().strip()
+    except OSError:
+        return None
+    return head
+
+
+def provenance(c_argv, r_argv):
+    return {
+        "c": executable_info(c_argv),
+        "rust": executable_info(r_argv),
+        "platform": platform.platform(),
+        "cjson_commit": cjson_commit(),
+    }
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--c", required=True, help="C side command (shell-quoted string)")
@@ -233,6 +284,7 @@ def main(argv=None):
                 "input": show(data), "file": name, "class": cls, "side": side,
                 "sanitizer_report": crash_report(report_src),
                 "rust_behavior": behavior_summary(r),
+                "timed_out_after_report": c["timed_out"] or r["timed_out"],
             })
         elif cls == "timeout":
             timeouts.append({"input": show(data), "file": name,
@@ -258,6 +310,7 @@ def main(argv=None):
             "c": args.c, "rust": args.rust, "inputs": os.path.abspath(args.inputs),
             "timeout": args.timeout, "max_bytes": args.max_bytes,
         },
+        "provenance": provenance(c_argv, r_argv),
         "elapsed_seconds": round(time.monotonic() - started, 2),
     }
     text = json.dumps(report, indent=2, ensure_ascii=False)

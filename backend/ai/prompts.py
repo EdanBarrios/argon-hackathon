@@ -96,8 +96,8 @@ def load_cjson_source(vendor_dir: Path) -> str:
     return _fence("c", "cJSON.h", header) + "\n" + _fence("c", "cJSON.c", body)
 
 
-def translate_input(c_source: str) -> str:
-    """First-turn user message: the whole C library plus the Rust contract."""
+def _reference(c_source: str) -> list[str]:
+    """The C library, the Rust contract and both drivers: everything a translation needs."""
     interface = (CRATE_DIR / "INTERFACE.md").read_text(encoding="utf-8")
     main_rs = (CRATE_DIR / "src" / "main.rs").read_text(encoding="utf-8")
     stub_rs = (CRATE_DIR / "src" / "cjson.rs").read_text(encoding="utf-8")
@@ -114,11 +114,67 @@ def translate_input(c_source: str) -> str:
     if driver_c:
         parts.append(_fence("c", "backend/harness/drivers/cjson_driver.c (the C side)", driver_c))
     parts.append(_fence("rust", "backend/harness/rust_crate/src/cjson.rs (stub to replace)", stub_rs))
+    return parts
+
+
+def translate_input(c_source: str) -> str:
+    """First-turn user message: the whole C library plus the Rust contract."""
+    parts = _reference(c_source)
     parts.append(
         "Now write the complete cjson.rs. Reply with exactly one ```rust block "
         "containing the whole file."
     )
     return "\n".join(parts)
+
+
+REPO_URL = "https://github.com/EdanBarrios/argon-hackathon"
+
+SANDBOX_TASK = """\
+You are in a remote Linux sandbox with a shell. Translate cJSON as described below, \
+but this time you can build your translation and run it through the team's \
+deterministic verifier yourself. The verifier decides what matches; your own reading \
+of the code does not. Shell state does not persist between commands, so start every \
+command that needs Rust with `. "$HOME/.cargo/env";`.
+
+Setup. Skip a step whose result already exists (this sandbox may be reused). If a \
+step fails, report its command and output verbatim and stop.
+1. Unless `clang` exists: `DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
+DEBIAN_FRONTEND=noninteractive apt-get install -y -qq clang`
+2. Unless `$HOME/.cargo/bin/rustc` exists: `curl --proto '=https' --tlsv1.2 -sSf \
+https://sh.rustup.rs | sh -s -- -y --profile minimal`
+3. Unless /work/theseus exists: `git clone --depth 1 --branch {branch} {repo} /work/theseus`. \
+Run every later command from /work/theseus.
+4. `backend/harness/fetch_cjson.sh && backend/harness/build_cjson.sh`
+5. `python3 -I backend/harness/gen_inputs.py --seed {seed} --count {count} --out /work/inputs \
+--cjson backend/harness/vendor/cJSON`
+
+Loop, at most {rounds} rounds, numbered from 1:
+a. Write your complete translation to /work/cjson.rs.
+b. `scripts/build_rust.sh /work/cjson.rs round<N>` prints one JSON line. If "ok" is \
+false, its "errors" are your feedback for the next round.
+c. If it built: `backend/harness/verify.sh --c backend/harness/build/cjson_driver \
+--rust <binary from b> --inputs /work/inputs --timeout 20 --out /work/verify_<N>.json`. \
+Read match_rate, divergences and crashes. Ignore crashes of class safety_improvement \
+(C crashed, Rust did not: intended).
+d. Stop when match_rate is 1.0 or the rounds run out. Otherwise fix the root causes \
+(the C source is the specification) and go to a.
+
+Rules: change only /work/cjson.rs. Never edit anything under /work/theseus, the \
+inputs, or the verifier. The host rebuilds your final file and verifies it again on \
+inputs you never see, so tuning to these inputs does not help.
+
+Final reply, in this format and nothing else:
+1. One line per round, copied from the tool output: \
+`ROUND <N> build=<ok|fail> match_rate=<number, or - if it did not build>`
+2. The complete final /work/cjson.rs (the last version that built) in exactly one \
+```rust block, with nothing after it.
+"""
+
+
+def sandbox_input(c_source: str, *, branch: str, seed: int, count: int, rounds: int) -> str:
+    """Single-turn task for a managed agent that runs translate, build, verify, repair itself."""
+    task = SANDBOX_TASK.format(branch=branch, repo=REPO_URL, seed=seed, count=count, rounds=rounds)
+    return "\n".join([task, "Reference material for the translation follows.\n", *_reference(c_source)])
 
 
 def repair_input(feedback_text: str) -> str:

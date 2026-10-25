@@ -11,14 +11,21 @@ Harness tools, the cJSON sources, the C driver and runs/ are taken from the
 (the main checkout when this runs from a git worktree). Override with --root or
 THESEUS_ROOT. Each round saves cjson.rs, build.json, verify.json, the feedback
 sent, usage and seconds under <out>/round_N/, and summary.json at the end.
+
+Held-out check: after the last round, the last good build is verified once more on
+inputs from --holdout-seed (default seed + 1000), minus any input whose bytes also
+appear in the loop's input set. The model never sees these inputs or their results,
+so summary.json's "holdout" rate is the number to quote, not the loop's own rate.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -72,6 +79,31 @@ def ensure_inputs(root: Path, count: int, seed: int) -> Path:
     return out
 
 
+def holdout_inputs(root: Path, count: int, seed: int, seen_dir: Path) -> tuple[Path, int]:
+    """Inputs generated at `seed`, minus any whose bytes appear in seen_dir.
+
+    Returns (directory, number removed as overlap). gen_inputs.py always includes
+    cJSON's own test files and the hand-written edge cases, so two seeds overlap;
+    removing the overlap keeps the held-out set truly unseen.
+    """
+    generated = ensure_inputs(root, count, seed)
+    seen = {hashlib.sha256(p.read_bytes()).digest() for p in seen_dir.iterdir() if p.is_file()}
+    out = root / "runs/ai" / f"holdout-c{count}-s{seed}-minus-{seen_dir.name}"
+    if out.is_dir():
+        shutil.rmtree(out)
+    out.mkdir(parents=True)
+    removed = 0
+    for p in sorted(generated.iterdir()):
+        if not p.is_file():
+            continue
+        data = p.read_bytes()
+        if hashlib.sha256(data).digest() in seen:
+            removed += 1
+            continue
+        (out / p.name).write_bytes(data)
+    return out, removed
+
+
 def tokens(usage: dict) -> int:
     return sum(int(usage.get(k) or 0) for k in ("total_input_tokens", "total_output_tokens", "total_thought_tokens"))
 
@@ -90,6 +122,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--count", type=int, default=300, help="generated inputs per verify (harness README: 300 for loops)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--final-inputs", help="optional bigger input dir to verify the last good build against")
+    ap.add_argument("--holdout-seed", type=int, help="seed for the held-out check (default: --seed + 1000)")
+    ap.add_argument("--no-holdout", action="store_true", help="skip the held-out check")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     args = ap.parse_args(argv)
 
@@ -203,6 +237,25 @@ def main(argv: list[str] | None = None) -> int:
                                      "behaviors_tested": final.get("behaviors_tested"),
                                      "counts": final.get("counts")}
             print(f"[loop] final verify on {args.final_inputs}: match_rate {final.get('match_rate')} {final.get('counts')}")
+    if not args.no_holdout and last_good_binary:
+        seed = args.holdout_seed if args.holdout_seed is not None else args.seed + 1000
+        hdir, overlap = holdout_inputs(root, args.count, seed, inputs)
+        held = {"seed": seed, "inputs": str(hdir), "overlap_removed": overlap,
+                "behaviors_tested": sum(1 for p in hdir.iterdir() if p.is_file())}
+        if held["behaviors_tested"]:
+            hv, raw = run_json(
+                [str(verify_sh), "--c", str(c_driver), "--rust", last_good_binary,
+                 "--inputs", str(hdir), "--jobs", str(args.jobs)],
+                timeout=1800,
+            )
+            if hv is None:
+                held["error"] = raw[-2000:]
+            else:
+                write_json(out / "holdout_verify.json", hv)
+                held.update(match_rate=hv.get("match_rate"), counts=hv.get("counts"))
+        summary["holdout"] = held
+        print(f"[loop] held-out seed {seed} ({held['behaviors_tested']} unseen inputs, {overlap} overlap removed): "
+              f"match_rate {held.get('match_rate')} {held.get('counts')}", flush=True)
     write_json(out / "summary.json", summary)
     print(f"[loop] summary: {out / 'summary.json'}", flush=True)
     return 0
