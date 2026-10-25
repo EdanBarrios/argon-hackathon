@@ -60,16 +60,16 @@
       {
         "input": "\"\\ud800\"",
         "c_output": "PARSE_ERROR at 1",
-        "rust_output": "OK\t\"\ufffd\"",
+        "rust_output": "OK\t\"�\"",
         "function": "utf16_literal_to_utf8",
         "resolved": true
       }
     ],
     "crashes": [
       {
-        "input": "[[[[...]]]] (nesting depth 100000)",
-        "sanitizer_report": "==41207==ERROR: AddressSanitizer: stack-overflow on address 0x16b5a3ff8 (pc 0x0001005c4e10 bp 0x16b5a4030 sp 0x16b5a3ff0 T0)\n    #0 0x1005c4e10 in parse_value cJSON.c:1342\n    #1 0x1005c5a2c in parse_array cJSON.c:1470\n    #2 0x1005c4f88 in parse_value cJSON.c:1378\n    ...\nSUMMARY: AddressSanitizer: stack-overflow cJSON.c:1342 in parse_value",
-        "rust_behavior": "Err(DepthLimit)"
+        "input": "{\"1\":1,",
+        "sanitizer_report": "cJSON v1.7.17 (CVE-2023-53154), heap-buffer-overflow\n==NNNNN==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000000d7\nREAD of size 1 at 0x6020000000d7 thread T0\n    #0 in parse_string cJSON.c:786\n    #1 in parse_object cJSON.c:1665\n    #2 in parse_value cJSON.c:1365\n    #3 in cJSON_ParseWithLengthOpts cJSON.c:1125\n0x6020000000d7 is located 0 bytes after 7-byte region\nSUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string",
+        "rust_behavior": "clean error: PARSE_ERROR at 7"
       }
     ]
   },
