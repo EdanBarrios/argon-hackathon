@@ -1,6 +1,6 @@
 """Translate -> build -> verify -> repair loop for cJSON parse + print.
 
-    cd backend && uv run python -m ai.loop --model gemini-4-argon --rounds 5 [--out DIR]
+    cd backend && uv run python -m ai.loop --model gemini-4-argon --rounds 5 [--target cjson] [--out DIR]
 
 Round 1 is translate(); every later round is repair() fed with what the harness
 reported: compile errors from build_rust.sh, or divergences and crashes from
@@ -33,6 +33,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import prompts
+from .targets import CJSON, TARGETS, Target
 from .translate import TranslateError, TranslateResult, repair, translate, trim_feedback
 
 
@@ -59,34 +60,30 @@ def run_json(cmd: list[str], timeout: float, cwd: Path | None = None) -> tuple[d
         return None, (proc.stderr + "\n" + out)[-4000:]
 
 
-def ensure_c_driver(root: Path) -> Path:
-    driver = root / "backend/harness/build/cjson_driver"
+def ensure_c_driver(root: Path, target: Target = CJSON) -> Path:
+    driver = root / target.c_driver
     if not driver.exists():
-        subprocess.run([str(root / "backend/harness/build_cjson.sh")], check=True)
+        subprocess.run([str(root / target.build_c)], check=True)
     return driver
 
 
-def ensure_inputs(root: Path, count: int, seed: int) -> Path:
-    out = root / "runs/ai" / f"inputs-c{count}-s{seed}"
+def ensure_inputs(root: Path, count: int, seed: int, target: Target = CJSON) -> Path:
+    out = root / "runs/ai" / f"{target.inputs_prefix}-c{count}-s{seed}"
     if out.is_dir() and any(out.iterdir()):
         return out
-    subprocess.run(
-        [sys.executable, "-I", str(root / "backend/harness/gen_inputs.py"),
-         "--seed", str(seed), "--count", str(count), "--out", str(out),
-         "--cjson", str(root / "backend/harness/vendor/cJSON")],
-        check=True,
-    )
+    subprocess.run(target.gen_inputs(root, seed, count, out), check=True)
     return out
 
 
-def holdout_inputs(root: Path, count: int, seed: int, seen_dir: Path) -> tuple[Path, int]:
+def holdout_inputs(root: Path, count: int, seed: int, seen_dir: Path,
+                   target: Target = CJSON) -> tuple[Path, int]:
     """Inputs generated at `seed`, minus any whose bytes appear in seen_dir.
 
     Returns (directory, number removed as overlap). gen_inputs.py always includes
     cJSON's own test files and the hand-written edge cases, so two seeds overlap;
     removing the overlap keeps the held-out set truly unseen.
     """
-    generated = ensure_inputs(root, count, seed)
+    generated = ensure_inputs(root, count, seed, target)
     seen = {hashlib.sha256(p.read_bytes()).digest() for p in seen_dir.iterdir() if p.is_file()}
     out = root / "runs/ai" / f"holdout-c{count}-s{seed}-minus-{seen_dir.name}"
     if out.is_dir():
@@ -115,6 +112,7 @@ def write_json(path: Path, data) -> None:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--model", default="gemini-4-argon")
+    ap.add_argument("--target", default=CJSON.name, choices=sorted(TARGETS))
     ap.add_argument("--rounds", type=int, default=5, help="model calls: 1 translate + (rounds-1) repairs")
     ap.add_argument("--out", help="output dir (default <root>/runs/ai/<timestamp>-<model>)")
     ap.add_argument("--root", help="harness root (default: auto, see module doc)")
@@ -132,22 +130,23 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     args = ap.parse_args(argv)
 
+    target = TARGETS[args.target]
     root = Path(args.root).resolve() if args.root else find_root()
-    build_sh = root / "scripts/build_rust.sh"
+    build_sh = root / target.build_rust
     verify_sh = root / "backend/harness/verify.sh"
-    vendor = root / "backend/harness/vendor/cJSON"
-    for p in (build_sh, verify_sh, vendor / "cJSON.c"):
+    vendor = root / target.vendor
+    for p in (build_sh, verify_sh, vendor / target.vendor_check):
         if not p.exists():
             print(f"missing harness piece: {p}", file=sys.stderr)
             return 2
-    c_driver = ensure_c_driver(root)
-    inputs = Path(args.inputs).resolve() if args.inputs else ensure_inputs(root, args.count, args.seed)
+    c_driver = ensure_c_driver(root, target)
+    inputs = Path(args.inputs).resolve() if args.inputs else ensure_inputs(root, args.count, args.seed, target)
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     out = Path(args.out).resolve() if args.out else root / "runs/ai" / f"{stamp}-{args.model}"
     out.mkdir(parents=True, exist_ok=True)
-    c_source = prompts.load_cjson_source(vendor)
-    print(f"[loop] model={args.model} rounds={args.rounds} inputs={inputs} out={out}", flush=True)
+    c_source = target.load_source(vendor)
+    print(f"[loop] target={target.name} model={args.model} rounds={args.rounds} inputs={inputs} out={out}", flush=True)
 
     rounds: list[dict] = []
     prev: TranslateResult | None = None
@@ -160,22 +159,22 @@ def main(argv: list[str] | None = None) -> int:
         rec: dict = {"round": n, "kind": "translate" if prev is None else "repair"}
         try:
             if prev is None:
-                res = translate(c_source, model=args.model)
+                res = translate(c_source, model=args.model, target=target)
             else:
                 write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}))
-                res = repair(prev, feedback or {}, model=args.model)
+                res = repair(prev, feedback or {}, model=args.model, target=target)
         except TranslateError as exc:
             rec["error"] = str(exc)
             rounds.append(rec)
             print(f"round {n}: model call failed: {exc}", flush=True)
             break
         prev = res
-        (rdir / "cjson.rs").write_text(res.rust_source, encoding="utf-8")
+        (rdir / target.rust_file).write_text(res.rust_source, encoding="utf-8")
         rec.update(interaction_id=res.interaction_id, seconds=res.seconds, usage=res.usage,
                    thinking_level=res.thinking_level, notes=res.notes, rust_lines=res.rust_source.count("\n"))
 
         build_id = re.sub(r"[^A-Za-z0-9._-]", "_", f"ai-{stamp}-{args.model}-r{n}")
-        build, raw = run_json([str(build_sh), str(rdir / "cjson.rs"), build_id], timeout=600)
+        build, raw = run_json([str(build_sh), str(rdir / target.rust_file), build_id], timeout=600)
         if build is None:
             build = {"ok": False, "errors": f"build_rust.sh produced no JSON: {raw}"}
         write_json(rdir / "build.json", build)
@@ -220,6 +219,7 @@ def main(argv: list[str] | None = None) -> int:
 
     summary: dict = {
         "model": args.model,
+        "target": target.name,
         "rounds_budget": args.rounds,
         "rounds_run": len(rounds),
         "inputs": str(inputs),
@@ -245,7 +245,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[loop] final verify on {args.final_inputs}: match_rate {final.get('match_rate')} {final.get('counts')}")
     if not args.no_holdout and last_good_binary:
         seed = args.holdout_seed if args.holdout_seed is not None else args.seed + 1000
-        hdir, overlap = holdout_inputs(root, args.holdout_count, seed, inputs)
+        hdir, overlap = holdout_inputs(root, args.holdout_count, seed, inputs, target)
         held = {"seed": seed, "inputs": str(hdir), "overlap_removed": overlap,
                 "behaviors_tested": sum(1 for p in hdir.iterdir() if p.is_file())}
         if held["behaviors_tested"]:

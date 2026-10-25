@@ -25,6 +25,7 @@ from typing import Any
 from google import genai
 
 from . import prompts
+from .targets import CJSON, Target
 
 DEFAULT_MODEL = "gemini-4-argon"
 POLL_SECONDS = 5
@@ -117,10 +118,10 @@ def _is_param_error(exc: Exception, word: str) -> bool:
     return word in text and any(s in text for s in ("400", "invalid", "not supported", "unsupported"))
 
 
-def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: list[str]):
+def _create(client: genai.Client, kwargs: dict, thinking: str | None, notes: list[str],
+            max_tokens: int = MAX_OUTPUT_TOKENS):
     """interactions.create, stepping down thinking_level / max_output_tokens if the model rejects them."""
     levels = [thinking] + THINKING_FALLBACK.get(thinking or "", [])
-    max_tokens = MAX_OUTPUT_TOKENS
     last: Exception | None = None
     for _ in range(8):
         cfg: dict = {"max_output_tokens": max_tokens}
@@ -180,7 +181,8 @@ def extract_rust(text: str | None, notes: list[str] | None = None) -> str:
     return blocks[0].rstrip() + "\n"
 
 
-def _run(model: str, input_text: str, thinking: str, previous_id: str | None) -> TranslateResult:
+def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
+         target: Target = CJSON) -> TranslateResult:
     """One logical call. If the model runs out of output budget (status "incomplete"),
     retry once at the next lower thinking level. Observed: gemini-3.8-flash at "high"
     spent ~63K thought tokens and stopped at the 65,536 output cap mid-file, even
@@ -190,7 +192,7 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
     kwargs: dict = {
         "model": model,
         "input": input_text,
-        "system_instruction": prompts.SYSTEM_INSTRUCTION,
+        "system_instruction": target.system_instruction,
         "background": True,
     }
     if previous_id:
@@ -199,8 +201,8 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
     usage = dict.fromkeys(USAGE_FIELDS, 0)
     level: str | None = thinking
     for attempt in (1, 2):
-        interaction, used_level = _create(client, kwargs, level, notes)
-        interaction = _wait(client, interaction)
+        interaction, used_level = _create(client, kwargs, level, notes, target.max_output_tokens)
+        interaction = _wait(client, interaction, target.max_wait_seconds)
         status = getattr(interaction, "status", None)
         for k, v in _usage_dict(interaction).items():
             usage[k] += v
@@ -336,12 +338,13 @@ def trim_feedback(feedback: dict) -> dict:
 # ---------------------------------------------------------------- public API
 
 
-def translate(c_source: str, model: str = DEFAULT_MODEL) -> TranslateResult:
-    """One-shot translation of cJSON parse + print into a complete cjson.rs (thinking high)."""
-    return _run(model, prompts.translate_input(c_source), "high", previous_id=None)
+def translate(c_source: str, model: str = DEFAULT_MODEL, target: Target = CJSON) -> TranslateResult:
+    """One-shot translation of the target (default cJSON parse + print) into one complete Rust file (thinking high)."""
+    return _run(model, target.translate_input(c_source), "high", previous_id=None, target=target)
 
 
-def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL) -> TranslateResult:
+def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
+           target: Target = CJSON) -> TranslateResult:
     """Continue prev's conversation with verifier feedback; returns a full new cjson.rs (thinking medium).
 
     feedback is {"compile_errors": str | None, "divergences": [...], "crashes": [...]}
@@ -349,4 +352,4 @@ def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL) ->
     for the summary if present).
     """
     text = prompts.format_feedback(trim_feedback(feedback))
-    return _run(model, prompts.repair_input(text), "medium", previous_id=prev.interaction_id)
+    return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)

@@ -62,7 +62,7 @@ def test_holdout_removes_inputs_the_loop_saw(tmp_path, monkeypatch):
     (generated / "x.json").write_bytes(b"[1]")  # same bytes as a.json, different name
     (generated / "y.json").write_bytes(b"[2]")
     (generated / "z.json").write_bytes(b"{}")
-    monkeypatch.setattr(loop, "ensure_inputs", lambda root, count, seed: generated)
+    monkeypatch.setattr(loop, "ensure_inputs", lambda root, count, seed, target=None: generated)
 
     out, removed = loop.holdout_inputs(tmp_path, 3, 1001, seen)
     assert removed == 2
@@ -101,3 +101,11 @@ def test_wait_gives_up_after_max_seconds(monkeypatch):
     monkeypatch.setattr(translate, "POLL_SECONDS", 0)
     with pytest.raises(translate.TranslateError, match="still 'in_progress'"):
         translate._wait(client, stuck, max_seconds=0.05)
+
+
+def test_cjson_target_keeps_the_original_prompt_words():
+    from ai.targets import CJSON
+
+    assert CJSON.system_instruction == prompts.SYSTEM_INSTRUCTION
+    assert CJSON.translate_input("C") == prompts.translate_input("C")
+    assert CJSON.repair_input("fb") == prompts.repair_input("fb")
