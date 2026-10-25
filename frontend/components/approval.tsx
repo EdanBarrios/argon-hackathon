@@ -40,6 +40,11 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
             {approval.pr_url}
           </a>
         </div>
+      ) : approval.approved_by && approval.pr_status === "dry_run" ? (
+        <div className="flex flex-col gap-1">
+          <div className="text-lg text-amber-400">Approved by {approval.approved_by}. Dry run: no PR opened.</div>
+          <p className="break-all text-neutral-300">{approval.pr_detail}</p>
+        </div>
       ) : approval.approved_by ? (
         <div className="text-lg text-green-400">✓ Approved by {approval.approved_by}. Opening PR...</div>
       ) : (
