@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
 import { crashViews, divergenceRows, holdoutResult, latestSummary, pipelineSteps, wallState } from "@/lib/derive";
-import { BaselineCompare } from "./baseline";
 import { EventLog } from "./event-log";
 import { Evidence } from "./evidence";
 import { Lanes } from "./lanes";
@@ -119,11 +118,6 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           {wall ? <VerifierWall wall={wall} holdout={holdout} /> : <p className="text-lg text-dim">Waiting for the first verify round.</p>}
         </section>
       )}
-
-      <section className="border-t border-line px-1 pt-6">
-        <h2 className="mb-4 text-xl font-bold">Flash vs Argon</h2>
-        <BaselineCompare />
-      </section>
 
       <section className="border-t border-line px-1 pt-6">
         <h2 className="mb-4 text-xl font-bold">Try any input</h2>

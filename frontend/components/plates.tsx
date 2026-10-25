@@ -14,14 +14,14 @@ export function Mark({ state, size = 18 }: { state: "registered" | "apart" | "cr
   if (state === "apart") {
     const off = size * 0.38;
     return (
-      <span className="relative inline-block" style={{ width: size, height: size }} aria-label="plates apart">
+      <span className="relative inline-block shrink-0" style={{ width: size, height: size }} aria-label="plates apart">
         <span className="absolute top-0 rounded-full bg-clang mix-blend-screen" style={{ width: size, height: size, left: -off }} />
         <span className="absolute top-0 rounded-full bg-div mix-blend-screen" style={{ width: size, height: size, left: off }} />
       </span>
     );
   }
   const cls = state === "registered" ? "bg-paper" : state === "crash" ? "bg-crash" : "live-dot bg-dim";
-  return <span className={`inline-block rounded-full ${cls}`} style={{ width: size, height: size }} aria-label={state} />;
+  return <span className={`inline-block shrink-0 rounded-full ${cls}`} style={{ width: size, height: size }} aria-label={state} />;
 }
 
 export function PlateHeads() {
@@ -116,7 +116,7 @@ export function DivergenceRows({ rows, confirmed }: { rows: DivergenceRow[]; con
             key={r.key}
             onClick={() => setOpen(selected ? null : r.key)}
             selected={selected}
-            left={<div className="break-all font-mono text-lg md:text-xl">{show(r.c_output)}</div>}
+            left={<div className="break-words font-mono text-sm md:text-xl">{show(r.c_output)}</div>}
             spine={
               <>
                 <Mark state={r.resolved ? "registered" : "apart"} />
@@ -128,12 +128,12 @@ export function DivergenceRows({ rows, confirmed }: { rows: DivergenceRow[]; con
             right={
               r.resolved && confirmed ? (
                 <>
-                  <div className="break-all font-mono text-lg text-match md:text-xl">{show(r.c_output)}</div>
-                  <div className="break-all font-mono text-sm text-dim line-through decoration-div/60">draft: {show(r.rust_output)}</div>
+                  <div className="break-words font-mono text-sm text-match md:text-xl">{show(r.c_output)}</div>
+                  <div className="break-words font-mono text-xs text-dim line-through md:text-sm decoration-div/60">draft: {show(r.rust_output)}</div>
                 </>
               ) : (
                 <>
-                  <div className={`break-all font-mono text-lg md:text-xl ${r.resolved ? "text-paper/70 line-through decoration-match/60" : "text-div"}`}>{show(r.rust_output)}</div>
+                  <div className={`break-words font-mono text-sm md:text-xl ${r.resolved ? "text-paper/70 line-through decoration-match/60" : "text-div"}`}>{show(r.rust_output)}</div>
                   {r.resolved && <div className="text-sm text-dim">repaired, re-verifying</div>}
                 </>
               )

@@ -5,7 +5,6 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import baseline from "@/data/baseline.json";
 import { C_PARSE_STRING, RUST_PARSE_STRING, type CodeLine } from "@/data/excerpts";
 import { crashViews, divergenceRows, heroStats, holdoutResult, wallState } from "@/lib/derive";
 import { staticFixture } from "@/lib/fixtures-static";
@@ -38,34 +37,6 @@ const preserved = stats.final && stats.current !== null && stats.current >= 1;
 
 const RECORDED = `/jobs/${encodeURIComponent(job.id)}?fixture=completed`;
 const n = (x: number) => x.toLocaleString("en-US");
-
-// Flash vs Argon, from results/cjson-flash-vs-argon via data/baseline.json.
-interface Run {
-  high_thinking: string;
-  match: number | null;
-  of: number | null;
-  seconds: number | null;
-  tokens: number | null;
-}
-interface ModelResult {
-  name: string;
-  model: string;
-  runs: Run[];
-  adversarial: { targeted: { match: number; of: number } };
-}
-const models = baseline.models as unknown as ModelResult[];
-const range = (xs: (number | null)[], f: (x: number) => string) => {
-  const v = xs.filter((x): x is number => x !== null).sort((a, b) => a - b);
-  if (!v.length) return "n/a";
-  return v[0] === v[v.length - 1] ? f(v[0]) : `${f(v[0])}–${f(v[v.length - 1])}`;
-};
-const compareRows = [
-  { label: "Finished first try, high thinking", f: (m: ModelResult) => `${m.runs.filter((r) => r.high_thinking === "finished").length} of ${m.runs.length}` },
-  { label: "Generated inputs", f: (m: ModelResult) => range(m.runs.map((r) => r.match), n) + " / " + range(m.runs.map((r) => r.of), n) },
-  { label: "Targeted edge inputs", f: (m: ModelResult) => `${n(m.adversarial.targeted.match)} / ${n(m.adversarial.targeted.of)}` },
-  { label: "Time to a working port", f: (m: ModelResult) => range(m.runs.map((r) => r.seconds), (x) => String(Math.round(x))) + " s" },
-  { label: "Total tokens", f: (m: ModelResult) => range(m.runs.map((r) => r.tokens), (x) => `${Math.round(x / 1000)}K`) },
-];
 
 function Code({ lines }: { lines: CodeLine[] }) {
   return (
@@ -181,11 +152,16 @@ export default function Home() {
           </span>
         </h1>
         <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-          <p data-rise className="lede text-paper/90">
-            Gemini 4 Argon migrates C parsers to memory-safe Rust. A deterministic verifier runs the original and the
-            replacement on the same inputs, exposes the differences, and makes the model repair them. A person approves,
-            and the evidence ships with the pull request.
-          </p>
+          <div className="flex flex-col gap-5">
+            <p data-rise className="lede text-paper/90">
+              Gemini 4 Argon migrates C parsers to memory-safe Rust. A deterministic verifier runs the original and the
+              replacement on the same inputs, exposes the differences, and makes the model repair them. A person approves,
+              and the evidence ships with the pull request.
+            </p>
+            <p data-rise className="max-w-[40ch] border-l-2 border-rust pl-4 text-lg leading-snug">
+              libexpat, about 18,500 lines of C, to 6,554 lines of safe Rust; matched on every input we tried.
+            </p>
+          </div>
           <div data-rise className="flex flex-wrap items-center gap-4">
             <a href="#run" className="rounded-md bg-paper px-6 py-3.5 text-lg font-bold text-ink transition hover:bg-white">
               Start a live run
@@ -330,41 +306,6 @@ export default function Home() {
               {(crash?.sanitizer_report ?? "").split("\n").slice(0, 14).join("\n")}
             </pre>
           </div>
-        </div>
-      </section>
-
-      {/* Why Argon */}
-      <section id="compare" className={`border-t border-line py-32 ${pad}`}>
-        <h2 data-reveal className="display text-[clamp(34px,4.4vw,68px)]">
-          Why Argon.
-        </h2>
-        <p data-reveal className="mt-6 max-w-[52ch] text-lg leading-snug text-paper/85">
-          Same prompts, same verifier, two runs per model on {baseline.library}. Argon wrote a working port in one pass at full thinking,
-          about 2.5x faster with about 2.7x fewer tokens. Flash hit its 64K output cap mid-file and finished only by thinking less,
-          and its port still diverged on {n(models[1]?.adversarial.targeted.of - models[1]?.adversarial.targeted.match)} targeted edge inputs.
-        </p>
-        <div className="mt-12 grid grid-cols-[1.4fr_1fr_1fr] border-t border-paper text-lg">
-          <div className="py-3" />
-          {models.map((m) => (
-            <div key={m.name} className="py-3">
-              <div className="text-2xl font-extrabold">{m.name}</div>
-              <div className="font-mono text-sm text-dim">{m.model}</div>
-            </div>
-          ))}
-          {compareRows.map((row) => (
-            <div key={row.label} className="contents">
-              <div className="border-t border-line py-3 text-paper/85">{row.label}</div>
-              {models.map((m) => {
-                const v = row.f(m);
-                const flagged = row.label === "Targeted edge inputs" && m.adversarial.targeted.match !== m.adversarial.targeted.of;
-                return (
-                  <div key={m.name} className={`border-t border-line py-3 font-mono tabular-nums ${flagged ? "text-div" : ""}`}>
-                    {v}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
         </div>
       </section>
 
