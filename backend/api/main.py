@@ -5,7 +5,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import cost, harness, pipeline, try_input
+from . import cost, harness, pipeline, pr, try_input
 from .models import ApproveRequest, CreateJobRequest, Event, Job, JobCost, TryRequest
 from .store import JobNotFound, JobStore
 
@@ -92,10 +92,19 @@ def approve(job_id: str, body: ApproveRequest) -> Job:
         raise HTTPException(status_code=409, detail=f"job {job_id} already approved")
     pipe = pipeline.get_pipeline(store)
     try:
-        pr_url = pipe.open_pr(job, body.approved_by)
+        out = pipe.open_pr(job, body.approved_by)
     except NotImplementedError as exc:
         raise HTTPException(status_code=501, detail=str(exc)) from None
-    store.emit(job_id, "approved", None, {"approved_by": body.approved_by, "pr_url": pr_url})
+    except pr.PRStepError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+    except Exception as exc:  # noqa: BLE001 - managed agent or network failure
+        raise HTTPException(status_code=502, detail=f"PR step failed: {type(exc).__name__}: {exc}") from None
+    # Mock returns a URL string; real mode returns {"status", "pr_url", "branch", "files", "detail"}.
+    data = {"pr_url": out, "pr_status": "opened"} if isinstance(out, str) else {
+        "pr_url": out.get("pr_url"), "pr_status": out.get("status"), "pr_branch": out.get("branch"),
+        "pr_detail": out.get("detail"), "pr_files": out.get("files"),
+    }
+    store.emit(job_id, "approved", None, {"approved_by": body.approved_by, **data})
     return store.get(job_id)
 
 

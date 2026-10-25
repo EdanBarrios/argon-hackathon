@@ -358,6 +358,7 @@ class RealPipeline:
             t0 = time.monotonic()
             build = self.build_step(rust_path, f"live-{job_id}-r{iteration}")
             build_secs = timed("build", t0, iteration=iteration, ok=bool(build.get("ok")))
+            (rdir / "build.json").write_text(json.dumps({k: build.get(k) for k in ("ok", "binary")}))
             feedback: dict[str, Any]
             if not build.get("ok"):
                 errors = build.get("errors") or "build failed"
@@ -567,10 +568,16 @@ class RealPipeline:
                     "rust_behavior": c.get("rust_behavior"),
                 })
 
-    def open_pr(self, job: Job, approved_by: str) -> str:
-        raise NotImplementedError(
-            "Opening a real PR is not wired; the evidence is at GET /jobs/{id}/result and runs/ai/live-*/."
-        )
+    def open_pr(self, job: Job, approved_by: str) -> dict[str, Any]:
+        """Managed-agent release step (backend/api/pr.py). Without GITHUB_TOKEN this is an
+        honest local dry run: status "dry_run", pr_url None, plus what would be pushed."""
+        from . import pr
+
+        model = None
+        for e in self.store.events(job.id):
+            if e.type in ("translate", "repair") and e.data.get("phase") in ("done", "loaded"):
+                model = e.data.get("source_model") or e.data.get("model") or model
+        return pr.open_pr_for_job(job.id, approved_by, model)
 
 
 def get_pipeline(store: JobStore, scenario: str = "completed") -> Pipeline:

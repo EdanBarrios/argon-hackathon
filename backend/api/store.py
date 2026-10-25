@@ -151,3 +151,6 @@ class JobStore:
         elif event.type == "approved":
             job.approval.approved_by = data.get("approved_by")
             job.approval.pr_url = data.get("pr_url")
+            job.approval.pr_status = data.get("pr_status")
+            job.approval.pr_branch = data.get("pr_branch")
+            job.approval.pr_detail = data.get("pr_detail")

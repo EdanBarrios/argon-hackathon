@@ -182,3 +182,32 @@ def test_translate_failure_fails_job(client, fake, monkeypatch):
 def test_guess_function():
     assert pipeline.guess_function("OK/OK print differs in string: C next=quote Rust next=alpha") == "print_string_ptr"
     assert pipeline.guess_function("C OK vs Rust ERR_AT, input starts with [") == "parse_array"
+
+
+def test_approve_without_token_is_an_honest_dry_run(client, fake, monkeypatch):
+    from harness.remote import open_pr as op
+
+    def no_agent(*a, **k):
+        raise AssertionError("dry run must not start a managed agent")
+
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.setattr(op, "env_value", lambda name: None)  # ignore the repo .env
+    monkeypatch.setattr(op, "_cve_check", lambda binary: {})
+    monkeypatch.setattr(op, "open_pr_remote", no_agent)
+    job = client.post("/jobs", json={"library": "cjson", "rounds": 3, "inputs": 10}).json()
+    assert wait(client, job["id"])["status"] == "completed"
+
+    r = client.post(f"/jobs/{job['id']}/approve", json={"approved_by": "edan"})
+    assert r.status_code == 200, r.text
+    approval = r.json()["approval"]
+    assert approval["approved_by"] == "edan"
+    assert approval["pr_url"] is None  # never a fake URL
+    assert approval["pr_status"] == "dry_run"
+    assert approval["pr_branch"].startswith("theseus/live-")
+    assert "GITHUB_TOKEN is not set" in approval["pr_detail"]
+    events = client.get(f"/jobs/{job['id']}/events").json()
+    assert "migrated/cjson/EVIDENCE.md" in events[-1]["data"]["pr_files"]
+    # the payload holds the round that reached 1.0 (round 2, "// v2")
+    payload = next(harness.RUNS_AI.glob(f"live-*-{job['id']}/release/pr-dry-run-local/crate"))
+    assert (payload / "src/cjson.rs").read_text() == "// v2\n"
+    assert "Approved by **edan**" in (payload / "EVIDENCE.md").read_text()
