@@ -82,7 +82,7 @@ function Verdict({ r }: { r: TryResult }) {
         </span>
       )}
       {r.old_c && (
-        <span className={`rounded-full border px-3 py-0.5 text-sm font-semibold uppercase ${VERDICT[r.verdict].cls}`}>
+        <span className={`rounded-full border px-3 py-0.5 text-sm font-semibold ${VERDICT[r.verdict].cls}`}>
           vs {r.c.version}: {VERDICT[r.verdict].text}
         </span>
       )}
@@ -134,7 +134,7 @@ export function TryPanel({ compact = false }: { compact?: boolean }) {
               void run(p.input);
             }}
             className={`rounded-full border px-3 py-1 font-mono text-base hover:bg-line disabled:opacity-50 ${
-              p.note ? "border-crash/70 text-amber-200" : "border-line text-paper"
+              p.note ? "border-crash/70 text-crash" : "border-line text-paper"
             }`}
           >
             {p.label}

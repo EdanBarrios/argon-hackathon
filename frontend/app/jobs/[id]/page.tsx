@@ -11,8 +11,8 @@ export default function JobPage(props: PageProps<"/jobs/[id]">) {
     <Suspense
       fallback={
         <main className="p-10">
-          <h1 className="text-4xl font-black tracking-[0.3em]">THESEUS</h1>
-          <p className="mt-6 text-xl text-neutral-400">Loading run...</p>
+          <h1 className="text-lg font-extrabold tracking-[-0.02em] text-paper">Theseus</h1>
+          <p className="mt-6 text-xl text-dim">Loading run…</p>
         </main>
       }
     >

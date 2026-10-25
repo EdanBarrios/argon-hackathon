@@ -35,7 +35,7 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
     <div className="flex flex-col gap-4">
       {approval.pr_url ? (
         <div className="flex flex-col gap-1">
-          <div className="text-lg text-match">✓ Approved by {approval.approved_by}. PR opened with the evidence report:</div>
+          <div className="text-lg text-match">Approved by {approval.approved_by}. PR opened with the evidence report:</div>
           <a href={approval.pr_url} target="_blank" rel="noreferrer" className="break-all font-mono text-xl text-paper underline">
             {approval.pr_url}
           </a>
@@ -46,13 +46,13 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
           <p className="break-all text-paper/80">{approval.pr_detail}</p>
         </div>
       ) : approval.approved_by ? (
-        <div className="text-lg text-match">✓ Approved by {approval.approved_by}. Opening PR...</div>
+        <div className="text-lg text-match">Approved by {approval.approved_by}. Opening PR…</div>
       ) : (
         <button
           type="button"
           onClick={onClick}
           disabled={!enabled}
-          className="w-full rounded-md border border-match bg-match/15 px-6 py-4 text-xl font-bold text-match transition hover:bg-match hover:text-ink disabled:cursor-not-allowed disabled:border-line disabled:bg-transparent disabled:text-dim "
+          className="rounded-md bg-paper px-7 py-3.5 text-lg font-bold text-ink transition hover:bg-white disabled:cursor-not-allowed disabled:bg-line disabled:text-dim"
         >
           {busy ? "Approving..." : "Approve and open PR"}
         </button>

@@ -10,7 +10,7 @@ import type { CrashView, DivergenceRow, WallRound } from "@/lib/derive";
 const n = (x: number) => x.toLocaleString("en-US");
 const show = (s: string) => s.replace(/\t/g, "  ");
 
-function Mark({ state, size = 18 }: { state: "registered" | "apart" | "crash" | "pending"; size?: number }) {
+export function Mark({ state, size = 18 }: { state: "registered" | "apart" | "crash" | "pending"; size?: number }) {
   if (state === "apart") {
     const off = size * 0.38;
     return (
@@ -26,7 +26,7 @@ function Mark({ state, size = 18 }: { state: "registered" | "apart" | "crash" | 
 
 export function PlateHeads() {
   return (
-    <div className="grid grid-cols-[1fr_11rem_1fr] items-baseline px-1 pb-2 pt-5 text-sm font-bold">
+    <div className="grid grid-cols-[minmax(0,1fr)_5.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_11rem_minmax(0,1fr)] items-baseline gap-4 px-1 pb-2 pt-5 text-sm font-bold">
       <span className="text-clang">C · cJSON, the reference</span>
       <span className="text-center font-normal text-dim">registration</span>
       <span className="text-right text-rust">Rust · the translation</span>
@@ -55,7 +55,7 @@ function Row({
       <Tag
         type={onClick ? "button" : undefined}
         onClick={onClick}
-        className={`grid w-full grid-cols-[1fr_11rem_1fr] items-center gap-4 px-1 py-4 text-left ${onClick ? "cursor-pointer transition hover:bg-panel" : ""}`}
+        className={`grid w-full grid-cols-[minmax(0,1fr)_5.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_11rem_minmax(0,1fr)] items-center gap-4 px-1 py-4 text-left ${onClick ? "cursor-pointer transition hover:bg-panel" : ""}`}
       >
         <div className="min-w-0">{left}</div>
         <div className="flex flex-col items-center gap-1.5">{spine}</div>
@@ -81,7 +81,7 @@ export function TotalsRow({ round, before, scanning }: { round: WallRound | null
     <Row
       left={
         <>
-          <div className="text-[54px] font-extrabold leading-none tracking-[-0.03em]">{n(round.total)}</div>
+          <div className="text-[clamp(40px,6vw,88px)] font-extrabold leading-none tracking-[-0.035em] tabular-nums">{n(round.total)}</div>
           <div className="mt-1 text-dim">inputs run · verify #{round.iteration ?? "?"}</div>
         </>
       }
@@ -93,7 +93,7 @@ export function TotalsRow({ round, before, scanning }: { round: WallRound | null
       }
       right={
         <>
-          <div className={`text-[54px] font-extrabold leading-none tracking-[-0.03em] ${full ? "text-match" : ""}`}>{n(round.match)}</div>
+          <div className={`text-[clamp(40px,6vw,88px)] font-extrabold leading-none tracking-[-0.035em] tabular-nums ${full ? "text-match" : ""}`}>{n(round.match)}</div>
           <div className="mt-1 text-dim">
             byte-identical{before && before.iteration !== round.iteration ? ` (${n(before.match)} before the repair)` : ""}
           </div>
@@ -116,7 +116,7 @@ export function DivergenceRows({ rows, confirmed }: { rows: DivergenceRow[]; con
             key={r.key}
             onClick={() => setOpen(selected ? null : r.key)}
             selected={selected}
-            left={<div className="truncate font-mono text-xl">{show(r.c_output)}</div>}
+            left={<div className="break-all font-mono text-lg md:text-xl">{show(r.c_output)}</div>}
             spine={
               <>
                 <Mark state={r.resolved ? "registered" : "apart"} />
@@ -128,19 +128,19 @@ export function DivergenceRows({ rows, confirmed }: { rows: DivergenceRow[]; con
             right={
               r.resolved && confirmed ? (
                 <>
-                  <div className="truncate font-mono text-xl text-match">{show(r.c_output)}</div>
-                  <div className="truncate font-mono text-sm text-dim line-through decoration-div/60">draft: {show(r.rust_output)}</div>
+                  <div className="break-all font-mono text-lg text-match md:text-xl">{show(r.c_output)}</div>
+                  <div className="break-all font-mono text-sm text-dim line-through decoration-div/60">draft: {show(r.rust_output)}</div>
                 </>
               ) : (
                 <>
-                  <div className={`truncate font-mono text-xl ${r.resolved ? "text-paper/70 line-through decoration-match/60" : "text-div"}`}>{show(r.rust_output)}</div>
+                  <div className={`break-all font-mono text-lg md:text-xl ${r.resolved ? "text-paper/70 line-through decoration-match/60" : "text-div"}`}>{show(r.rust_output)}</div>
                   {r.resolved && <div className="text-sm text-dim">repaired, re-verifying</div>}
                 </>
               )
             }
           >
             {selected && (
-              <div className="grid grid-cols-[1fr_11rem_1fr] gap-4 px-1 pb-5 text-base">
+              <div className="grid grid-cols-[minmax(0,1fr)_5.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_11rem_minmax(0,1fr)] gap-4 px-1 pb-5 text-base">
                 <div className="text-dim">
                   {r.function_guessed ? "Likely in" : "In"} <span className="font-mono text-paper">{r.function}</span>.
                   {r.resolved ? " Registered after the repair." : " Open: sent to the model."}
@@ -165,15 +165,21 @@ export function DivergenceRows({ rows, confirmed }: { rows: DivergenceRow[]; con
   );
 }
 
-export function RepairRow({ repair }: { repair: NonNullable<DivergenceRow["repair"]> }) {
+export function RepairRow({ repair, functions, guessed }: { repair: NonNullable<DivergenceRow["repair"]>; functions: string[]; guessed: boolean }) {
   return (
     <div className="border-t border-line bg-panel px-5 py-4">
       <p className="text-lg">
         <span className="font-bold text-match">
-          {repair.model ?? "Argon"} repair{repair.iteration !== null ? `, round ${repair.iteration}` : ""}
+          Argon repair{repair.iteration !== null ? `, round ${repair.iteration}` : ""}
           {repair.seconds !== null ? ` · ${Math.round(repair.seconds)} s.` : "."}
         </span>{" "}
-        {repair.summary}
+        Returned a corrected file
+        {functions.length > 0 && (
+          <>
+            , {guessed ? "likely in" : "in"} <span className="font-mono">{functions.join(", ")}</span>
+          </>
+        )}
+        . <span className="font-mono text-sm text-dim">{repair.model ?? ""}</span>
       </p>
       {repair.patterns.length > 0 && (
         <p className="mt-1 font-mono text-sm text-dim">Sent as patterns, not answers: {repair.patterns.join(" · ")}</p>
