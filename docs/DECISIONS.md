@@ -11,3 +11,8 @@ Anyone may add rows. Newest at the bottom.
 | pending (11:15) | Sandbox (remote) vs local runner | Depends on A's smoke test | A + C |
 | pending | Backend host | | C |
 | 10:31 | Repair loops use thinking_level medium, lead planner high | Organizer guide; speed for live demo | C |
+| 11:00 | Edan (C) builds A's translate/repair temporarily; A takes over on return | A offline (venue Wi-Fi) | Edan |
+| 11:05 | Output extraction: prompt asks for exactly one fenced rust block; no block raises TranslateError, an unclosed fence is reported as truncated, several blocks take the longest and log a note | Deterministic, easy to explain; truncation is the likely failure on long decodes | Edan (for A) |
+| 11:05 | Repair feedback: compile errors in full; divergences deduped by a coarse pattern (accept/reject kind, error offset side, print diff location), shortest input per pattern, top 10 by frequency; Rust crashes and timeouts up to 10; safety_improvement dropped | One example per bug, not 10 copies of the same bug; keeps the repair prompt small | Edan (for A) |
+| 11:05 | Repair budget: --rounds 5 = 1 translate + 4 repairs, stop early at match_rate 1.0; loops verify on 300 generated inputs (seed 1), full 2000 is opt-in via --final-inputs | Harness README: 300 inputs for repair loops; report honestly at the budget | Edan (for A) |
+| 11:05 | max_output_tokens 131072 with background=True for every call; translate thinking high, repair medium, step down automatically if a model rejects a level (probe: Flash and Argon both accept high) | Rust parse+print is ~20K tokens and thinking counts toward the cap | Edan (for A) |
