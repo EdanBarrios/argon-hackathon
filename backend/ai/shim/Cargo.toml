@@ -1,0 +1,14 @@
+[package]
+name = "theseus_expat"
+version = "0.1.0"
+edition = "2021"
+description = "libexpat 2.9.0 C ABI over Argon's safe-Rust expat.rs (for CPython's pyexpat)"
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+
+[profile.release]
+panic = "unwind"

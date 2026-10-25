@@ -1,0 +1,18 @@
+symbols: 52 required, 0 missing
+  events: <a x=1>[hi]<!--c--><b></b></a>
+PASS parse ok
+PASS events
+PASS error code none
+  error: 7 mismatched tag line 2 col 5
+PASS mismatch is error
+PASS error position
+PASS stop -> aborted
+PASS cleared handler not called
+PASS ns parser, no namespaces
+PASS ns parser, xmlns -> error
+PASS GetBuffer/ParseBuffer
+  version: expat_2.9.0-theseus-argon
+PASS version
+PASS error strings 1..44
+PASS feature list terminated
+SMOKE OK
