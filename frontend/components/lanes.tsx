@@ -18,7 +18,7 @@ function Dots({ agent }: { agent: Agent }) {
           <span
             key={it}
             className={`h-3 w-3 rounded-full ${
-              current ? "animate-pulse bg-white" : done ? "bg-neutral-300" : "border border-neutral-700"
+              current ? "animate-pulse bg-paper" : done ? "bg-paper/70" : "border border-line"
             }`}
           />
         );
@@ -28,9 +28,9 @@ function Dots({ agent }: { agent: Agent }) {
 }
 
 export function Lanes({ agents }: { agents: Agent[] }) {
-  if (!agents.length) return <p className="text-lg text-neutral-500">Waiting for the planner to assign modules...</p>;
+  if (!agents.length) return <p className="text-lg text-dim">Waiting for the planner to assign modules...</p>;
   return (
-    <div className="flex flex-col divide-y divide-neutral-800">
+    <div className="flex flex-col divide-y divide-line">
       {agents.map((a) => {
         const full = a.match_rate >= 1;
         return (
@@ -41,19 +41,19 @@ export function Lanes({ agents }: { agents: Agent[] }) {
             </div>
             <Dots agent={a} />
             <div className="min-w-0">
-              <div className="h-4 overflow-hidden rounded-full bg-neutral-800">
+              <div className="h-4 overflow-hidden rounded-full bg-line">
                 <div
                   className={`h-full rounded-full transition-[width] duration-700 ease-out ${
-                    a.status === "failed" ? "bg-red-500" : full ? "bg-green-500" : "bg-green-600/70"
+                    a.status === "failed" ? "bg-div" : full ? "bg-match" : "bg-match/70"
                   }`}
                   style={{ width: `${Math.max(0, Math.min(1, a.match_rate)) * 100}%` }}
                 />
               </div>
-              <div className="mt-1 truncate font-mono text-xs text-neutral-500">
+              <div className="mt-1 truncate font-mono text-xs text-dim">
                 {a.interaction_id ?? "no interaction yet"} · iter {a.iteration}
               </div>
             </div>
-            <div className={`text-right text-2xl font-bold tabular-nums ${full ? "text-green-400" : "text-white"}`}>
+            <div className={`text-right text-2xl font-bold tabular-nums ${full ? "text-match" : "text-paper"}`}>
               {pct(a.match_rate)}
             </div>
           </div>

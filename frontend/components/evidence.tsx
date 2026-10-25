@@ -1,13 +1,15 @@
 import type { Job, Source } from "@/lib/api";
 import type { CrashView, DivergenceRow, WallState } from "@/lib/derive";
 import { ApprovalPanel } from "./approval";
+import { Mark } from "./plates";
 
 interface Check {
   ok: boolean;
   text: string;
 }
 
-// What the PR's evidence report will claim, built only from what the verifier reported.
+// The last row of the spine: what the PR's evidence report will claim, built only
+// from what the verifier reported, and the one approve control.
 export function Evidence({
   job,
   source,
@@ -36,24 +38,27 @@ export function Evidence({
   for (const c of crashes) checks.push({ ok: true, text: `${c.cve ?? "Crash input"}: C ${c.kind}, Rust ${c.rust_behavior}` });
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      {checks.length ? (
-        <ul className="flex flex-col gap-2">
-          {checks.map((c, i) => (
-            <li key={i} className="rise flex items-start gap-3 text-lg" style={{ animationDelay: `${i * 120}ms` }}>
-              <span className={`font-mono font-bold ${c.ok ? "text-match" : "text-div"}`}>{c.ok ? "[✓]" : "[✗]"}</span>
-              <span className="text-neutral-100">{c.text}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-lg text-neutral-500">Evidence appears as the verifier reports.</p>
-      )}
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-dim">
-        A human approves before anything is pushed. The model never grades its own work.
-      </p>
-      <div className="mt-auto">
+    <div className="grid items-start gap-6 border-t border-line px-1 py-6 md:grid-cols-[minmax(0,1fr)_auto]">
+      <div>
+        <h2 className="mb-3 text-xl font-bold">The evidence report this PR will carry</h2>
+        {checks.length ? (
+          <ul className="flex flex-col gap-2">
+            {checks.map((c, i) => (
+              <li key={i} className="flex items-start gap-3 text-lg">
+                <span className="mt-[0.45em] flex">
+                  <Mark state={c.ok ? "registered" : "apart"} size={12} />
+                </span>
+                <span>{c.text}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-lg text-dim">Evidence appears as the verifier reports.</p>
+        )}
+      </div>
+      <div className="flex max-w-sm flex-col gap-3 md:items-end md:text-right">
         <ApprovalPanel job={job} source={source} onJob={onJob} />
+        <p className="text-sm text-dim">A human approves before anything is pushed. The model never grades its own work.</p>
       </div>
     </div>
   );

@@ -35,30 +35,30 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
     <div className="flex flex-col gap-4">
       {approval.pr_url ? (
         <div className="flex flex-col gap-1">
-          <div className="text-lg text-green-400">✓ Approved by {approval.approved_by}. PR opened with the evidence report:</div>
-          <a href={approval.pr_url} target="_blank" rel="noreferrer" className="break-all font-mono text-xl text-white underline">
+          <div className="text-lg text-match">Approved by {approval.approved_by}. PR opened with the evidence report:</div>
+          <a href={approval.pr_url} target="_blank" rel="noreferrer" className="break-all font-mono text-xl text-paper underline">
             {approval.pr_url}
           </a>
         </div>
       ) : approval.approved_by && approval.pr_status === "dry_run" ? (
         <div className="flex flex-col gap-1">
-          <div className="text-lg text-amber-400">Approved by {approval.approved_by}. Dry run: no PR opened.</div>
-          <p className="break-all text-neutral-300">{approval.pr_detail}</p>
+          <div className="text-lg text-crash">Approved by {approval.approved_by}. Dry run: no PR opened.</div>
+          <p className="break-all text-paper/80">{approval.pr_detail}</p>
         </div>
       ) : approval.approved_by ? (
-        <div className="text-lg text-green-400">✓ Approved by {approval.approved_by}. Opening PR...</div>
+        <div className="text-lg text-match">Approved by {approval.approved_by}. Opening PR…</div>
       ) : (
         <button
           type="button"
           onClick={onClick}
           disabled={!enabled}
-          className="w-full rounded-md border border-match bg-match/15 px-6 py-4 font-mono text-xl font-bold uppercase tracking-widest text-match shadow-[0_0_24px_rgb(61_220_132/0.25)] transition hover:bg-match hover:text-black disabled:cursor-not-allowed disabled:border-line disabled:bg-transparent disabled:text-neutral-500 disabled:shadow-none"
+          className="rounded-md bg-paper px-7 py-3.5 text-lg font-bold text-ink transition hover:bg-white disabled:cursor-not-allowed disabled:bg-line disabled:text-dim"
         >
           {busy ? "Approving..." : "Approve and open PR"}
         </button>
       )}
-      {hint && !approval.approved_by && <p className="text-neutral-500">{hint}</p>}
-      {msg && <p className="text-neutral-300">{msg}</p>}
+      {hint && !approval.approved_by && <p className="text-dim">{hint}</p>}
+      {msg && <p className="text-paper/80">{msg}</p>}
     </div>
   );
 }

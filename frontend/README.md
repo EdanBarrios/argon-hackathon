@@ -1,6 +1,6 @@
 # Theseus frontend
 
-Next.js (App Router, Tailwind, no component libraries, system fonts only).
+Next.js (App Router, Tailwind, no component libraries). Fonts are self-hosted in `public/fonts` (Schibsted Grotesk and Fragment Mono, OFL) because venue Wi-Fi is unreliable. Motion: GSAP ScrollTrigger and Lenis; the verifier field on the home page is a 2D canvas.
 
 ```bash
 cd frontend
@@ -12,7 +12,7 @@ npm run dev          # http://localhost:3000, syncs contracts/fixtures first
 
 ## Views
 
-- `/` Start run (POST /jobs `{"library":"cjson","modules":["parser","printer"]}`), load a job by id, sample links.
+- `/` The story of one recorded run (job_2fc7b6), read through `lib/derive.ts`: rewrite, verify, divergence, repair, held-out, CVE, Flash vs Argon. Ends with the start-run form (`components/story/start-run.tsx`), load a job by id, and the Try panel.
 - `/jobs/<id>` run view, polls the API every 1s until a terminal status.
 - `/jobs/<anything>?fixture=running|completed|failed` sample data, rendered on the server, no backend needed.
 

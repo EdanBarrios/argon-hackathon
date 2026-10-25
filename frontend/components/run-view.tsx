@@ -2,33 +2,21 @@
 
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
-import { crashViews, divergenceRows, heroStats, holdoutResult, latestSummary, pct, pipelineSteps, wallState } from "@/lib/derive";
-import { BaselineCompare } from "./baseline";
-import { CrashCard } from "./crash-card";
-import { Divergences } from "./divergences";
+import { crashViews, divergenceRows, holdoutResult, latestSummary, pipelineSteps, wallState } from "@/lib/derive";
 import { EventLog } from "./event-log";
 import { Evidence } from "./evidence";
 import { Lanes } from "./lanes";
 import { Pipeline } from "./pipeline";
+import { CrashRow, DivergenceRows, HoldoutRow, PlateHeads, RepairRow, TotalsRow } from "./plates";
 import { Ticker } from "./ticker";
 import { TryPanel } from "./try-panel";
-import { Card, CountUp, SampleBadge, StatusPill } from "./ui";
+import { SampleBadge, StatusPill } from "./ui";
 import { VerifierWall } from "./verifier-wall";
-
-function Stat({ label, children, sub }: { label: string; children: React.ReactNode; sub?: React.ReactNode }) {
-  return (
-    <div className="panel rise px-5 py-4">
-      <div className="font-mono text-xs uppercase tracking-[0.25em] text-dim">{label}</div>
-      <div className="mt-1 font-mono text-5xl font-black tabular-nums">{children}</div>
-      {sub && <div className="mt-1 text-sm text-neutral-400">{sub}</div>}
-    </div>
-  );
-}
 
 function Wordmark() {
   return (
-    <Link href="/" className="font-mono text-3xl font-black tracking-[0.35em] text-white">
-      THESEUS
+    <Link href="/" className="text-lg font-extrabold tracking-[-0.02em] text-paper">
+      Theseus
     </Link>
   );
 }
@@ -41,7 +29,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
       <main className="mx-auto max-w-3xl p-10">
         <Wordmark />
         <p className="mt-6 text-xl text-div">{error}</p>
-        <p className="mt-4 text-lg text-neutral-400">
+        <p className="mt-4 text-lg text-dim">
           Try the recorded run: <Link className="underline" href={`/jobs/${id}?fixture=completed`}>completed</Link>,{" "}
           <Link className="underline" href={`/jobs/${id}?fixture=running`}>running</Link>, or{" "}
           <Link className="underline" href="/">go home</Link>.
@@ -53,117 +41,88 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
     return (
       <main className="p-10">
         <Wordmark />
-        <p className="mt-6 font-mono text-xl text-neutral-400">
-          Loading job {id}
-          <span className="cursor text-match">▌</span>
-        </p>
+        <p className="mt-6 text-xl text-dim">Loading job {id}…</p>
       </main>
     );
   }
 
-  const stats = heroStats(job, events);
   const rows = divergenceRows(job, events);
   const crashes = crashViews(job, events);
   const wall = wallState(job, events);
   const holdout = holdoutResult(events);
   const steps = pipelineSteps(job, events);
+  const roundLast = wall?.rounds[wall.rounds.length - 1] ?? null;
+  const roundFirst = wall?.rounds[0] ?? null;
+  const repair = rows.find((r) => r.repair)?.repair ?? null;
   const openCount = rows.filter((r) => !r.resolved).length;
-  const preserved = stats.final && stats.current !== null && stats.current >= 1;
+  const repairFunctions = [...new Set(rows.filter((r) => r.repair).map((r) => r.function))];
+  const working = job.status === "running" || job.status === "verifying" || job.status === "queued";
 
   return (
-    <main className="mx-auto flex max-w-[1440px] flex-col gap-4 px-6 py-5">
-      {/* Header */}
-      <header className="flex flex-wrap items-center gap-x-5 gap-y-2">
+    <main className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 pb-16 pt-4 md:px-12">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-4">
         <Wordmark />
-        <span className="font-mono text-2xl text-dim">▸</span>
-        <span className="font-mono text-2xl font-semibold text-white">{job.library}</span>
+        <span className="text-dim">/</span>
+        <span className="text-lg font-semibold">{job.library}</span>
         <StatusPill status={job.status} size="lg" />
-        <span className="font-mono text-sm uppercase tracking-widest text-dim">runner {job.runner}</span>
         <span className="font-mono text-sm text-dim">{job.id}</span>
-        <span className="ml-auto">
-          {source === "fixture" ? <SampleBadge notice={notice} /> : notice && <span className="text-sm text-neutral-400">{notice}</span>}
+        <span className="text-sm text-dim">runner {job.runner}</span>
+        {cost && <span className="text-sm text-dim">${cost.total_usd.toFixed(cost.total_usd < 1 ? 3 : 2)} in model calls so far</span>}
+        <span className="ml-auto flex items-center gap-4">
+          {source === "fixture" ? <SampleBadge notice={notice} /> : notice && <span className="text-sm text-dim">{notice}</span>}
+          <a href="#approve" className={`rounded-md px-4 py-2 text-base font-bold transition ${job.status === "completed" ? "bg-paper text-ink hover:bg-white" : "border border-line text-dim"}`}>
+            {job.approval.pr_url ? "PR opened" : job.approval.approved_by ? "Approved" : "Approve and open PR"}
+          </a>
         </span>
       </header>
 
       {job.error && (
-        <div className="panel border-div/70 p-4 text-lg">
+        <div className="rounded-md border border-div/70 p-4 text-lg">
           <span className="font-mono font-bold text-div">{job.error.code}</span>
-          <span className="text-red-100">: {job.error.message}</span>
-          {job.error.retryable && <span className="ml-2 text-neutral-400">(retryable)</span>}
+          <span className="text-paper">: {job.error.message}</span>
+          {job.error.retryable && <span className="ml-2 text-dim">(retryable)</span>}
         </div>
       )}
-
-      <Ticker text={latestSummary(events)} />
 
       <Pipeline steps={steps} />
+      <Ticker text={latestSummary(events)} />
 
-      {/* Verifier wall + headline numbers */}
-      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-4">
-        <Card
-          title="Verifier: C vs Rust, same inputs"
-          right={<span className="font-mono text-xs uppercase tracking-[0.2em] text-dim">1 square = 1 input</span>}
-        >
-          {wall ? <VerifierWall wall={wall} holdout={holdout} /> : <p className="text-lg text-neutral-500">Waiting for the first verify round.</p>}
-        </Card>
-        <div className="flex flex-col gap-4">
-          <Stat label={`Match rate · baseline → ${stats.final ? "final" : "now"}`}>
-            <span className="text-neutral-500">{pct(stats.baseline)}</span>
-            <span className="mx-2 text-3xl text-dim">→</span>
-            <span className={stats.current !== null && stats.current >= 1 ? "text-match glow-match" : "text-white"}>
-              {stats.current === null ? "n/a" : <CountUp value={stats.current * 100} format={(x) => `${Math.round(x)}%`} />}
+      {job.agents.length > 1 && <Lanes agents={job.agents} />}
+
+      {/* The evidence, printed twice. */}
+      <section aria-label="Evidence, C beside Rust">
+        <PlateHeads />
+        <TotalsRow round={roundLast} before={roundFirst} scanning={wall?.scanning ?? false} />
+        {rows.length > 0 && (
+          <div className="flex items-baseline justify-between px-1 pb-1 pt-6 text-sm">
+            <span className="font-bold">
+              {rows.length} {rows.length === 1 ? "input" : "inputs"} where the outputs differed
             </span>
-          </Stat>
-          <Stat label={preserved ? "Tested behaviors preserved" : "Behaviors tested"} sub={holdout ? `+ ${holdout.match}/${holdout.total} held-out` : undefined}>
-            <span className={preserved ? "text-match glow-match" : "text-white"}>
-              {stats.behaviors === null ? "n/a" : <CountUp value={stats.behaviors} />}
-            </span>
-          </Stat>
-          <Stat label="Memory bugs caught in C" sub={crashes[0]?.cve ? `${crashes[0].cve} · Rust returns a clean error` : undefined}>
-            <span className={stats.crashes ? "text-crash glow-crash" : "text-white"}>{stats.crashes}</span>
-          </Stat>
-          {cost && (
-            <Stat label="Model cost, this run">
-              <span className="text-white">${cost.total_usd.toFixed(cost.total_usd < 1 ? 3 : 2)}</span>
-            </Stat>
-          )}
+            <span className={openCount ? "font-bold text-div" : "text-match"}>{openCount ? `${openCount} open · click a row` : "all registered after the repair"}</span>
+          </div>
+        )}
+        <DivergenceRows rows={rows} confirmed={!!roundLast && roundLast.div === 0 && !(wall?.scanning ?? false)} />
+        {repair && <RepairRow repair={repair} functions={repairFunctions} guessed={rows.some((r) => r.function_guessed)} />}
+        {holdout && <HoldoutRow match={holdout.match} total={holdout.total} />}
+        {crashes.map((c, i) => (
+          <CrashRow key={i} crash={c} />
+        ))}
+        <div id="approve" className="scroll-mt-6">
+          <Evidence job={job} source={source} onJob={setJob} wall={wall} holdout={holdout} rows={rows} crashes={crashes} />
         </div>
-      </div>
+      </section>
 
-      {job.agents.length > 1 && (
-        <Card title="Agents">
-          <Lanes agents={job.agents} />
-        </Card>
+      {(working || (wall && wall.rounds.length > 0)) && (
+        <section className="border-t border-line px-1 pt-6">
+          <h2 className="mb-4 text-xl font-bold">Every input, one mark each</h2>
+          {wall ? <VerifierWall wall={wall} holdout={holdout} /> : <p className="text-lg text-dim">Waiting for the first verify round.</p>}
+        </section>
       )}
 
-      <Card
-        title="Divergences"
-        right={
-          openCount > 0 ? (
-            <span className="font-mono text-base font-bold text-div glow-div">{openCount} open · click to inspect</span>
-          ) : rows.length ? (
-            <span className="font-mono text-base text-match">all {rows.length} repaired</span>
-          ) : null
-        }
-      >
-        <Divergences rows={rows} />
-      </Card>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Card title="Memory safety">
-          <CrashCard crashes={crashes} />
-        </Card>
-        <Card title="Evidence report">
-          <Evidence job={job} source={source} onJob={setJob} wall={wall} holdout={holdout} rows={rows} crashes={crashes} />
-        </Card>
-      </div>
-
-      <Card title="Flash vs Argon">
-        <BaselineCompare />
-      </Card>
-
-      <Card title="Try any input">
+      <section className="border-t border-line px-1 pt-6">
+        <h2 className="mb-4 text-xl font-bold">Try any input</h2>
         <TryPanel compact />
-      </Card>
+      </section>
 
       <EventLog events={events} />
     </main>
