@@ -3,6 +3,7 @@
 Usage:
   cd backend && uv run python ../scripts/sandbox_smoke.py
   cd backend && uv run python ../scripts/sandbox_smoke.py --followup <interaction_id>
+  cd backend && uv run python ../scripts/sandbox_smoke.py --apt   # new sandbox, apt mirrors allowlisted
 
 Turn 1 makes ONE background managed-agent call (antigravity + gemini-4-argon) in a
 remote sandbox with a network allowlist, asks it to check toolchains, ASan, rustup,
@@ -76,6 +77,46 @@ clang preinstalled (yes/no), rustc preinstalled (yes/no), rustup install seconds
 ASan works (yes/no), git clone works (yes/no), cJSON harness build works (yes/no/skipped).
 """
 
+# Hosts the apt 403s named in the first run (sources.list has Ubuntu plus Chrome,
+# Cloud SDK and NodeSource repos). Used with --apt.
+APT_HOSTS = [
+    "archive.ubuntu.com",
+    "security.ubuntu.com",
+    "ports.ubuntu.com",
+    "dl.google.com",
+    "packages.cloud.google.com",
+    "deb.nodesource.com",
+]
+
+APT_PROMPT = """You are running a smoke test of this sandbox. Run each step below in the
+sandbox shell. For every command, report the exact command, its output VERBATIM
+(stdout and stderr, in a code block; for very long apt output keep the first 15
+and last 15 lines and say how many lines you cut), its exit code, and its
+wall-clock time. If a step fails, report the error verbatim and continue.
+
+1. `uname -a; cat /etc/os-release | head -3; which apt-get dnf apk`
+2. Time this: `DEBIAN_FRONTEND=noninteractive apt-get update` then
+   `DEBIAN_FRONTEND=noninteractive apt-get install -y clang` (this also gives `cc`).
+   If apt-get is missing, use whatever package manager exists. Then
+   `which clang cc; clang --version`.
+3. Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal`
+   then `. "$HOME/.cargo/env"; rustc --version; cargo --version`. Time it.
+4. In /tmp/smoke: write hello.c, `clang -fsanitize=address -g hello.c -o hello_c && ./hello_c`.
+   Then the same flags on this deliberately buggy program and run it:
+   `int main(){int a[2]; volatile int i=2; return a[i];}`
+   Report whether an AddressSanitizer stack-buffer-overflow report appeared (show its first 10 lines).
+5. In /tmp/smoke: write hello.rs, `rustc hello.rs -o hello_rs && ./hello_rs`.
+6. `git clone --depth 1 https://github.com/EdanBarrios/argon-hackathon /tmp/smoke/argon-hackathon`
+7. From /tmp/smoke/argon-hackathon: `backend/harness/fetch_cjson.sh`, then
+   `backend/harness/build_cjson.sh`, then
+   `printf '[1,{"a":true}]' | backend/harness/build/cjson_driver` (expect `OK\t[1,{"a":true}]`).
+
+At the end, print a table: step, ok or failed, seconds. Then state plainly:
+apt works (yes/no), clang installed (yes/no) and install seconds, rustup seconds,
+ASan works (yes/no), Rust hello works (yes/no), git clone works (yes/no),
+cJSON driver build works (yes/no).
+"""
+
 FOLLOWUP_PROMPT = """Follow-up check on the same sandbox. Run these and report output verbatim
 with exit codes:
 
@@ -117,8 +158,9 @@ def fmt_usage(usage) -> str:
     return " ".join(f"{f.replace('total_', '')}={getattr(usage, f, None)}" for f in fields)
 
 
-def run(client: genai.Client, prompt: str, previous_id: str | None) -> int:
-    environment: dict | str = ENVIRONMENT
+def run(
+    client: genai.Client, prompt: str, previous_id: str | None, environment: dict | str = ENVIRONMENT
+) -> int:
     if previous_id:
         # Reuse turn 1's sandbox. Sending the config dict again may provision a
         # fresh environment; a string is an existing environment ID (SDK type
@@ -180,6 +222,9 @@ def run(client: genai.Client, prompt: str, previous_id: str | None) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--apt", action="store_true", help="new sandbox with apt mirrors allowlisted; install clang, full test"
+    )
     parser.add_argument("--followup", metavar="INTERACTION_ID", help="send the persistence check turn")
     args = parser.parse_args()
 
@@ -190,6 +235,12 @@ def main() -> int:
     client = genai.Client(api_key=key)
     if args.followup:
         return run(client, FOLLOWUP_PROMPT, args.followup)
+    if args.apt:
+        env = {
+            "type": "remote",
+            "network": {"allowlist": [{"domain": d} for d in ALLOWLIST + APT_HOSTS]},
+        }
+        return run(client, APT_PROMPT, None, env)
     return run(client, TURN1_PROMPT, None)
 
 
