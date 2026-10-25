@@ -155,10 +155,10 @@ export default function Home() {
           Theseus
         </Link>
         <div className="flex items-center gap-6 text-base">
-          <Link href={RECORDED} className="text-dim transition hover:text-paper">
+          <Link href={RECORDED} className="hidden text-dim transition hover:text-paper sm:inline">
             Recorded run
           </Link>
-          <a href="#run" className="rounded-md bg-paper px-4 py-2 font-bold text-ink transition hover:bg-white">
+          <a href="#run" className="whitespace-nowrap rounded-md bg-paper px-4 py-2 font-bold text-ink transition hover:bg-white">
             Start a live run
           </a>
         </div>
