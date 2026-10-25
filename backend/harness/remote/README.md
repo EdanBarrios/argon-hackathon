@@ -1,0 +1,71 @@
+# backend/harness/remote
+
+Owner: **C (systems)**. Managed-agent sandbox runs (antigravity-preview-09-2026) as functions the
+API pipeline can call, parallel model baselines, and the human-approved PR step.
+
+Built on Brendan's `backend/ai/sandbox_run.py`. Reused, not copied: the sandbox task prompt
+(`prompts.sandbox_input`, `prompts.SYSTEM_INSTRUCTION`), the apt-mirror allowlist
+(`sandbox_run.ENVIRONMENT`), `parse_claims`, `host_verify`, `extract_rust`, `ensure_inputs` and
+`holdout_inputs`. Added here: a function interface, parallel jobs, per-job directories, step
+transcripts, progress events, a pull of the sandbox's own verify reports through the
+Environments files API, and the PR step.
+
+## Interfaces
+
+```python
+from harness.remote import run_module_remote, run_parallel, RemoteSpec, open_pr_remote  # cwd: backend/
+
+r = run_module_remote(library="cjson", model="gemini-4-argon", rounds=4, inputs=300,
+                      job_dir=None, on_event=print)          # blocking, tens of minutes
+r.local_match_rate, r.holdout_match_rate, r.sandbox_match_rate, r.match_rates_agree
+r.interaction_id, r.environment_id, r.seconds, r.usage, r.cost_usd, r.rust_source, r.transcript, r.job_dir
+
+rs = run_parallel([RemoteSpec(model="gemini-4-argon"), RemoteSpec(model="gemini-3.8-flash")],
+                  job_root=None, on_event=print)            # one thread + one sandbox per spec
+
+url = open_pr_remote(r.job_dir, approved_by="Edan", dry_run=False)   # only after a human clicks
+```
+
+`run_module_remote` never raises for agent, build or verify failures: check `status`, `error`
+and `local_match_rate`. `rounds` is total rounds (1 translate + rounds-1 repairs), the team
+convention. `resume_remote(interaction_id, job_dir)` re-attaches if the client process dies.
+
+## CLI
+
+```bash
+cd backend
+uv run python ../scripts/run_remote.py --library cjson --models gemini-4-argon,gemini-3.8-flash --rounds 4
+uv run python ../scripts/open_pr_remote.py runs/remote/<stamp>/cjson-gemini-4-argon --approved-by Edan --dry-run
+```
+
+Output: `runs/remote/<stamp>/summary.json` and one directory per job with `prompt.md`,
+`transcript.jsonl` (every agent step), `agent_output.md`, `cjson.rs`, `sandbox_work/` (the
+sandbox's own `verify_<N>.json` and `cjson.rs`), `verify_local.json`, `verify_holdout.json` and
+`result.json`.
+
+## How it works
+
+1. **One isolated sandbox per module and model.** The agent installs clang and rustup, clones
+   this public repo, fetches cJSON, builds the ASan/UBSan C driver, generates inputs, writes
+   `cjson.rs` against `rust_crate/INTERFACE.md`, builds it with `scripts/build_rust.sh`, and runs
+   `verify.sh` against the C driver, repairing until match_rate 1.0 or the budget runs out.
+2. **verify.sh is the only judge.** The prompt says so, and the agent must paste the final
+   verify.sh JSON summary verbatim between markers. We also pull the sandbox's
+   `verify_<N>.json` files directly and compare.
+3. **Trust but verify.** The host rebuilds the returned `cjson.rs` and re-runs `verify.sh`
+   locally on the same seed (`local_match_rate`, must equal the sandbox claim; a mismatch is
+   flagged `MISMATCH`) and on a held-out seed the agent never saw (`holdout_match_rate`, the
+   number to quote).
+4. **PR only after human approval.** `open_pr_remote` refuses without `approved_by` or a local
+   match rate of 1.0. The host builds the crate and `EVIDENCE.md` from verified files and mounts
+   them as inline sources; the agent only runs git and curl.
+5. **Credentials at the proxy.** `GITHUB_TOKEN` is registered with `client.credentials.create`
+   (github.com: Basic `x-oauth-basic:<token>`; api.github.com: Bearer) and attached to allowlist
+   rules. The allowlist is github.com and api.github.com only. The token never enters the
+   prompt or the sandbox, and the credentials are deleted when the step ends.
+
+## Token for the PR step
+
+Fine-grained personal access token, repository access **only EdanBarrios/argon-hackathon**,
+permissions **Contents: Read and write** and **Pull requests: Read and write** (Metadata: Read is
+added automatically). Put it in `.env` as `GITHUB_TOKEN=...`.
