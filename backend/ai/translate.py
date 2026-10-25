@@ -172,6 +172,10 @@ def extract_rust(text: str | None, notes: list[str] | None = None) -> str:
 
 
 def _run(model: str, input_text: str, thinking: str, previous_id: str | None) -> TranslateResult:
+    """One logical call. If the model runs out of output budget (status "incomplete"),
+    retry once at the next lower thinking level. Observed: gemini-3.8-flash at "high"
+    spent ~63K thought tokens and stopped at the 65,536 output cap mid-file, even
+    with max_output_tokens=131072. Usage and seconds include the failed attempt."""
     client = _get_client()
     notes: list[str] = []
     kwargs: dict = {
@@ -183,17 +187,34 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None) ->
     if previous_id:
         kwargs["previous_interaction_id"] = previous_id
     started = time.monotonic()
-    interaction, used_level = _create(client, kwargs, thinking, notes)
-    interaction = _wait(client, interaction)
-    seconds = round(time.monotonic() - started, 1)
-    status = getattr(interaction, "status", None)
-    usage = _usage_dict(interaction)
-    if status != "completed":
+    usage = dict.fromkeys(USAGE_FIELDS, 0)
+    level: str | None = thinking
+    for attempt in (1, 2):
+        interaction, used_level = _create(client, kwargs, level, notes)
+        interaction = _wait(client, interaction)
+        status = getattr(interaction, "status", None)
+        for k, v in _usage_dict(interaction).items():
+            usage[k] += v
+        if status == "completed":
+            break
+        seconds = round(time.monotonic() - started, 1)
+        lower = (THINKING_FALLBACK.get(used_level or "") or [None])[0]
+        if status == "incomplete" and attempt == 1 and used_level is not None:
+            u = _usage_dict(interaction)
+            notes.append(
+                f"{model} interaction {interaction.id} incomplete at thinking_level={used_level!r} "
+                f"(thought {u['total_thought_tokens']}, output {u['total_output_tokens']} tokens, "
+                f"{seconds}s); retried with {lower!r}"
+            )
+            print(f"[ai.translate] {notes[-1]}", file=sys.stderr, flush=True)
+            level = lower
+            continue
         errors = getattr(interaction, "errors", None)
         raise TranslateError(
-            f"interaction {interaction.id} ended with status {status!r} after {seconds}s"
+            f"interaction {interaction.id} ended with status {status!r} after {seconds}s, usage {usage}"
             + (f": {errors}" if errors else "")
         )
+    seconds = round(time.monotonic() - started, 1)
     rust = extract_rust(getattr(interaction, "output_text", None), notes)
     for note in notes:
         print(f"[ai.translate] {note}", file=sys.stderr)
