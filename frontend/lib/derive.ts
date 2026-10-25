@@ -17,17 +17,28 @@ export interface RepairView {
   summary: string;
 }
 
-/** The first `repair` event after `afterSeq` that touched `fn` (any agent when `agentId` is null). */
+/**
+ * The `repair` event after `afterSeq` that touched `fn` (any agent when `agentId` is null).
+ * A repair round may list several `functions`; prefer its `phase: "done"` event.
+ */
 function findRepair(events: JobEvent[], fn: string, agentId: string | null, afterSeq = 0): RepairView | null {
-  const e = events.find(
+  const touches = (r: JobEvent) => {
+    const fns = Array.isArray(r.data.functions) ? (r.data.functions as string[]) : [];
+    return r.data.function === fn || fns.includes(fn);
+  };
+  const matching = events.filter(
     (r) =>
       r.type === "repair" &&
       r.seq > afterSeq &&
-      r.data.function === fn &&
       (agentId === null || r.agent_id === agentId) &&
       typeof r.data.summary === "string",
   );
-  return e ? { iteration: e.data.iteration ?? null, summary: e.data.summary as string } : null;
+  // The "done" event often names only one function, so match the round through its "started" event.
+  const started = matching.find(touches);
+  if (!started) return null;
+  const done = matching.find((r) => r.data.phase === "done" && r.data.iteration === started.data.iteration);
+  const e = done ?? started;
+  return { iteration: e.data.iteration ?? null, summary: e.data.summary as string };
 }
 
 /**
