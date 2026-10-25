@@ -1,0 +1,3 @@
+gemini-4-argon/round_1: prompt 206,294, segments [65563, 65567, 379] (3), rebuilt input 815,575, reported 815,566, diff -9, cached 0
+argon-fresh-a/round_2: prompt 280,158, segments [65563, 8153] (2), rebuilt input 625,879, reported 625,800, diff -79, cached 0
+argon-fresh-a/round_3: prompt 280,333, segments [65563, 8169] (2), rebuilt input 626,229, reported 626,150, diff -79, cached 554,740
