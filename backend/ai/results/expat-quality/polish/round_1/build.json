@@ -1,0 +1,5 @@
+{
+  "ok": true,
+  "binary": "<repo>/runs/build-expat/ai-20261025-140246-gemini-4-argon-r1/target/release/theseus_expat",
+  "build_seconds": 2
+}

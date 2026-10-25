@@ -43,7 +43,7 @@ Each answer has a short version to say out loud, then the evidence behind it. Ev
 
 ## 3. "What does the quality gate check?"
 
-**Say:** "Matching the C output is the first gate. On top of that, the host, not the model, runs rustfmt and clippy on the generated file. We count default clippy warnings, and separately every site that could panic: indexing without a check, `unwrap`, `expect`, `panic!`. Then the host applies clippy's own safe fixes and rustfmt, and keeps that version only if a rebuild and a full reverify show behavior no worse. Leftover rounds go to the model as lint-only polish turns. A polish that changes even one output byte is thrown out; we caught exactly that once, when a polish broke tab and carriage-return escapes on 6 of 300 inputs. On cJSON the result was 0 clippy warnings and 0 panic sites, with held-out still 763/763."
+**Say:** "Matching the C output is the first gate. On top of that, the host, not the model, runs rustfmt and clippy on the generated file. We count default clippy warnings, and separately every site that could panic: indexing without a check, `unwrap`, `expect`, `panic!`. Then the host applies clippy's own safe fixes and rustfmt, and keeps that version only if a rebuild and a full reverify show behavior no worse. Leftover rounds go to the model as lint-only polish turns. A polish that changes even one output byte is thrown out; we caught exactly that once, when a polish broke tab and carriage-return escapes on 6 of 300 inputs. On cJSON the result was 0 clippy warnings and 0 panic sites, with held-out still 763/763. On libexpat, one polish round took 153 panic-prone index sites and 1 clippy warning to 0 and 0, and it still matches C on all 1,253 unseen held-out inputs."
 
 **Evidence** (`backend/ai/quality.py`, `backend/ai/loop.py`, `cjson-quality/`):
 
@@ -53,4 +53,4 @@ Each answer has a short version to say out loud, then the evidence behind it. Ev
 - **Choosing a build:** loop match rate first, then lints. The held-out set never steers the choice; it is measured once on the chosen build.
 - **Already enforced at build:** the word `unsafe` is rejected anywhere in the file, and the crate has `#![forbid(unsafe_code)]`. std only, no FFI, builds offline.
 - **cJSON numbers:** default clippy 3 → 0, panic lints 41 → 0, held-out 763/763, targeted 980/980, $0.67 (`cjson-quality/`).
-- **Be careful on stage:** libexpat has **not** been through the quality gate yet. Its claim is behavior (2,000 tested behaviors, no `unsafe`), not "0 clippy". The run that measures it is planned in `backend/ai/handoff/HANDOFF-expat-quality.md`.
+- **libexpat numbers:** default clippy 1 → 0, panic lints 153 → 0, loop 747/747, held-out 1,253/1,253, 0 crashes, one polish round, $1.47 (`expat-quality/`, n = 1). Prompt rule 7 was not in the expat system instruction for that run; the polish turn's own message carried the lint report.
