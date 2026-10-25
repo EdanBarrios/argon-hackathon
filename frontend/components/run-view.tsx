@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePollJob, type FixtureKind, type Snapshot } from "@/lib/api";
 import { crashViews, divergenceRows, heroStats, pct, verifySeries } from "@/lib/derive";
-import baseline from "@/data/baseline.json";
 import { ApprovalPanel } from "./approval";
+import { BaselineCompare } from "./baseline";
 import { MatchChart } from "./chart";
 import { CrashCard } from "./crash-card";
 import { Divergences } from "./divergences";
@@ -17,71 +17,6 @@ function Stat({ label, value, tone = "text-white" }: { label: string; value: str
     <div className="rounded-xl border border-neutral-800 bg-neutral-900 px-5 py-4">
       <div className="text-sm font-bold uppercase tracking-[0.2em] text-neutral-400">{label}</div>
       <div className={`mt-1 text-5xl font-black tabular-nums ${tone}`}>{value}</div>
-    </div>
-  );
-}
-
-// Flash vs Argon results come from data/baseline.json (Brendan's runs), not the API.
-interface BaselineRun {
-  model: string;
-  mode: string;
-  match_rate: number | null;
-  behaviors_tested: number | null;
-  rounds: number | null;
-  crashes: number | null;
-  seconds: number | null;
-  usd: number | null;
-}
-
-const CELLS = [
-  { model: "flash", mode: "single", label: "Flash, single pass" },
-  { model: "flash", mode: "repair", label: "Flash + repair loop" },
-  { model: "argon", mode: "single", label: "Argon, single pass" },
-  { model: "argon", mode: "repair", label: "Argon + repair loop" },
-];
-
-function roundsText(r: BaselineRun) {
-  if (r.rounds === null || r.mode === "single") return null;
-  return r.match_rate !== null && r.match_rate >= 1 ? `100% in ${r.rounds} rounds` : `${r.rounds} rounds, not 100%`;
-}
-
-function BaselineGrid() {
-  const runs = baseline.runs as unknown as BaselineRun[];
-  return (
-    <div>
-      <p className="mb-3 text-neutral-400">
-        {baseline.module} module. {baseline.note.split(";")[0]}.
-      </p>
-      <div className="grid grid-cols-2 gap-3">
-        {CELLS.map((c) => {
-          const r = runs.find((x) => x.model === c.model && x.mode === c.mode);
-          if (!r || r.match_rate === null) {
-            return (
-              <div key={c.label} className="rounded-lg border border-dashed border-neutral-700 p-4">
-                <div className="text-lg font-semibold">{c.label}</div>
-                <div className="mt-1 font-mono text-sm uppercase tracking-widest text-neutral-500">pending baseline runs</div>
-              </div>
-            );
-          }
-          const full = r.match_rate >= 1;
-          const details = [
-            r.behaviors_tested !== null && `${r.behaviors_tested.toLocaleString("en-US")} behaviors`,
-            roundsText(r),
-            r.crashes !== null && `${r.crashes} crashes`,
-            r.seconds !== null && `${Math.round(r.seconds)}s`,
-            r.usd !== null && `$${r.usd.toFixed(r.usd < 1 ? 3 : 2)}`,
-          ].filter(Boolean);
-          return (
-            <div key={c.label} className={`rounded-lg border p-4 ${full ? "border-green-500/60" : "border-neutral-700"}`}>
-              <div className="text-lg font-semibold">{c.label}</div>
-              <div className={`mt-1 text-4xl font-black tabular-nums ${full ? "text-green-400" : "text-white"}`}>
-                {pct(r.match_rate)}
-              </div>
-              <div className="mt-1 text-base text-neutral-400">{details.join(" · ")}</div>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 }
@@ -193,7 +128,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           <ApprovalPanel job={job} source={source} onJob={setJob} />
         </Card>
         <Card title="Flash vs Argon">
-          <BaselineGrid />
+          <BaselineCompare />
         </Card>
       </div>
 

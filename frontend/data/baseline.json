@@ -1,10 +1,26 @@
 {
-  "module": "printer",
-  "note": "Same harness, prompts and repair budget (5 rounds). Fill in from real runs only; null shows as pending.",
-  "runs": [
-    { "model": "flash", "mode": "single", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
-    { "model": "flash", "mode": "repair", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
-    { "model": "argon", "mode": "single", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null },
-    { "model": "argon", "mode": "repair", "match_rate": null, "behaviors_tested": null, "rounds": null, "crashes": null, "seconds": null, "usd": null }
+  "library": "cJSON v1.7.19, parse + print",
+  "source": "results/cjson-flash-vs-argon (summary.json, *verify*.json, adversarial/*.json)",
+  "note": "Same prompts, verifier and inputs. n = 2 runs per model.",
+  "models": [
+    {
+      "name": "Argon",
+      "model": "gemini-4-argon",
+      "runs": [
+        { "id": "argon-1", "high_thinking": "finished", "match": 2000, "of": 2000, "seconds": 355.0, "tokens": 71338, "thought_tokens": 30544 },
+        { "id": "argon-2", "high_thinking": "finished", "match": 2000, "of": 2000, "seconds": 332.7, "tokens": 66314, "thought_tokens": 25510 }
+      ],
+      "adversarial": { "run": "argon-1", "match": 1183, "of": 1183 }
+    },
+    {
+      "name": "Flash",
+      "model": "gemini-3.8-flash",
+      "runs": [
+        { "id": "flash-1", "high_thinking": "token_cap", "match": null, "of": null, "seconds": null, "tokens": null, "thought_tokens": null },
+        { "id": "flash-2", "high_thinking": "token_cap", "retried_at": "medium", "match": 2000, "of": 2000, "seconds": 837.7, "tokens": 189263, "thought_tokens": 112403 }
+      ],
+      "adversarial": { "run": "flash-2", "match": 1183, "of": 1183 },
+      "footnote": "At high thinking Flash hit its 64K output cap mid-file (it spent ~63K on thinking). flash-2 retried at medium thinking and reached 2,000/2,000; its time and tokens include both attempts. flash-1 had no retry."
+    }
   ]
 }
