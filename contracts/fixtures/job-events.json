@@ -47,8 +47,8 @@
     "type": "divergence",
     "data": {
       "input": "[1e999]",
-      "c_output": "[inf]",
-      "rust_output": "[Infinity]",
+      "c_output": "OK\t[null]",
+      "rust_output": "OK\t[inf]",
       "function": "print_number"
     }
   },
@@ -69,7 +69,7 @@
     "data": {
       "iteration": 2,
       "function": "print_number",
-      "summary": "Non-finite doubles now print via the same branch as C (\"inf\"/\"-inf\"/\"nan\") instead of Rust's Display impl."
+      "summary": "Non-finite doubles now print as null, matching C's print_number, instead of Rust's Display impl (\"inf\")."
     }
   },
   {

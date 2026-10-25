@@ -38,29 +38,29 @@
     "divergences": [
       {
         "input": "[1e999]",
-        "c_output": "[inf]",
-        "rust_output": "[Infinity]",
+        "c_output": "OK\t[null]",
+        "rust_output": "OK\t[inf]",
         "function": "print_number",
         "resolved": true
       },
       {
         "input": "\"\\ud83d\\ude00\"",
-        "c_output": "\"😀\"",
-        "rust_output": "\"\\ud83d\\ude00\"",
+        "c_output": "OK\t\"😀\"",
+        "rust_output": "OK\t\"\\ud83d\\ude00\"",
         "function": "parse_string",
         "resolved": true
       },
       {
         "input": "{\"a\": 1,}",
-        "c_output": "PARSE_ERROR at 8",
-        "rust_output": "{\"a\":1}",
+        "c_output": "PARSE_ERROR at 9",
+        "rust_output": "OK\t{\"a\":1}",
         "function": "parse_object",
         "resolved": true
       },
       {
         "input": "\"\\ud800\"",
-        "c_output": "PARSE_ERROR at 0",
-        "rust_output": "\"\ufffd\"",
+        "c_output": "PARSE_ERROR at 1",
+        "rust_output": "OK\t\"\ufffd\"",
         "function": "utf16_literal_to_utf8",
         "resolved": true
       }
