@@ -1,0 +1,34 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Local role marker
+.role
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+build/
+.vercel
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Rust
+target/
+
+# C build output
+*.o
+*.a
+*.dSYM/
+
+# Misc
+.DS_Store
+*.log
+tmp/
+runs/
