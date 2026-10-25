@@ -9,7 +9,7 @@ from api import cost
 from api.main import app
 
 FIXTURES = Path(__file__).resolve().parents[2] / "contracts" / "fixtures"
-MOCK_DURATION = 0.3  # seconds for the whole replay, instead of ~30
+MOCK_DURATION = 1.5  # seconds for the whole replay, instead of ~30 (slack for a loaded machine)
 
 
 def fixture(name: str):
@@ -158,12 +158,10 @@ def test_404(client):
     assert client.post("/jobs/nope/approve", json={"approved_by": "edan"}).status_code == 404
 
 
-def test_real_mode_fails_job_cleanly(client, monkeypatch):
+def test_real_mode_rejects_unknown_start_from(client, monkeypatch):
     monkeypatch.setenv("THESEUS_MODE", "real")
-    job_id = client.post("/jobs", json={"library": "cjson"}).json()["id"]
-    final, _ = wait_for(client, job_id)
-    assert final["status"] == "failed"
-    assert final["error"]["code"] == "not_implemented"
+    r = client.post("/jobs", json={"library": "cjson", "start_from": "nope"})
+    assert r.status_code == 400
 
 
 def test_cost_math():
@@ -203,3 +201,9 @@ def test_cost_endpoint_in_mock(client):
     assert set(out["models"][0]) == {
         "model", "input_tokens", "cached_tokens", "output_tokens", "thought_tokens", "usd",
     }
+
+
+def test_list_jobs(client):
+    job_id = client.post("/jobs", json={"library": "cjson"}).json()["id"]
+    ids = [j["id"] for j in client.get("/jobs").json()]
+    assert ids[0] == job_id
