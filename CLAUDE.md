@@ -17,6 +17,8 @@ If `.role` is missing or invalid, this session is **read-only**: do not edit fil
 
 Anyone may edit `docs/DECISIONS.md`.
 
+`scripts/guard-edit.sh` enforces this table on Edit/Write via `.claude/settings.json`. This is a cooperative guardrail, not a security boundary.
+
 ## No-overlap rules
 
 - Never edit another role's paths.
