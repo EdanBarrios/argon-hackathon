@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 1253,
+  "counts": {
+    "match": 1253,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 1253,
+    "attempted": 1253,
+    "scored": 1253,
+    "matched": 1253,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "<repo>/backend/harness/expat/build/expat_driver",
+    "rust": "<repo>/runs/build-expat/ai-20261025-135907-gemini-4-argon-r1h/target/release/theseus_expat",
+    "inputs": "<repo>/runs/ai/holdout-c2000-s1001-minus-expat-inputs-c300-s1",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "<repo>/backend/harness/expat/build/expat_driver",
+      "sha256": "3b6cac78c7f459deb7c49b7ea7a5eecd0dbd9c542a2690598e120e3bea0c0315"
+    },
+    "rust": {
+      "executable": "<repo>/runs/build-expat/ai-20261025-135907-gemini-4-argon-r1h/target/release/theseus_expat",
+      "sha256": "d51210115f5196b496b6818770e339944bcdab386e32f90ed0f293d5f27fbe2e"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 7.41
+}

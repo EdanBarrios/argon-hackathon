@@ -1,0 +1,12 @@
+best file == its round's file  claimed=True   recheck=True   OK
+no 'unsafe' keyword            claimed=True   recheck=True   OK
+fresh build ok                 claimed=True   recheck=True   OK
+loop match                     claimed=747    recheck=747    OK
+loop rust crashes              claimed=0      recheck=0      OK
+held-out match                 claimed=1253   recheck=1253   OK
+held-out tested                claimed=1253   recheck=1253   OK
+held-out rust crashes          claimed=0      recheck=0      OK
+fmt ok                         claimed=True   recheck=True   OK
+default clippy warnings        claimed=0      recheck=0      OK
+panic lints                    claimed=0      recheck=0      OK
+ALL CLAIMS HOLD

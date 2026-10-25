@@ -1,0 +1,63 @@
+{
+  "round": 1,
+  "kind": "start_from",
+  "start_from": "<repo>/backend/ai/results/expat-long-decode/argon-fresh-b/round_4/expat.rs",
+  "interaction_id": "",
+  "seconds": 0.0,
+  "usage": {},
+  "thinking_level": null,
+  "notes": [],
+  "continuations": 0,
+  "rust_lines": 6557,
+  "compile_ok": true,
+  "build_seconds": 2,
+  "match_rate": 1.0,
+  "divergences": 0,
+  "crashes": 0,
+  "timeouts": 0,
+  "safety_improvements": 0,
+  "behaviors_tested": 747,
+  "quality": {
+    "fmt_ok": false,
+    "fmt_diff_lines": 856,
+    "clippy_errors": 0,
+    "clippy_warnings": 1,
+    "panic_lints": 153,
+    "arithmetic_side_effects": 491,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 491,
+      "clippy::indexing_slicing": 153,
+      "clippy::too_many_arguments": 1
+    }
+  },
+  "host_fix": {
+    "clippy_fix_ok": true,
+    "fmt_ok": true,
+    "changed": true,
+    "applied": true,
+    "compile_ok": true,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 747,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "quality": {
+      "fmt_ok": true,
+      "fmt_diff_lines": 0,
+      "clippy_errors": 0,
+      "clippy_warnings": 1,
+      "panic_lints": 153,
+      "arithmetic_side_effects": 491,
+      "by_lint": {
+        "clippy::arithmetic_side_effects": 491,
+        "clippy::indexing_slicing": 153,
+        "clippy::too_many_arguments": 1
+      }
+    }
+  }
+}

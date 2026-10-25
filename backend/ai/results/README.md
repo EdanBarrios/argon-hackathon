@@ -73,6 +73,21 @@ n = 1, run 2026-10-25 ~12:55-13:10 PT with `ai.loop` from `feat/ai-quality` (rus
 
 How to say it: "With the lint rules in the prompt and one polish round, Argon's cJSON port is clippy clean with zero panic-prone index or unwrap sites, and still matches C on 763 unseen inputs and all 980 targeted ones." One run; 980/980 targeted was 1 of 4 before, so repeat before quoting it as typical.
 
+## libexpat R_2_9_0: quality gate (`expat-quality/`)
+
+n = 1, run 2026-10-25 13:58-14:13 PT. The start file was `argon-fresh-b/round_4`, followed by the host fix and 1 polish round (`--fresh-repair`). Loop inputs: 747. Held-out: 1,253 unseen.
+
+| | Before (`measure-b`) | After (`polish`) |
+|---|---|---|
+| Loop / held-out | 747/747, 1,253/1,253 | 747/747, 1,253/1,253 |
+| Rust crashes | 0 | 0 |
+| Default clippy warnings | 1 | **0** |
+| Panic lints | 153 | **0** |
+| arithmetic_side_effects (reported only) | 491 | 488 |
+| Cost | $0 | 573 s, **$1.47** |
+
+Prompt rule 7 was not in the expat system instruction; the polish turn's own message carried the lint report. `expat-quality/recheck.txt`: all 11 claims hold. Details and caveats are in `expat-quality/README.md`.
+
 ## Files
 
 - `<run>/summary.json`: per-round results, seconds, token usage, held-out block.

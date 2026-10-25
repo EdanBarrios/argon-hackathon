@@ -1,0 +1,179 @@
+{
+  "model": "gemini-4-argon",
+  "target": "expat",
+  "rounds_budget": 4,
+  "start_from": "../runs/ai/expat-quality/start-b-hostfixed.rs",
+  "fresh_repair": true,
+  "rounds_run": 2,
+  "inputs": "<repo>/runs/ai/expat-inputs-c300-s1",
+  "verify_timeout": 20.0,
+  "final_match_rate": 1.0,
+  "best_round": 2,
+  "best_match_rate": 1.0,
+  "best_host_fixed": true,
+  "best_file": "<repo>/runs/ai/expat-quality/polish/best/expat.rs",
+  "rounds_to_100": 1,
+  "polish_rounds_run": 1,
+  "quality": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 0,
+    "panic_lints": 0,
+    "arithmetic_side_effects": 488,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 488
+    },
+    "host_fixed": true,
+    "clean": true
+  },
+  "quality_first_build": {
+    "fmt_ok": true,
+    "fmt_diff_lines": 0,
+    "clippy_errors": 0,
+    "clippy_warnings": 1,
+    "panic_lints": 153,
+    "arithmetic_side_effects": 491,
+    "by_lint": {
+      "clippy::arithmetic_side_effects": 491,
+      "clippy::indexing_slicing": 153,
+      "clippy::too_many_arguments": 1
+    }
+  },
+  "total_model_seconds": 573.2,
+  "total_tokens": {
+    "total_input_tokens": 626924,
+    "total_output_tokens": 75239,
+    "total_thought_tokens": 0,
+    "total_cached_tokens": 280695
+  },
+  "usd": 1.4729,
+  "rounds": [
+    {
+      "round": 1,
+      "kind": "start_from",
+      "start_from": "<repo>/runs/ai/expat-quality/start-b-hostfixed.rs",
+      "interaction_id": "",
+      "seconds": 0.0,
+      "usage": {},
+      "thinking_level": null,
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6473,
+      "compile_ok": true,
+      "build_seconds": 2,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 747,
+      "quality": {
+        "fmt_ok": true,
+        "fmt_diff_lines": 0,
+        "clippy_errors": 0,
+        "clippy_warnings": 1,
+        "panic_lints": 153,
+        "arithmetic_side_effects": 491,
+        "by_lint": {
+          "clippy::arithmetic_side_effects": 491,
+          "clippy::indexing_slicing": 153,
+          "clippy::too_many_arguments": 1
+        }
+      },
+      "host_fix": {
+        "clippy_fix_ok": true,
+        "fmt_ok": true,
+        "changed": false,
+        "applied": false
+      }
+    },
+    {
+      "round": 2,
+      "kind": "polish",
+      "polish_of_round": 1,
+      "interaction_id": "v1_ChZnMjdlYXA2T0RyS1k5TW9QM3F1OE9BEhZnMjdlYXA2T0RyS1k5TW9QM3F1OE9B",
+      "seconds": 573.2,
+      "usage": {
+        "total_input_tokens": 626924,
+        "total_output_tokens": 75239,
+        "total_thought_tokens": 0,
+        "total_cached_tokens": 280695,
+        "total_tokens": 702163
+      },
+      "thinking_level": "medium",
+      "notes": [],
+      "continuations": 0,
+      "rust_lines": 6669,
+      "compile_ok": true,
+      "build_seconds": 3,
+      "match_rate": 1.0,
+      "divergences": 0,
+      "crashes": 0,
+      "timeouts": 0,
+      "safety_improvements": 0,
+      "behaviors_tested": 747,
+      "quality": {
+        "fmt_ok": false,
+        "fmt_diff_lines": 37,
+        "clippy_errors": 0,
+        "clippy_warnings": 3,
+        "panic_lints": 0,
+        "arithmetic_side_effects": 488,
+        "by_lint": {
+          "clippy::arithmetic_side_effects": 488,
+          "clippy::unnecessary_map_or": 3
+        }
+      },
+      "host_fix": {
+        "clippy_fix_ok": true,
+        "fmt_ok": true,
+        "changed": true,
+        "applied": true,
+        "compile_ok": true,
+        "match_rate": 1.0,
+        "counts": {
+          "match": 747,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0,
+          "infra_failure": 0
+        },
+        "quality": {
+          "fmt_ok": true,
+          "fmt_diff_lines": 0,
+          "clippy_errors": 0,
+          "clippy_warnings": 0,
+          "panic_lints": 0,
+          "arithmetic_side_effects": 488,
+          "by_lint": {
+            "clippy::arithmetic_side_effects": 488
+          }
+        }
+      }
+    }
+  ],
+  "holdout": {
+    "seed": 1001,
+    "inputs": "<repo>/runs/ai/holdout-c2000-s1001-minus-expat-inputs-c300-s1",
+    "overlap_removed": 747,
+    "behaviors_tested": 1253,
+    "match_rate": 1.0,
+    "counts": {
+      "match": 1253,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    }
+  },
+  "panics": {
+    "loop": 0,
+    "holdout": 0,
+    "total": 0
+  }
+}
