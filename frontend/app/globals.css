@@ -4,6 +4,17 @@
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Security-terminal palette. Color is semantic: match, divergence, crash; C vs Rust. */
+  --color-ink: #05080a;
+  --color-panel: #0a0f13;
+  --color-line: #1a242c;
+  --color-dim: #5b6b78;
+  --color-match: #3ddc84;
+  --color-div: #ff4d5e;
+  --color-crash: #ffb020;
+  --color-rust: #f46623;
+  --color-clang: #5aa9ff;
 }
 
 :root {
@@ -12,4 +23,179 @@
 
 body {
   font-family: var(--font-sans);
+  background-color: var(--color-ink);
+  /* Faint grid plus a vignette, so the page reads as a console, not a blank dashboard. */
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgb(61 220 132 / 0.07), transparent 60%),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  background-attachment: fixed;
+}
+
+/* Panel with corner brackets. */
+.panel {
+  position: relative;
+  border: 1px solid var(--color-line);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 40%), var(--color-panel);
+  border-radius: 6px;
+}
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgb(61 220 132 / 0.5);
+  border-style: solid;
+  pointer-events: none;
+}
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+  border-top-left-radius: 6px;
+}
+.panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 1px 1px 0;
+  border-bottom-right-radius: 6px;
+}
+
+.glow-match {
+  text-shadow: 0 0 18px rgb(61 220 132 / 0.55);
+}
+.glow-div {
+  text-shadow: 0 0 18px rgb(255 77 94 / 0.55);
+}
+.glow-crash {
+  text-shadow: 0 0 18px rgb(255 176 32 / 0.5);
+}
+
+/* Verifier wall cells. Delay is set inline so cells fill in order. */
+.cell {
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.06);
+  transition:
+    background-color 260ms ease-out,
+    box-shadow 260ms ease-out;
+}
+.cell[data-s="match"] {
+  background: var(--color-match);
+  box-shadow: 0 0 6px rgb(61 220 132 / 0.45);
+}
+.cell[data-s="div"] {
+  background: var(--color-div);
+  box-shadow: 0 0 8px rgb(255 77 94 / 0.8);
+  animation: cell-pulse 1.2s ease-in-out infinite;
+}
+.cell[data-s="crash"] {
+  background: var(--color-crash);
+  box-shadow: 0 0 8px rgb(255 176 32 / 0.8);
+}
+.cell[data-s="scan"] {
+  animation: cell-scan 1.6s linear infinite;
+}
+@keyframes cell-pulse {
+  50% {
+    box-shadow: 0 0 14px rgb(255 77 94 / 1);
+  }
+}
+@keyframes cell-scan {
+  0%,
+  100% {
+    background: rgb(255 255 255 / 0.05);
+  }
+  50% {
+    background: rgb(61 220 132 / 0.28);
+  }
+}
+
+/* Live dot. */
+@keyframes live {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(61 220 132 / 0.6);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 6px rgb(61 220 132 / 0);
+  }
+}
+.live-dot {
+  animation: live 1.4s ease-in-out infinite;
+}
+
+/* Pipeline connector that fills when the next step lands. */
+.connector {
+  background: var(--color-line);
+  position: relative;
+  overflow: hidden;
+}
+.connector[data-on="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(61 220 132 / 0.2), var(--color-match));
+  animation: fill-x 600ms ease-out both;
+  transform-origin: left;
+}
+@keyframes fill-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Active pipeline step: a sweep across the card. */
+.step-active {
+  position: relative;
+  overflow: hidden;
+}
+.step-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(61 220 132 / 0.12), transparent);
+  animation: sweep 1.6s linear infinite;
+}
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Entry animation for steps, rows and panels. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.rise {
+  animation: rise 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Blinking terminal cursor. */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.cursor {
+  animation: blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }

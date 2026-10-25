@@ -52,7 +52,7 @@ export function ApprovalPanel({ job, source, onJob }: { job: Job; source: Source
           type="button"
           onClick={onClick}
           disabled={!enabled}
-          className="rounded-lg bg-white px-6 py-4 text-xl font-bold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500"
+          className="w-full rounded-md border border-match bg-match/15 px-6 py-4 font-mono text-xl font-bold uppercase tracking-widest text-match shadow-[0_0_24px_rgb(61_220_132/0.25)] transition hover:bg-match hover:text-black disabled:cursor-not-allowed disabled:border-line disabled:bg-transparent disabled:text-neutral-500 disabled:shadow-none"
         >
           {busy ? "Approving..." : "Approve and open PR"}
         </button>

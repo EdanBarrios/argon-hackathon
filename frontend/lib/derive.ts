@@ -10,11 +10,22 @@ export interface DivergenceRow {
   resolved: boolean;
   agent_id: string | null;
   repair: RepairView | null;
+  /** True when the pipeline inferred the function from the divergence pattern. */
+  function_guessed: boolean;
 }
+
+const guessed = (events: JobEvent[], input: string) =>
+  events.some(
+    (e) => e.type === "divergence" && e.data.input === input && typeof e.data.function_source === "string" && /guess/i.test(e.data.function_source),
+  );
 
 export interface RepairView {
   iteration: number | null;
   summary: string;
+  model: string | null;
+  seconds: number | null;
+  /** Deduped divergence patterns the repair prompt was given (from the "started" event). */
+  patterns: string[];
 }
 
 /**
@@ -38,7 +49,13 @@ function findRepair(events: JobEvent[], fn: string, agentId: string | null, afte
   if (!started) return null;
   const done = matching.find((r) => r.data.phase === "done" && r.data.iteration === started.data.iteration);
   const e = done ?? started;
-  return { iteration: e.data.iteration ?? null, summary: e.data.summary as string };
+  return {
+    iteration: e.data.iteration ?? null,
+    summary: e.data.summary as string,
+    model: typeof started.data.model === "string" ? started.data.model : null,
+    seconds: typeof done?.data.seconds === "number" ? done.data.seconds : null,
+    patterns: Array.isArray(started.data.patterns) ? (started.data.patterns as string[]) : [],
+  };
 }
 
 /**
@@ -53,6 +70,7 @@ export function divergenceRows(job: Job, events: JobEvent[]): DivergenceRow[] {
       key: `r${i}`,
       agent_id: null,
       repair: findRepair(events, d.function, null),
+      function_guessed: guessed(events, d.input),
     }));
   }
   return events
@@ -76,6 +94,7 @@ export function divergenceRows(job: Job, events: JobEvent[]): DivergenceRow[] {
         resolved,
         agent_id: e.agent_id,
         repair,
+        function_guessed: guessed(events, e.data.input ?? ""),
       };
     });
 }
@@ -85,6 +104,17 @@ export interface CrashView {
   kind: string;
   rust_behavior: string;
   sanitizer_report: string | null;
+  cve: string | null;
+  c_version: string | null;
+}
+
+/** CVE id and C version live on the crash event, not on result.crashes. */
+function crashMeta(events: JobEvent[], input: string) {
+  const e = events.find((x) => x.type === "crash" && x.data.input === input);
+  return {
+    cve: typeof e?.data.cve === "string" ? e.data.cve : null,
+    c_version: typeof e?.data.c_version === "string" ? e.data.c_version : null,
+  };
 }
 
 const kindFrom = (s: string | undefined) => s?.match(/AddressSanitizer:\s*([\w-]+)/)?.[1] ?? "crash";
@@ -96,6 +126,7 @@ export function crashViews(job: Job, events: JobEvent[]): CrashView[] {
       kind: kindFrom(c.sanitizer_report),
       rust_behavior: c.rust_behavior,
       sanitizer_report: c.sanitizer_report,
+      ...crashMeta(events, c.input),
     }));
   }
   return events
@@ -105,6 +136,7 @@ export function crashViews(job: Job, events: JobEvent[]): CrashView[] {
       kind: kindFrom(e.data.sanitizer),
       rust_behavior: e.data.rust_behavior ?? "?",
       sanitizer_report: null,
+      ...crashMeta(events, e.data.input ?? ""),
     }));
 }
 
@@ -181,3 +213,143 @@ export const pct = (x: number | null | undefined, digits = 0) =>
 
 /** HH:MM:SS straight from the ISO string, so server and client render the same text. */
 export const clock = (iso: string) => iso.slice(11, 19);
+
+// ---------------------------------------------------------------------------
+// Pipeline, verifier wall, held-out: everything below is read from real events.
+
+export type StepTone = "neutral" | "match" | "div" | "crash";
+
+export interface PipelineStep {
+  key: string;
+  label: string;
+  detail: string;
+  tone: StepTone;
+  active: boolean;
+}
+
+const isHoldout = (e: JobEvent) => e.type === "verify" && e.data.holdout === true;
+
+/** One step per pipeline event, in order. A trailing active step while the job is still working. */
+export function pipelineSteps(job: Job, events: JobEvent[]): PipelineStep[] {
+  const steps: PipelineStep[] = [];
+  const repairs = new Map<number, PipelineStep>();
+  for (const e of events) {
+    const d = e.data;
+    if (e.type === "translate") {
+      const fromSaved = typeof d.source_label === "string";
+      steps.push({
+        key: `t${e.seq}`,
+        label: fromSaved ? (d.source_label as string) : "Argon translates",
+        detail: [typeof d.rust_lines === "number" ? `${d.rust_lines} lines of Rust` : null, fromSaved ? (d.source_model as string) : d.module]
+          .filter(Boolean)
+          .join(" · "),
+        tone: "neutral",
+        active: false,
+      });
+    } else if (e.type === "verify") {
+      const n = d.behaviors_tested ?? 0;
+      const ok = Math.round((d.match_rate ?? 0) * n);
+      const full = d.match_rate === 1;
+      steps.push({
+        key: `v${e.seq}`,
+        label: isHoldout(e) ? "Held-out check" : `Verify #${d.iteration ?? steps.length}`,
+        detail: isHoldout(e) ? `${ok}/${n} never-seen inputs` : `${ok}/${n} identical · ${pct(d.match_rate, 1)}`,
+        tone: full ? "match" : "div",
+        active: false,
+      });
+    } else if (e.type === "repair") {
+      const it = d.iteration ?? 0;
+      const existing = repairs.get(it);
+      const done = d.phase === "done" || d.phase === undefined;
+      const model = typeof d.model === "string" ? d.model : existing ? null : "Argon";
+      const step: PipelineStep = existing ?? {
+        key: `r${e.seq}`,
+        label: "Argon repair",
+        detail: "",
+        tone: "neutral",
+        active: false,
+      };
+      step.active = !done;
+      step.detail = done
+        ? typeof d.seconds === "number"
+          ? `fixed in ${Math.round(d.seconds)} s`
+          : `round ${it}`
+        : `${Array.isArray(d.patterns) ? d.patterns.length : "?"} divergence patterns → ${model ?? "model"}`;
+      if (!existing) {
+        repairs.set(it, step);
+        steps.push(step);
+      }
+    } else if (e.type === "crash") {
+      steps.push({
+        key: `c${e.seq}`,
+        label: typeof d.cve === "string" ? d.cve : "Crash check",
+        detail: "C crashes · Rust clean error",
+        tone: "crash",
+        active: false,
+      });
+    } else if (e.type === "approval_required" || e.type === "approved") {
+      const approved = e.type === "approved" || !!job.approval.approved_by;
+      const prev = steps.find((s) => s.key === "pr");
+      const step = prev ?? { key: "pr", label: "Pull request", detail: "", tone: "neutral" as StepTone, active: false };
+      step.detail = job.approval.pr_url ? "opened with evidence" : approved ? "approved" : "awaiting human approval";
+      step.tone = job.approval.pr_url ? "match" : "neutral";
+      if (!prev) steps.push(step);
+    }
+  }
+  const working = job.status === "running" || job.status === "verifying" || job.status === "queued";
+  if (working && !steps.some((s) => s.active)) {
+    steps.push({
+      key: "now",
+      label: job.status === "verifying" ? "Verifier running" : job.status === "queued" ? "Queued" : "Working",
+      detail: job.status === "verifying" ? "C and Rust on every input" : "",
+      tone: "neutral",
+      active: true,
+    });
+  }
+  return steps;
+}
+
+export interface WallRound {
+  /** Total inputs in this verify round. */
+  total: number;
+  match: number;
+  div: number;
+  crash: number;
+  iteration: number | null;
+}
+
+export interface WallState {
+  /** Every main (non-held-out) verify round, in order. */
+  rounds: WallRound[];
+  /** True while a verify round is in progress and its result has not landed yet. */
+  scanning: boolean;
+}
+
+/** Counts from each non-held-out verify event. Order of cells is not meaningful. */
+export function wallState(job: Job, events: JobEvent[]): WallState | null {
+  const main = events.filter((e) => e.type === "verify" && !isHoldout(e));
+  const last = main[main.length - 1];
+  const lastStatus = [...events].reverse().find((e) => e.type === "job_status");
+  const scanning = job.status === "verifying" && !!lastStatus && (!last || lastStatus.seq > last.seq);
+  if (!main.length && !scanning) return null;
+  const rounds = main.map((e) => {
+    const total = e.data.behaviors_tested ?? 0;
+    const div = typeof e.data.divergences === "number" ? e.data.divergences : 0;
+    const crash = typeof e.data.crashes === "number" ? e.data.crashes : 0;
+    return { total, match: Math.max(0, total - div - crash), div, crash, iteration: e.data.iteration ?? null };
+  });
+  return { rounds, scanning };
+}
+
+export function holdoutResult(events: JobEvent[]): { match: number; total: number } | null {
+  const e = [...events].reverse().find(isHoldout);
+  if (!e) return null;
+  const total = e.data.behaviors_tested ?? 0;
+  return { match: Math.round((e.data.match_rate ?? 0) * total), total };
+}
+
+/** Latest human-readable line from the pipeline. */
+export function latestSummary(events: JobEvent[]): string | null {
+  const e = [...events].reverse().find((x) => typeof x.data.summary === "string");
+  return e ? (e.data.summary as string) : null;
+}
