@@ -35,3 +35,16 @@ Things that surprised us, in plain language. Newest at the bottom. Use these for
 **Surprise 1: our own driver hides the bug.** Our v1.7.19 driver appends a NUL and passes `len + 1`. That spare readable byte is a sentinel the parser never steps past, so the over-read never happens, even on a vulnerable library. To trigger the real CVE the old driver had to copy stdin into a buffer of *exactly* `len` bytes (ASan redzone right after it) and call `cJSON_ParseWithLengthOpts(buf, len, &end, require_null_terminated=0)`, no appended NUL. One deliberate, documented difference.
 
 **Surprise 2: the crash looked like a timeout.** `verify.sh` with its default 5 s timeout classified the crash as `timeout`, not `safety_improvement`. The ASan report itself is produced in ~0.4 s of CPU, but macOS symbolization (atos resolving frame names) adds ~5 s of wall time, tipping it just over the limit. Run the verifier with `--timeout 20` and it classifies the input as `safety_improvement` correctly.
+
+## 12:09: The libexpat canary caught a wrong expectation, not a broken driver
+
+**What happened.** The first canary for the libexpat harness declared `<!ENTITY e "x&#38;y">` and expected `&e;` to expand to `x&y`. Instead the driver printed `ERROR 5 line 3 col 36` (XML_ERROR_UNCLOSED_TOKEN at `&e;`).
+
+**Why.** XML expands character references inside an entity value when the entity is declared, so the stored value is `x&y`. That value is parsed again as markup when it is referenced, and `&y` is then an unterminated entity reference. expat was right and our test was wrong. The literal value needs `x&amp;y`: it is stored as `x&amp;y` and expands to `x&y`.
+
+**What we changed.** The canary now uses `x&amp;y` and also checks the `ENTITY ... VALUE "x&amp;y"` line, so it pins the store-then-reparse behavior a Rust port must reproduce. As with cJSON, the canary runs before C against C, because a perfect C-vs-C score says nothing on its own.
+
+**Other notes.**
+- With a load average of about 240 from parallel agents, one ASan build of `xmlparse.c` took 4 minutes, and the full self-test (2000 inputs, run twice) took 9.6 minutes. `build_expat.sh` now skips the rebuild when the binary is up to date.
+- The billion-laughs input (`edge_bl_breach`) takes about 2 s per side under ASan before it fails with code 43. Use `--timeout 20`.
+- The interface `Result<Vec<Event>, XmlError>` means events emitted before an error are not compared. Only the error code and position are. That is a deliberate trade for a simpler port. Error positions still pin where expat failed.
