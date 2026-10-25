@@ -27,3 +27,11 @@ Things that surprised us, in plain language. Newest at the bottom. Use these for
 **SDK gotchas.** Allowlist entries must be objects, `{"domain": "github.com"}`, not bare strings. Resending the environment dict on a follow-up may give a fresh sandbox, so pass the previous `environment_id` string instead.
 
 **Untested option.** Adding the Ubuntu mirrors (`archive.ubuntu.com`, `security.ubuntu.com`) to the allowlist might let apt install clang. We have not tried this yet.
+
+## 11:18: The demo crash needs the non-NUL-terminated length API, and ASan is slow enough to look like a timeout
+
+**What the bug is.** cJSON v1.7.17 (CVE-2023-53154) reads one byte past the end of the input buffer when a JSON object ends right after a comma, like `{"1":1,`. `parse_object` sees the comma, steps past it, and starts reading the next member name without first checking that any byte follows. v1.7.18 added the missing bounds check.
+
+**Surprise 1: our own driver hides the bug.** Our v1.7.19 driver appends a NUL and passes `len + 1`. That spare readable byte is a sentinel the parser never steps past, so the over-read never happens, even on a vulnerable library. To trigger the real CVE the old driver had to copy stdin into a buffer of *exactly* `len` bytes (ASan redzone right after it) and call `cJSON_ParseWithLengthOpts(buf, len, &end, require_null_terminated=0)`, no appended NUL. One deliberate, documented difference.
+
+**Surprise 2: the crash looked like a timeout.** `verify.sh` with its default 5 s timeout classified the crash as `timeout`, not `safety_improvement`. The ASan report itself is produced in ~0.4 s of CPU, but macOS symbolization (atos resolving frame names) adds ~5 s of wall time, tipping it just over the limit. Run the verifier with `--timeout 20` and it classifies the input as `safety_improvement` correctly.
