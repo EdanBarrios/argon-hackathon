@@ -32,3 +32,13 @@ Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and 
 `match_rate = match / (match + divergence + rust_crash + both_crash + timeout)`. `--max-bytes` skips input files larger than the limit (listed under `skipped_inputs`). Commands are split with shell quoting rules, not run through a shell.
 
 Speed: each ASan process costs about 0.2 s to start on macOS, so 2000 inputs take about 3 to 4 minutes on 8 cores. Use `--count 300` for repair loops.
+
+## Mutation sensitivity check
+
+The self-test shows the verifier reports no false divergences. `mutants.py` shows the other direction: that the verifier plus the generated inputs catch a real bug in C.
+
+```bash
+python3 -I backend/harness/mutants.py --inputs backend/harness/inputs/cjson [--timeout 5] [--jobs N]
+```
+
+For each of a fixed list of single-site mutations in cJSON's parse/print path (flipped comparisons, off-by-one bounds, changed constants such as the nesting limit or `%1.15g`, a dropped escape case, a narrower whitespace test, and so on), it copies the vendored `cJSON.c` to a temp dir, applies the one exact-string substitution (it errors out, naming the mutation, if a site does not match exactly once), builds a driver with `build_cjson.sh`, and runs `verify.sh` with the unmutated driver against the mutant. A mutant is KILLED if any input does not match, SURVIVED otherwise. It prints one JSON report (`mutants`, `killed`, `survived`, `kill_rate`, per-mutant counts and example inputs), lists survivors on stderr and exits 1 if any survived. A survivor is not a harness bug: it names behaviour the generated inputs never exercise. About 45 s for 300 inputs on 8 cores.
