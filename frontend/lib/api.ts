@@ -128,9 +128,86 @@ export interface JobCost {
   total_usd: number;
 }
 
+export type StartFrom = "fresh" | "flash-2" | "argon-1" | "argon-2";
+
 export interface CreateJobBody {
   library: string;
   modules?: string[];
+  // Real-mode knobs (contracts/README.md). The mock replay ignores them.
+  model?: string;
+  thinking?: "low" | "medium" | "high";
+  rounds?: number;
+  inputs?: number;
+  final_full?: boolean;
+  start_from?: StartFrom | string;
+  holdout?: boolean;
+  cve_check?: boolean;
+}
+
+// ---------- POST /try ----------
+
+export type TryVerdict = "match" | "divergence" | "safety_improvement" | "rust_crash" | "both_crash" | "timeout";
+
+export interface TrySide {
+  label: string;
+  version: string;
+  binary: string;
+  stdout: string;
+  stdout_hex: string | null;
+  exit_code: number | null;
+  signal: number | null;
+  timed_out: boolean;
+  crashed: boolean;
+  exit: string;
+  sanitizer_summary: string | null;
+  stderr_head: string | null;
+  seconds: number;
+}
+
+export interface TryResult {
+  library: string;
+  input_bytes: number;
+  input: string;
+  input_hex: string | null;
+  cve: string | null;
+  c: TrySide;
+  rust: TrySide;
+  old_c: TrySide | null;
+  verdict: TryVerdict;
+  old_verdict: TryVerdict | null;
+  old_c_missing?: string;
+}
+
+export interface TryBody {
+  library: "cjson";
+  input: string;
+  compare_old?: boolean;
+}
+
+/** POST /try. Throws Error with the server's detail, or a clear "unreachable" message. Never fakes a result. */
+export async function tryInput(body: TryBody): Promise<TryResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/try`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error(`API unreachable at ${API_URL}. Start the backend; no result is shown without it.`);
+  }
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try {
+      const j = (await res.json()) as { detail?: unknown };
+      if (j.detail) detail = `${res.status}: ${typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail)}`;
+    } catch {
+      /* keep status only */
+    }
+    throw new ApiError(res.status, `POST /try failed (${detail})`);
+  }
+  return (await res.json()) as TryResult;
 }
 
 export const TERMINAL: Status[] = ["completed", "failed", "cancelled"];
@@ -161,6 +238,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const createJob = (body: CreateJobBody) =>
   request<Job>("/jobs", { method: "POST", body: JSON.stringify(body) });
+
+export const listJobs = () => request<Job[]>("/jobs");
 
 export const getJob = (id: string) => request<Job>(`/jobs/${encodeURIComponent(id)}`);
 

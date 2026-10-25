@@ -108,6 +108,7 @@ export function verifySeries(job: Job, events: JobEvent[]): Series[] {
   const byAgent = new Map<string, Series>();
   for (const e of events) {
     if (e.type !== "verify" || typeof e.data.match_rate !== "number") continue;
+    if (e.data.holdout || e.data.final_full) continue; // extra checks on other input sets, not a repair round
     const id = e.agent_id ?? "job";
     const label = job.agents.find((a) => a.id === id)?.module ?? id;
     const s = byAgent.get(id) ?? { agent_id: id, label, points: [] };

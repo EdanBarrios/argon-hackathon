@@ -1,15 +1,187 @@
 {
-  "match_rate": 1.0,
-  "behaviors_tested": 958,
+  "match_rate": 0.9806122448979592,
+  "behaviors_tested": 980,
   "counts": {
-    "match": 958,
-    "divergence": 0,
+    "match": 961,
+    "divergence": 19,
     "safety_improvement": 0,
     "rust_crash": 0,
     "both_crash": 0,
     "timeout": 0
   },
-  "divergences": [],
+  "divergences": [
+    {
+      "input": "\"\\uZ\\t\\\\\"",
+      "file": "str_straddle_0.bin",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\\uZ\\\\\\\\\"",
+      "file": "str_straddle_1.bin",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\\u\\xd4\\t\\\\\"",
+      "file": "str_straddle_2.bin",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\\uZ\\\"\\\\\"",
+      "file": "str_straddle_3.bin",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"\\u000\\\\\"",
+      "file": "str_straddle_4.bin",
+      "c_output": "OK\t\"\"",
+      "rust_output": "PARSE_ERROR at 7",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "\"a\\uZZZ\\\\\"",
+      "file": "str_straddle_6.bin",
+      "c_output": "OK\t\"a\"",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"\\uZ\\t\\\\\",1]",
+      "file": "str_straddle_arr_0.bin",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"\\uZ\\\\\\\\\",1]",
+      "file": "str_straddle_arr_1.bin",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"\\u\\xd4\\t\\\\\",1]",
+      "file": "str_straddle_arr_2.bin",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"\\uZ\\\"\\\\\",1]",
+      "file": "str_straddle_arr_3.bin",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"\\u000\\\\\",1]",
+      "file": "str_straddle_arr_4.bin",
+      "c_output": "OK\t[\"\",1]",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "[\"a\\uZZZ\\\\\",1]",
+      "file": "str_straddle_arr_6.bin",
+      "c_output": "OK\t[\"a\",1]",
+      "rust_output": "PARSE_ERROR at 9",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\uZ\\t\\\\\":1}",
+      "file": "str_straddle_key_0.bin",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\uZ\\\\\\\\\":1}",
+      "file": "str_straddle_key_1.bin",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\u\\xd4\\t\\\\\":1}",
+      "file": "str_straddle_key_2.bin",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\uZ\\\"\\\\\":1}",
+      "file": "str_straddle_key_3.bin",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\\u000\\\\\":1}",
+      "file": "str_straddle_key_4.bin",
+      "c_output": "OK\t{\"\":1}",
+      "rust_output": "PARSE_ERROR at 8",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"a\\uZZZ\\\\\":1}",
+      "file": "str_straddle_key_6.bin",
+      "c_output": "OK\t{\"a\":1}",
+      "rust_output": "PARSE_ERROR at 9",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    },
+    {
+      "input": "{\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\\u\\xd4\\t\\\\\"",
+      "file": "str_straddle_obj_fuzz_min.bin",
+      "c_output": "PARSE_ERROR at 58",
+      "rust_output": "PARSE_ERROR at 56",
+      "c_exit": 0,
+      "rust_exit": 0,
+      "function": null
+    }
+  ],
   "crashes": [],
   "timeouts": [],
   "truncated_lists": false,
@@ -17,7 +189,7 @@
   "config": {
     "c": "/Users/edan/dev/argon-hackathon/backend/harness/build/cjson_driver",
     "rust": "/private/tmp/claude-501/-Users-edan-dev/20d334b5-7705-49f1-8496-4499e2d99de4/scratchpad/flash2_bin",
-    "inputs": "/var/folders/v0/01zmydvn41v1bh15lwlld07m0000gn/T/tmp.g5ew3zAnsc",
+    "inputs": "/var/folders/v0/01zmydvn41v1bh15lwlld07m0000gn/T/tmp.2z8ibWGFxa",
     "timeout": 20.0,
     "max_bytes": 1048576
   },
@@ -33,5 +205,5 @@
     "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
     "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
   },
-  "elapsed_seconds": 96.79
+  "elapsed_seconds": 124.99
 }

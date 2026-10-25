@@ -1,0 +1,5 @@
+# Fetched third-party sources, build output and generated inputs.
+vendor/
+build/
+inputs/
+rust_crate/target/

@@ -10,6 +10,7 @@ import { CrashCard } from "./crash-card";
 import { Divergences } from "./divergences";
 import { EventLog } from "./event-log";
 import { Lanes } from "./lanes";
+import { TryPanel } from "./try-panel";
 import { Card, SampleBadge, StatusPill } from "./ui";
 
 function Stat({ label, value, tone = "text-white" }: { label: string; value: string; tone?: string }) {
@@ -74,6 +75,21 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
         </div>
       )}
 
+      {(() => {
+        // Latest human-readable step from the pipeline (e.g. "Starting from Flash's first attempt ...").
+        const latest = [...events].reverse().find((e) => typeof e.data.summary === "string");
+        const origin = events.find((e) => e.type === "translate" && typeof e.data.summary === "string");
+        return latest ? (
+          <div className="flex flex-col gap-1 rounded-xl border border-neutral-700 bg-neutral-900 px-5 py-3">
+            {origin && origin !== latest && <div className="text-sm text-neutral-400">{origin.data.summary as string}</div>}
+            <div className="text-xl text-white">
+              <span className="mr-3 text-sm font-bold uppercase tracking-[0.2em] text-neutral-400">Now</span>
+              {latest.data.summary as string}
+            </div>
+          </div>
+        ) : null;
+      })()}
+
       {/* Hero stats */}
       <div className={`grid gap-4 ${cost ? "grid-cols-[2fr_1fr_1fr_1fr]" : "grid-cols-[2fr_1fr_1fr]"}`}>
         <div className="rounded-xl border border-neutral-800 bg-neutral-900 px-5 py-4">
@@ -131,6 +147,10 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
           <BaselineCompare />
         </Card>
       </div>
+
+      <Card title="Try any input">
+        <TryPanel compact />
+      </Card>
 
       <EventLog events={events} />
     </main>

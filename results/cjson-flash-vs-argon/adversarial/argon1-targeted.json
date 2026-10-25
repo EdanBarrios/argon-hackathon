@@ -1,8 +1,8 @@
 {
   "match_rate": 1.0,
-  "behaviors_tested": 958,
+  "behaviors_tested": 980,
   "counts": {
-    "match": 958,
+    "match": 980,
     "divergence": 0,
     "safety_improvement": 0,
     "rust_crash": 0,
@@ -17,7 +17,7 @@
   "config": {
     "c": "/Users/edan/dev/argon-hackathon/backend/harness/build/cjson_driver",
     "rust": "/Users/edan/dev/argon-hackathon/runs/build/ai-20261025-110631-gemini-4-argon-r1/target/release/theseus_cjson",
-    "inputs": "/var/folders/v0/01zmydvn41v1bh15lwlld07m0000gn/T/tmp.1W1bk8K0S5",
+    "inputs": "/var/folders/v0/01zmydvn41v1bh15lwlld07m0000gn/T/tmp.oDBH7dPPr7",
     "timeout": 20.0,
     "max_bytes": 1048576
   },
@@ -33,5 +33,5 @@
     "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
     "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
   },
-  "elapsed_seconds": 109.99
+  "elapsed_seconds": 128.45
 }

@@ -34,7 +34,7 @@ export function Lanes({ agents }: { agents: Agent[] }) {
       {agents.map((a) => {
         const full = a.match_rate >= 1;
         return (
-          <div key={a.id} className="grid grid-cols-[9rem_8rem_auto_1fr_6rem] items-center gap-5 py-3">
+          <div key={a.id} className="grid grid-cols-[minmax(9rem,16rem)_8rem_auto_1fr_6rem] items-center gap-5 py-3">
             <div className="truncate text-2xl font-semibold">{a.module}</div>
             <div>
               <StatusPill status={a.status} />
