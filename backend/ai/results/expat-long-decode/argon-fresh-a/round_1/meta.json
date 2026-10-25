@@ -1,0 +1,17 @@
+{
+  "round": 1,
+  "kind": "start_from",
+  "start_from": "<repo>/backend/ai/results/expat-long-decode/gemini-4-argon/round_1/expat.rs",
+  "interaction_id": "",
+  "seconds": 0.0,
+  "usage": {},
+  "thinking_level": null,
+  "notes": [],
+  "continuations": 0,
+  "rust_lines": 6554,
+  "compile_ok": false,
+  "build_seconds": 1,
+  "match_rate": null,
+  "divergences": null,
+  "crashes": null
+}

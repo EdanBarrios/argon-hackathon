@@ -26,6 +26,17 @@ Run 12:15-12:42 PT, local runner. Input: all of `expat/lib` minus the entropy sh
 
 How to say it: "Argon translated the whole of libexpat (18.5K lines of C) into 6.5K lines of safe Rust in one 18-minute reply, with one compile error. Flash could not produce a file." Nothing about behavior is claimed until a build passes verify.sh.
 
+### Repairs as new calls (`argon-fresh-a`, `argon-fresh-b`, started 12:45, in progress)
+
+Both start from Argon's round-1 file (`--start-from`, no model call in round 1) and send each repair as a new conversation: the full translate message plus the previous file plus the compiler output (`--fresh-repair`). Identical settings for a and b. Continuation off.
+
+| Run | Round 2 (repair, thinking medium) |
+|---|---|
+| a | completed in 570 s, 73,658 output tokens, 0 thought. Fixed the E0282 type error (one line changed); the build now stops at a borrow error, E0505 at `expat.rs:5969` (rustc reports borrow errors only once type checking passes) |
+| b | completed in 570 s, 73,653 output tokens, 0 thought. **Returned the file unchanged**, so the same E0282 |
+
+So a new conversation avoids the server failure, but at thinking medium the model may copy the file without reasoning. Rounds 3-4 are running; this table is updated when they land.
+
 Open questions, recorded as reported:
 - Usage for Argon's round 1 reports **815,566 input tokens** for a prompt of about 204K tokens. We have not explained the 4x.
 - The repair turn failed at 65,416 output tokens, close to 65,536. Suspected: a follow-up turn (`previous_interaction_id`) has a lower output cap than a fresh call. Not confirmed.
