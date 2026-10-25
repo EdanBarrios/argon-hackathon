@@ -29,7 +29,7 @@ backend/harness/verify.sh --c backend/harness/build/cjson_driver \
 
 Each input goes to both commands on stdin with `LC_ALL=C`. Raw stdout bytes and exit codes are compared, never re-parsed as JSON. Classes: `match`, `divergence`, `safety_improvement` (C crashed or a sanitizer fired, Rust exited cleanly, not counted as a mismatch), `rust_crash` (signal, sanitizer or panic), `both_crash`, `timeout`. A side that printed a sanitizer report and only then hit `--timeout` (macOS symbolization can take seconds) counts as crashed, not timed out; its crash entry has `timed_out_after_report: true`.
 
-`match_rate = match / (match + divergence + rust_crash + both_crash + timeout)`. `--max-bytes` skips input files larger than the limit (listed under `skipped_inputs`). Commands are split with shell quoting rules, not run through a shell.
+`match_rate = match / (match + divergence + rust_crash + both_crash + timeout)`. `--max-bytes` skips input files larger than the limit (listed under `skipped_inputs`). Commands are split with shell quoting rules, not run through a shell. The report's `provenance` records each side's resolved executable and its sha256 (of `argv[0]`, so an interpreter, not its script, if the command is one), `platform.platform()`, and the vendored cJSON commit read from `vendor/cJSON/.git`.
 
 Speed: each ASan process costs about 0.2 s to start on macOS, so 2000 inputs take about 3 to 4 minutes on 8 cores. Use `--count 300` for repair loops.
 

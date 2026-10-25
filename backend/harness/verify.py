@@ -22,9 +22,12 @@ JSON library, because formatting differences ARE the behavior under test.
 
 import argparse
 import concurrent.futures
+import hashlib
 import json
 import os
+import platform
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -33,6 +36,7 @@ import time
 REPORT_TEXT_LIMIT = 300      # chars of input/output kept per report entry
 SANITIZER_REPORT_LINES = 15  # lines of sanitizer/crash output kept
 MAX_LISTED = 200             # max entries per list in the report
+CJSON_GIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "cJSON", ".git")
 
 SANITIZER_MARKERS = (
     b"ERROR: AddressSanitizer",
@@ -194,6 +198,40 @@ def list_inputs(directory, max_bytes):
     return files, skipped
 
 
+def executable_info(argv):
+    """Resolved path and sha256 of the program a side runs (argv[0])."""
+    path = shutil.which(argv[0])
+    if path is None:
+        return {"executable": argv[0], "sha256": None}
+    digest = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    return {"executable": os.path.realpath(path), "sha256": digest.hexdigest()}
+
+
+def cjson_commit():
+    """Commit of the vendored cJSON checkout, read from .git without git."""
+    try:
+        with open(os.path.join(CJSON_GIT, "HEAD"), encoding="ascii") as fh:
+            head = fh.read().strip()
+        if head.startswith("ref: "):
+            with open(os.path.join(CJSON_GIT, head[5:]), encoding="ascii") as fh:
+                head = fh.read().strip()
+    except OSError:
+        return None
+    return head
+
+
+def provenance(c_argv, r_argv):
+    return {
+        "c": executable_info(c_argv),
+        "rust": executable_info(r_argv),
+        "platform": platform.platform(),
+        "cjson_commit": cjson_commit(),
+    }
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--c", required=True, help="C side command (shell-quoted string)")
@@ -272,6 +310,7 @@ def main(argv=None):
             "c": args.c, "rust": args.rust, "inputs": os.path.abspath(args.inputs),
             "timeout": args.timeout, "max_bytes": args.max_bytes,
         },
+        "provenance": provenance(c_argv, r_argv),
         "elapsed_seconds": round(time.monotonic() - started, 2),
     }
     text = json.dumps(report, indent=2, ensure_ascii=False)
