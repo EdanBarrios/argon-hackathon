@@ -117,7 +117,7 @@ export function RunView({ id, fixture, initial }: { id: string; fixture: Fixture
         </section>
       )}
 
-      <section id="approve" className="grid gap-5 lg:grid-cols-2">
+      <section id="approve" className="grid items-start gap-5 lg:grid-cols-2">
         <div className="rounded-md border border-line p-5">
           <h2 className="mb-4 text-base font-bold">Evidence report</h2>
           <Evidence job={job} source={source} onJob={setJob} wall={wall} holdout={holdout} rows={rows} crashes={crashes} />
