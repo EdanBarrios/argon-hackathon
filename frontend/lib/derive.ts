@@ -246,6 +246,9 @@ export function pipelineSteps(job: Job, events: JobEvent[]): PipelineStep[] {
         tone: "neutral",
         active: false,
       });
+    } else if (e.type === "verify" && d.compile_ok === false) {
+      // The model's file did not compile; the pipeline sends the compiler errors back.
+      steps.push({ key: `v${e.seq}`, label: "Build failed", detail: "compiler errors sent back to the model", tone: "div", active: false });
     } else if (e.type === "verify") {
       const n = d.behaviors_tested ?? 0;
       const ok = Math.round((d.match_rate ?? 0) * n);
@@ -327,7 +330,8 @@ export interface WallState {
 
 /** Counts from each non-held-out verify event. Order of cells is not meaningful. */
 export function wallState(job: Job, events: JobEvent[]): WallState | null {
-  const main = events.filter((e) => e.type === "verify" && !isHoldout(e));
+  // A round whose build failed tested nothing, so it has no marks to draw.
+  const main = events.filter((e) => e.type === "verify" && !isHoldout(e) && e.data.compile_ok !== false);
   const last = main[main.length - 1];
   const lastStatus = [...events].reverse().find((e) => e.type === "job_status");
   const scanning = job.status === "verifying" && !!lastStatus && (!last || lastStatus.seq > last.seq);
