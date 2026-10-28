@@ -180,6 +180,8 @@ def verify(rust_binary: Path, inputs_dir: Path, timeout: float = 20.0) -> dict[s
 
 def ensure_c_driver() -> Path:
     if not os.access(C_DRIVER, os.X_OK):
+        # build_cjson.sh needs the vendored source, which a fresh clone lacks
+        subprocess.run([str(HARNESS / "fetch_cjson.sh")], check=True, capture_output=True)
         subprocess.run([str(HARNESS / "build_cjson.sh")], check=True, capture_output=True)
     return C_DRIVER
 
@@ -193,6 +195,7 @@ def ensure_inputs(count: int, seed: int = 1) -> Path:
     with _inputs_lock:
         if out.is_dir() and any(out.iterdir()):
             return out
+        subprocess.run([str(HARNESS / "fetch_cjson.sh")], check=True, capture_output=True)
         subprocess.run(
             [sys.executable, "-I", str(GEN_INPUTS), "--seed", str(seed), "--count", str(count),
              "--out", str(out), "--cjson", str(VENDOR)],
