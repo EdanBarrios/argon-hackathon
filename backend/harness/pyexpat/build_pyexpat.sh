@@ -13,8 +13,7 @@ SRC="$HERE/vendor/cpython"
 [ -s "$SRC/Modules/pyexpat.c" ] || "$HERE/fetch_cpython.sh"
 
 if [ -z "${EXPAT_INC:-}" ]; then
-  for d in "$HERE/../expat/vendor/libexpat/expat/lib" \
-           /Users/edan/dev/argon-hackathon/backend/harness/expat/vendor/libexpat/expat/lib; do
+  for d in "$HERE/../expat/vendor/libexpat/expat/lib"; do
     [ -s "$d/expat.h" ] && { EXPAT_INC="$d"; break; }
   done
 fi

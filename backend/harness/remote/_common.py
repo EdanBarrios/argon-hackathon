@@ -17,7 +17,7 @@ from google import genai
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 HARNESS = REPO_ROOT / "backend" / "harness"
-PUBLIC_REPO = "EdanBarrios/argon-hackathon"
+PUBLIC_REPO = "EdanBarrios/theseus"
 PUBLIC_REPO_URL = f"https://github.com/{PUBLIC_REPO}"
 
 AGENT = "antigravity-preview-09-2026"

@@ -1,0 +1,8 @@
+{
+  "library": "cjson",
+  "model": "gemini-3.8-flash",
+  "rounds": 4,
+  "inputs": 300,
+  "seed": 1,
+  "branch": "main"
+}

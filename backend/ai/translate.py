@@ -20,11 +20,12 @@ import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from google import genai
 
 from . import prompts
+from .patch import PatchError, apply_patch
 from .feedback_patterns import divergence_pattern, expat_divergence_pattern  # noqa: F401 (re-export)
 from .targets import CJSON, Target
 
@@ -67,6 +68,18 @@ class TranslateResult:
     notes: list[str] = field(default_factory=list)
     # Follow-up turns used because the first reply hit the output cap (0 = single pass).
     continuations: int = 0
+    # How a repair produced rust_source: "patch" (SEARCH/REPLACE blocks applied), "patch_fallback"
+    # (the patch did not apply, so a full-file call followed; usage and seconds include both),
+    # None for a full-file reply.
+    repair_mode: str | None = None
+
+
+class PatchFailed(TranslateError):
+    """A patch reply did not apply. Carries what the wasted call cost."""
+
+    def __init__(self, message: str, usage: dict, seconds: float, notes: list[str]):
+        super().__init__(message)
+        self.usage, self.seconds, self.notes = usage, seconds, notes
 
 
 # ---------------------------------------------------------------- client
@@ -214,7 +227,8 @@ def _continue(client: genai.Client, kwargs: dict, interaction: Any, level: str |
 
 
 def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
-         target: Target = CJSON) -> TranslateResult:
+         target: Target = CJSON,
+         parse: Callable[[str | None, list[str]], str] = extract_rust) -> TranslateResult:
     """One logical call. If the model runs out of output budget (status "incomplete"),
     retry once at the next lower thinking level. Observed: gemini-3.8-flash at "high"
     spent ~63K thought tokens and stopped at the 65,536 output cap mid-file, even
@@ -263,7 +277,10 @@ def _run(model: str, input_text: str, thinking: str, previous_id: str | None,
             + (f": {errors}" if errors else "")
         )
     seconds = round(time.monotonic() - started, 1)
-    rust = extract_rust(text if text is not None else getattr(interaction, "output_text", None), notes)
+    try:
+        rust = parse(text if text is not None else getattr(interaction, "output_text", None), notes)
+    except PatchError as exc:
+        raise PatchFailed(f"patch reply did not apply: {exc}", usage, seconds, notes) from exc
     for note in notes:
         print(f"[ai.translate] {note}", file=sys.stderr)
     return TranslateResult(
@@ -330,7 +347,8 @@ def translate(c_source: str, model: str = DEFAULT_MODEL, target: Target = CJSON)
 
 
 def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
-           target: Target = CJSON, *, fresh_source: str | None = None) -> TranslateResult:
+           target: Target = CJSON, *, fresh_source: str | None = None,
+           patch: bool = False) -> TranslateResult:
     """Continue prev's conversation with verifier feedback; returns a full new cjson.rs (thinking medium).
 
     feedback is {"compile_errors": str | None, "divergences": [...], "crashes": [...]}
@@ -339,13 +357,48 @@ def repair(prev: TranslateResult, feedback: dict, model: str = DEFAULT_MODEL,
 
     With fresh_source (the C source), the repair is a new conversation that resends the
     whole translate message plus prev's file, instead of a previous_interaction_id turn.
+
+    With patch=True the model answers with SEARCH/REPLACE blocks that are applied to
+    prev.rust_source, so a small fix costs a small reply. If the blocks do not apply, the
+    full-file repair below runs instead and the result adds up both calls.
     """
     text = prompts.format_feedback(trim_feedback(feedback, target.divergence_pattern))
+    if patch:
+        try:
+            return _patch_repair(prev, text, model, target, fresh_source)
+        except PatchFailed as failed:
+            print(f"[ai.translate] {failed}; falling back to a full-file repair", file=sys.stderr)
+            res = repair(prev, feedback, model, target, fresh_source=fresh_source)
+            res.usage = {k: res.usage.get(k, 0) + failed.usage.get(k, 0) for k in USAGE_FIELDS}
+            res.seconds = round(res.seconds + failed.seconds, 1)
+            res.notes = [*failed.notes, str(failed), *res.notes]
+            res.repair_mode = "patch_fallback"
+            return res
     if fresh_source is not None:
         message = prompts.fresh_repair_input(target.translate_input(fresh_source), target.rust_file,
                                              prev.rust_source, text)
         return _run(model, message, "medium", previous_id=None, target=target)
     return _run(model, target.repair_input(text), "medium", previous_id=prev.interaction_id, target=target)
+
+
+def _patch_repair(prev: TranslateResult, feedback_text: str, model: str, target: Target,
+                  fresh_source: str | None) -> TranslateResult:
+    """One patch-mode call. Continues prev's conversation unless fresh_source is given (or prev
+    has no conversation, as after --start-from). The file is always resent in full."""
+    new_conversation = fresh_source is not None
+    message = prompts.patch_repair_input(
+        target.rust_file, prev.rust_source, feedback_text,
+        reference_input=target.translate_input(fresh_source) if new_conversation else None)
+
+    def parse(text: str | None, notes: list[str]) -> str:
+        patched, stats = apply_patch(prev.rust_source, text)
+        notes.append(f"patch: {stats.blocks} block(s), -{stats.lines_removed}/+{stats.lines_added} lines")
+        return patched
+
+    res = _run(model, message, "medium", previous_id=None if new_conversation else prev.interaction_id,
+               target=target, parse=parse)
+    res.repair_mode = "patch"
+    return res
 
 
 def polish(prev: TranslateResult, current_source: str, lint_text: str, model: str = DEFAULT_MODEL,

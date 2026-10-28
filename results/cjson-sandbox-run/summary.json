@@ -1,0 +1,211 @@
+{
+  "wall_seconds": 1854.9,
+  "results": [
+    {
+      "library": "cjson",
+      "model": "gemini-4-argon",
+      "status": "completed",
+      "interaction_id": "v1_ChcxVV9lYXN5MUs0Q3M5TW9Qb1lqTTBBcxIXMVVfZWFzeTFLNENzOU1vUG9Zak0wQXM",
+      "environment_id": "8e9f8e8568715bfac696924c22e15937",
+      "seconds": 517.2,
+      "usage": {
+        "total_input_tokens": 350463,
+        "total_output_tokens": 25959,
+        "total_thought_tokens": 5061,
+        "total_cached_tokens": 274775,
+        "total_tool_use_tokens": 0,
+        "total_tokens": 381483
+      },
+      "cost_usd": 0.4891,
+      "sandbox_match_rate": 1.0,
+      "local_match_rate": 1.0,
+      "holdout_match_rate": 1.0,
+      "match_rates_agree": true,
+      "rust_source": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-4-argon/cjson.rs",
+      "transcript": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-4-argon/transcript.jsonl",
+      "job_dir": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-4-argon",
+      "rounds_used": 2,
+      "claimed_rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "match_rate": 0.9933333333333333
+        },
+        {
+          "round": 2,
+          "build_ok": true,
+          "match_rate": 1.0
+        }
+      ],
+      "sandbox_verify": {
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        },
+        "divergences": [],
+        "crashes": []
+      },
+      "sandbox_verify_file": {
+        "file": "verify_2.json",
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        }
+      },
+      "local_verify": {
+        "inputs": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-4-argon/inputs",
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        }
+      },
+      "holdout_verify": {
+        "inputs": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-4-argon/holdout_inputs",
+        "match_rate": 1.0,
+        "behaviors_tested": 64,
+        "counts": {
+          "match": 64,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        },
+        "seed": 1001,
+        "overlap_removed": 236
+      },
+      "local_build": {
+        "ok": true,
+        "binary": "/Users/edan/dev/argon-hackathon/runs/build/remote-20261025-115152-cjson-gemini-4-argon/target/release/theseus_cjson",
+        "build_seconds": 12
+      },
+      "notes": [
+        "steps: {'code_execution_call': 4, 'code_execution_result': 4, 'thought': 3, 'function_call': 1, 'function_result': 1, 'model_output': 1}",
+        "pulled 3 files from sandbox /work",
+        "returned cjson.rs is identical to the sandbox's /work/cjson.rs",
+        "local re-verify re-run with reverify_job"
+      ],
+      "error": null
+    },
+    {
+      "library": "cjson",
+      "model": "gemini-3.8-flash",
+      "status": "completed",
+      "interaction_id": "v1_ChcxVV9lYW9DOE10MnYxTWtQZ2IzRXFRYxIXMVVfZWFvQzhNdDJ2MU1rUGdiM0VxUWM",
+      "environment_id": "88bee879a15231c8317eaaee8905d130",
+      "seconds": 1827.3,
+      "usage": {
+        "total_input_tokens": 3986791,
+        "total_output_tokens": 22400,
+        "total_thought_tokens": 48966,
+        "total_cached_tokens": 3856926,
+        "total_tool_use_tokens": 0,
+        "total_tokens": 4058157
+      },
+      "cost_usd": 1.3591,
+      "sandbox_match_rate": 1.0,
+      "local_match_rate": 1.0,
+      "holdout_match_rate": 1.0,
+      "match_rates_agree": true,
+      "rust_source": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-3.8-flash/cjson.rs",
+      "transcript": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-3.8-flash/transcript.jsonl",
+      "job_dir": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-3.8-flash",
+      "rounds_used": 1,
+      "claimed_rounds": [
+        {
+          "round": 1,
+          "build_ok": true,
+          "match_rate": 1.0
+        }
+      ],
+      "sandbox_verify": {
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        },
+        "divergences": [],
+        "crashes": []
+      },
+      "sandbox_verify_file": {
+        "file": "verify_1.json",
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0
+        }
+      },
+      "local_verify": {
+        "inputs": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-3.8-flash/inputs",
+        "match_rate": 1.0,
+        "behaviors_tested": 300,
+        "counts": {
+          "match": 300,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0,
+          "infra_failure": 0
+        }
+      },
+      "holdout_verify": {
+        "inputs": "/Users/edan/dev/argon-hackathon/runs/remote/20261025-115152/cjson-gemini-3.8-flash/holdout_inputs",
+        "match_rate": 1.0,
+        "behaviors_tested": 64,
+        "counts": {
+          "match": 64,
+          "divergence": 0,
+          "safety_improvement": 0,
+          "rust_crash": 0,
+          "both_crash": 0,
+          "timeout": 0,
+          "infra_failure": 0
+        },
+        "seed": 1001,
+        "overlap_removed": 236
+      },
+      "local_build": {
+        "ok": true,
+        "binary": "/Users/edan/dev/argon-hackathon/runs/build/remote-20261025-115152-cjson-gemini-3.8-flash/target/release/theseus_cjson",
+        "build_seconds": 4
+      },
+      "notes": [
+        "steps: {'thought': 37, 'code_execution_call': 49, 'code_execution_result': 49, 'function_call': 5, 'function_result': 5, 'model_output': 1}",
+        "pulled 2 files from sandbox /work",
+        "returned cjson.rs is identical to the sandbox's /work/cjson.rs",
+        "local re-verify re-run with reverify_job"
+      ],
+      "error": null
+    }
+  ],
+  "note": "results re-read after reverify_job (see FRICTION-LOG 12:25)"
+}

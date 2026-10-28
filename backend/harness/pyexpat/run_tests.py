@@ -10,7 +10,7 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE / "vendor" / "cpython" / "Lib" / "test"
 SUITES = ["test_pyexpat", "test_sax", "test_minidom", "test_xml_etree", "test_xml_etree_c"]
 PY = os.environ.get("PYTHON", sys.executable)
-RUNS = Path(os.environ.get("RUNS_DIR", "/Users/edan/dev/argon-hackathon/runs/pyexpat"))
+RUNS = Path(os.environ.get("RUNS_DIR", HERE.parents[2] / "runs" / "pyexpat"))
 
 
 def overlay() -> Path:

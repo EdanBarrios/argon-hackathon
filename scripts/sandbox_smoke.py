@@ -66,9 +66,9 @@ continue with the next step.
    `int main(){int a[2]; volatile int i=2; return a[i];}`
    Report whether the ASan report appeared.
 5. In /tmp/smoke, write a Rust hello world (hello.rs), compile it with `rustc hello.rs -o hello_rs`, and run `./hello_rs`.
-6. `git clone --depth 1 https://github.com/EdanBarrios/argon-hackathon /tmp/smoke/argon-hackathon`
-   then `ls -la /tmp/smoke/argon-hackathon/backend/harness`.
-7. If time allows: read /tmp/smoke/argon-hackathon/backend/harness/README.md, run
+6. `git clone --depth 1 https://github.com/EdanBarrios/theseus /tmp/smoke/theseus`
+   then `ls -la /tmp/smoke/theseus/backend/harness`.
+7. If time allows: read /tmp/smoke/theseus/backend/harness/README.md, run
    `backend/harness/fetch_cjson.sh`, then the C driver build command the README gives,
    from the repo root. Report output verbatim and timing.
 
@@ -106,8 +106,8 @@ wall-clock time. If a step fails, report the error verbatim and continue.
    `int main(){int a[2]; volatile int i=2; return a[i];}`
    Report whether an AddressSanitizer stack-buffer-overflow report appeared (show its first 10 lines).
 5. In /tmp/smoke: write hello.rs, `rustc hello.rs -o hello_rs && ./hello_rs`.
-6. `git clone --depth 1 https://github.com/EdanBarrios/argon-hackathon /tmp/smoke/argon-hackathon`
-7. From /tmp/smoke/argon-hackathon: `backend/harness/fetch_cjson.sh`, then
+6. `git clone --depth 1 https://github.com/EdanBarrios/theseus /tmp/smoke/theseus`
+7. From /tmp/smoke/theseus: `backend/harness/fetch_cjson.sh`, then
    `backend/harness/build_cjson.sh`, then
    `printf '[1,{"a":true}]' | backend/harness/build/cjson_driver` (expect `OK\t[1,{"a":true}]`).
 
@@ -120,7 +120,7 @@ cJSON driver build works (yes/no).
 FOLLOWUP_PROMPT = """Follow-up check on the same sandbox. Run these and report output verbatim
 with exit codes:
 
-1. `ls -la /tmp/smoke /tmp/smoke/argon-hackathon/backend/harness`
+1. `ls -la /tmp/smoke /tmp/smoke/theseus/backend/harness`
 2. `which clang rustc cargo; ls -la "$HOME/.cargo/bin" 2>&1; . "$HOME/.cargo/env" 2>/dev/null; which rustc && rustc --version`
 3. `cat /proc/1/stat 2>/dev/null | cut -d' ' -f22; uptime`
 

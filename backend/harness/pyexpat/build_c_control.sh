@@ -5,7 +5,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="${1:?usage: build_c_control.sh <out-dir>}"; mkdir -p "$OUT"
 EXP="${EXPAT_DIR:-}"
-for d in "$HERE/../expat" /Users/edan/dev/argon-hackathon/backend/harness/expat; do
+for d in "$HERE/../expat"; do
   [ -z "$EXP" ] && [ -s "$d/vendor/libexpat/expat/lib/expat.h" ] && EXP="$d"
 done
 LIB="$EXP/vendor/libexpat/expat/lib"

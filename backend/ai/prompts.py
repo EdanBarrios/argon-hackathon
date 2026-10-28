@@ -132,7 +132,7 @@ def translate_input(c_source: str) -> str:
     return "\n".join(parts)
 
 
-REPO_URL = "https://github.com/EdanBarrios/argon-hackathon"
+REPO_URL = "https://github.com/EdanBarrios/theseus"
 
 SANDBOX_TASK = """\
 You are in a remote Linux sandbox with a shell. Translate cJSON as described below, \
@@ -268,6 +268,39 @@ def fresh_repair_input(reference_input: str, rust_file: str, prev_rust: str, fee
         + "\n" + feedback_text
         + f"\n\nReply with exactly one ```rust block containing the complete corrected {rust_file}, "
         "the whole file."
+    )
+
+
+PATCH_FORMAT = """\
+Reply with SEARCH/REPLACE blocks only, no ```rust block and no whole file. Each block is:
+
+<<<<<<< SEARCH
+exact lines copied from the file above
+=======
+the lines that replace them
+>>>>>>> REPLACE
+
+Rules: SEARCH must match the current file character for character (indentation included) and \
+must match exactly one place, so include a few unchanged neighbouring lines when the fix is a \
+common line. Keep blocks small and give one block per separate fix. To delete lines leave the \
+replacement empty; to insert, search for a neighbouring line and repeat it in the replacement. \
+Do not elide code with comments like "rest unchanged". Blocks are applied in order, each to \
+the file as the blocks before it left it."""
+
+
+def patch_repair_input(rust_file: str, current_rust: str, feedback_text: str,
+                       reference_input: str | None = None) -> str:
+    """Repair as edits: the current file in full (the host may have reformatted it, so only
+    this text is the one to search in), the verifier's report, and the SEARCH/REPLACE format.
+    With reference_input (the translate message) it starts a new conversation."""
+    return (
+        (reference_input + "\n\n" if reference_input else "")
+        + f"The verifier and the compiler reported the problems below for the current {rust_file}. "
+        "Fix every reported problem at its root cause (the C source is the specification), and "
+        "do not break behavior that already matches. Each divergence is one representative of a "
+        "distinct failure pattern.\n\n"
+        + _fence("rust", f"{rust_file} (current)", current_rust)
+        + "\n" + feedback_text + "\n\n" + PATCH_FORMAT
     )
 
 

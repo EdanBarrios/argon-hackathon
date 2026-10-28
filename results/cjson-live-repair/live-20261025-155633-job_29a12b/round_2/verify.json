@@ -1,0 +1,54 @@
+{
+  "match_rate": 1.0,
+  "behaviors_tested": 578,
+  "counts": {
+    "match": 578,
+    "divergence": 0,
+    "safety_improvement": 0,
+    "rust_crash": 0,
+    "both_crash": 0,
+    "timeout": 0,
+    "infra_failure": 0
+  },
+  "divergences": [],
+  "crashes": [],
+  "timeouts": [],
+  "infra_failures": [],
+  "truncated_lists": false,
+  "summary": {
+    "inputs_found": 578,
+    "attempted": 578,
+    "scored": 578,
+    "matched": 578,
+    "diverged": 0,
+    "rust_crashes": 0,
+    "both_crashes": 0,
+    "timeouts": 0,
+    "infra_failures": 0,
+    "safety_improvements": 0,
+    "skipped": 0,
+    "skipped_reasons": []
+  },
+  "skipped_inputs": [],
+  "skipped_details": [],
+  "config": {
+    "c": "/Users/edan/dev/argon-hackathon/backend/harness/build/cjson_driver",
+    "rust": "/Users/edan/dev/argon-hackathon/runs/build/live-job_29a12b-r2/target/release/theseus_cjson",
+    "inputs": "/Users/edan/dev/argon-hackathon/runs/ai/inputs-c300-s1+targeted_str_",
+    "timeout": 20.0,
+    "max_bytes": 1048576
+  },
+  "provenance": {
+    "c": {
+      "executable": "/Users/edan/dev/argon-hackathon/backend/harness/build/cjson_driver",
+      "sha256": "d46c64423ca90d53992ec27e5e28dd531839ac576d0072fa2f38bc7c349622d5"
+    },
+    "rust": {
+      "executable": "/Users/edan/dev/argon-hackathon/runs/build/live-job_29a12b-r2/target/release/theseus_cjson",
+      "sha256": "e95ef7b15e36cbddddf6ecb694b61cc41ae83885e131c26bb61e8bbceaff6623"
+    },
+    "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+    "cjson_commit": "c859b25da02955fef659d658b8f324b5cde87be3"
+  },
+  "elapsed_seconds": 104.09
+}

@@ -1,0 +1,8 @@
+{
+  "library": "cjson",
+  "model": "gemini-4-argon",
+  "rounds": 4,
+  "inputs": 300,
+  "seed": 1,
+  "branch": "main"
+}

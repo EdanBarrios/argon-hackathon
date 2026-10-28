@@ -5,8 +5,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="${1:?usage: build_stub.sh <out-dir>}"; mkdir -p "$OUT"
 EXPAT_INC="${EXPAT_INC:-}"
 if [ -z "$EXPAT_INC" ]; then
-  for d in "$HERE/../expat/vendor/libexpat/expat/lib" \
-           /Users/edan/dev/argon-hackathon/backend/harness/expat/vendor/libexpat/expat/lib; do
+  for d in "$HERE/../expat/vendor/libexpat/expat/lib"; do
     [ -s "$d/expat.h" ] && { EXPAT_INC="$d"; break; }
   done
 fi
