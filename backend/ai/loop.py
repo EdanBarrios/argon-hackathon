@@ -261,6 +261,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--start-from", help="existing Rust file to use as round 1 instead of a translate call")
     ap.add_argument("--fresh-repair", action="store_true",
                     help="send each repair as a new conversation (C source + previous file + feedback)")
+    ap.add_argument("--patch-repair", action="store_true",
+                    help="repairs reply with SEARCH/REPLACE blocks applied on the host instead of the whole file "
+                         "(falls back to a full-file repair when a block does not apply)")
     ap.add_argument("--polish-rounds", type=int,
                     help="max lint-only rounds after the best build matches every loop input (default: the target's)")
     ap.add_argument("--no-host-fix", action="store_true", help="skip the host's clippy --fix + rustfmt pass")
@@ -338,7 +341,8 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 write_json(rdir / "feedback_sent.json", trim_feedback(feedback or {}, target.divergence_pattern))
                 res = repair(prev, feedback or {}, model=args.model, target=target,
-                             fresh_source=c_source if args.fresh_repair else None)
+                             fresh_source=c_source if (args.fresh_repair or (args.patch_repair and not prev.interaction_id)) else None,
+                             patch=args.patch_repair)
         except TranslateError as exc:
             rec["error"] = str(exc)
             rounds.append(rec)
@@ -347,7 +351,8 @@ def main(argv: list[str] | None = None) -> int:
         prev = res
         (rdir / target.rust_file).write_text(res.rust_source, encoding="utf-8")
         rec.update(interaction_id=res.interaction_id, seconds=res.seconds, usage=res.usage,
-                   thinking_level=res.thinking_level, notes=res.notes, continuations=res.continuations, rust_lines=res.rust_source.count("\n"))
+                   thinking_level=res.thinking_level, notes=res.notes, continuations=res.continuations,
+                   repair_mode=res.repair_mode, rust_lines=res.rust_source.count("\n"))
 
         build_id = re.sub(r"[^A-Za-z0-9._-]", "_", f"ai-{stamp}-{args.model}-r{n}")
         build, verify = build_verify(rdir / target.rust_file, build_id)
@@ -430,6 +435,7 @@ def main(argv: list[str] | None = None) -> int:
         "rounds_budget": args.rounds,
         "start_from": args.start_from,
         "fresh_repair": args.fresh_repair,
+        "patch_repair": args.patch_repair,
         "rounds_run": len(rounds),
         "inputs": str(inputs),
         "verify_timeout": args.timeout,

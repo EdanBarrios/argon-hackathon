@@ -271,6 +271,39 @@ def fresh_repair_input(reference_input: str, rust_file: str, prev_rust: str, fee
     )
 
 
+PATCH_FORMAT = """\
+Reply with SEARCH/REPLACE blocks only, no ```rust block and no whole file. Each block is:
+
+<<<<<<< SEARCH
+exact lines copied from the file above
+=======
+the lines that replace them
+>>>>>>> REPLACE
+
+Rules: SEARCH must match the current file character for character (indentation included) and \
+must match exactly one place, so include a few unchanged neighbouring lines when the fix is a \
+common line. Keep blocks small and give one block per separate fix. To delete lines leave the \
+replacement empty; to insert, search for a neighbouring line and repeat it in the replacement. \
+Do not elide code with comments like "rest unchanged". Blocks are applied in order, each to \
+the file as the blocks before it left it."""
+
+
+def patch_repair_input(rust_file: str, current_rust: str, feedback_text: str,
+                       reference_input: str | None = None) -> str:
+    """Repair as edits: the current file in full (the host may have reformatted it, so only
+    this text is the one to search in), the verifier's report, and the SEARCH/REPLACE format.
+    With reference_input (the translate message) it starts a new conversation."""
+    return (
+        (reference_input + "\n\n" if reference_input else "")
+        + f"The verifier and the compiler reported the problems below for the current {rust_file}. "
+        "Fix every reported problem at its root cause (the C source is the specification), and "
+        "do not break behavior that already matches. Each divergence is one representative of a "
+        "distinct failure pattern.\n\n"
+        + _fence("rust", f"{rust_file} (current)", current_rust)
+        + "\n" + feedback_text + "\n\n" + PATCH_FORMAT
+    )
+
+
 def polish_input(rust_file: str, current_rust: str, lint_text: str) -> str:
     """Polish-turn message: the build already matches on every loop input; clear lints only.
     The file is sent in full because the host may have reformatted it, so line numbers in
