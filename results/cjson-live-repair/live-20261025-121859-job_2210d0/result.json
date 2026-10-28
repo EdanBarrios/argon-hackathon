@@ -1,0 +1,105 @@
+{
+  "result": {
+    "baseline_match_rate": 0.9630350194552529,
+    "final_match_rate": 1.0,
+    "behaviors_tested": 514,
+    "divergences": [
+      {
+        "input": "\"\\uZ\\t\\\\\"",
+        "c_output": "OK\t\"\"",
+        "rust_output": "PARSE_ERROR at 7",
+        "function": "parse_string",
+        "resolved": true
+      },
+      {
+        "input": "[\"\\uZ\\t\\\\\",1]",
+        "c_output": "OK\t[\"\",1]",
+        "rust_output": "PARSE_ERROR at 8",
+        "function": "parse_array",
+        "resolved": true
+      },
+      {
+        "input": "{\"\\uZ\\t\\\\\":1}",
+        "c_output": "OK\t{\"\":1}",
+        "rust_output": "PARSE_ERROR at 8",
+        "function": "parse_object",
+        "resolved": true
+      },
+      {
+        "input": "{\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\":\"\",\"\\u\\xd4\\t\\\\\"",
+        "c_output": "PARSE_ERROR at 58",
+        "rust_output": "PARSE_ERROR at 56",
+        "function": "parse_string",
+        "resolved": true
+      }
+    ],
+    "crashes": [
+      {
+        "input": "{\"1\":1,",
+        "sanitizer_report": "=================================================================\n==49745==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000000f7 at pc 0x000104746e03 bp 0x7ff7bb7cb8b0 sp 0x7ff7bb7cb8a8\nREAD of size 1 at 0x6020000000f7 thread T0\n    #0 0x000104746e02 in parse_string cJSON.c:786\n    #1 0x00010474c727 in parse_object cJSON.c:1665\n    #2 0x000104737714 in parse_value cJSON.c:1365\n    #3 0x00010473491c in cJSON_ParseWithLengthOpts cJSON.c:1125\n    #4 0x000104755218 in main cjson_driver_old.c:89\n    #5 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\n0x6020000000f7 is located 0 bytes after 7-byte region [0x6020000000f0,0x6020000000f7)\nallocated by thread T0 here:\n    #0 0x000104c73b22 in malloc+0x82 (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0x9db22)\n    #1 0x000104755158 in main cjson_driver_old.c:77\n    #2 0x7ff801fde52f in start+0xbef (dyld:x86_64+0xfffffffffffde52f)\nSUMMARY: AddressSanitizer: heap-buffer-overflow cJSON.c:786 in parse_string",
+        "rust_behavior": "clean error: PARSE_ERROR at 7"
+      }
+    ]
+  },
+  "timings": [
+    {
+      "stage": "inputs",
+      "seconds": 0.0,
+      "inputs_dir": "/Users/edan/dev/argon-hackathon/runs/ai/inputs-c100-s1+targeted_str_"
+    },
+    {
+      "stage": "build",
+      "seconds": 5.0,
+      "iteration": 1,
+      "ok": true
+    },
+    {
+      "stage": "verify",
+      "seconds": 22.1,
+      "iteration": 1,
+      "inputs": 514
+    },
+    {
+      "stage": "repair",
+      "seconds": 117.4,
+      "iteration": 2,
+      "model": "gemini-4-argon"
+    },
+    {
+      "stage": "build",
+      "seconds": 3.5,
+      "iteration": 2,
+      "ok": true
+    },
+    {
+      "stage": "verify",
+      "seconds": 18.4,
+      "iteration": 2,
+      "inputs": 514
+    },
+    {
+      "stage": "holdout_verify",
+      "seconds": 0.8,
+      "inputs": 0
+    },
+    {
+      "stage": "cve_check",
+      "seconds": 0.6
+    }
+  ],
+  "holdout": {
+    "match_rate": null,
+    "behaviors_tested": 0,
+    "overlap_removed": 236,
+    "counts": {
+      "match": 0,
+      "divergence": 0,
+      "safety_improvement": 0,
+      "rust_crash": 0,
+      "both_crash": 0,
+      "timeout": 0,
+      "infra_failure": 0
+    },
+    "inputs": "/Users/edan/dev/argon-hackathon/runs/ai/holdout-c100-s1001-minus-inputs-c100-s1+targeted_str_"
+  }
+}
