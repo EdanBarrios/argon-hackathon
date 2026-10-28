@@ -1,41 +1,24 @@
-Read docs/PLAN.md first.
-
 # Theseus: agent rules
 
-## Role detection
+Read `README.md` first. `docs/PLAN.md` is the original hackathon-day plan and is kept for history.
 
-Read `.role` in the repo root. Valid values: `ai`, `frontend`, `systems`.
-If `.role` is missing or invalid, this session is **read-only**: do not edit files.
+## Working rules
 
-## Ownership
-
-| Role | May edit |
-|---|---|
-| `ai` | `backend/ai/` |
-| `frontend` | `frontend/` |
-| `systems` | `backend/api/`, `backend/harness/`, `scripts/`, and all shared files: root files, `docs/`, `contracts/`, `.claude/`, `backend/pyproject.toml` |
-
-Anyone may edit `docs/DECISIONS.md`.
-
-`scripts/guard-edit.sh` enforces this table on Edit/Write via `.claude/settings.json`. This is a cooperative guardrail, not a security boundary.
-
-## No-overlap rules
-
-- Never edit another role's paths.
-- If the guard blocks you, stop and ask the owner. **Never work around it via bash.**
-- Never change the contract silently. Announce first; C edits `contracts/`.
-- No broad refactors.
-- Never revert others' work.
-- Never force-push.
-- Merges go through C.
-- Work on a `feat/<role>-*` branch.
+- Work on a feature branch and open a PR. Never force-push to `main`.
+- No broad refactors. Never revert someone else's work.
+- Do not change `contracts/` silently; say so in the PR.
+- Never commit secrets (`.env`), fetched third-party sources, or `runs/`.
 
 ## Before committing
 
 1. `git status`
 2. `git diff`
-3. Run the tests for your area.
+3. Run the tests for the area you changed (`cd backend && uv run pytest -q`; the billion-laughs test can time out under heavy machine load).
+
+## Claims
+
+Say "N tested behaviors preserved", never "proves", "equivalent", "secure" or "drop-in replacement". Every number in the README or docs needs a saved file under `results/` or `backend/ai/results/`. Lua is translated, not verified.
 
 ## Argon
 
-Argon API facts are in docs/PLAN.md section 6. Use the Interactions API only.
+Argon API facts are in `docs/PLAN.md` section 6. Use the Interactions API only.
