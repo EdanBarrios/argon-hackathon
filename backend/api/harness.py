@@ -143,6 +143,19 @@ def candidate_binary(name: str, build: bool = True) -> Path | None:
     return Path(res["binary"]) if res.get("ok") else None
 
 
+# The committed Argon port (980/980 targeted inputs, clippy clean), used when runs/ is empty,
+# as on a fresh clone.
+COMMITTED_PORT = ROOT / "backend" / "ai" / "results" / "cjson-quality" / "argon-full" / "best" / "cjson.rs"
+
+
+def committed_binary() -> Path | None:
+    """Build the committed port (cached by build_rust.sh) and return its binary, or None."""
+    if not COMMITTED_PORT.is_file():
+        return None
+    res = build_rust(COMMITTED_PORT, "committed-argon-full")
+    return Path(res["binary"]) if res.get("ok") else None
+
+
 # ---------------------------------------------------------------- scripts
 
 

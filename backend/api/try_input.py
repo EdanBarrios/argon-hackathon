@@ -38,9 +38,13 @@ def rust_binary() -> tuple[Path, str]:
     if live and os.access(live, os.X_OK):
         return Path(live), _live_best["label"]
     built = harness.candidate_binary("argon-1")
-    if built is None:
-        raise harness.HarnessError("no Rust binary: runs/ai/argon-1 has no buildable cjson.rs; set THESEUS_RUST_BIN")
-    return built, "Argon's translation (runs/ai/argon-1)"
+    if built is not None:
+        return built, "Argon's translation (runs/ai/argon-1)"
+    committed = harness.committed_binary()
+    if committed is None:
+        raise harness.HarnessError("no Rust binary: runs/ai/argon-1 has no buildable cjson.rs and the committed "
+                                   "port did not build; set THESEUS_RUST_BIN")
+    return committed, "Argon's translation (committed: ai/results/cjson-quality/argon-full)"
 
 
 def known_cve(data: bytes) -> str | None:

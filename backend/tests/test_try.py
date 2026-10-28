@@ -94,6 +94,19 @@ def test_try_missing_rust_binary_is_503(client, drivers, monkeypatch):
     assert client.post("/try", json={"input": "[1]"}).status_code == 503
 
 
+def test_rust_binary_falls_back_to_committed_port(tmp_path, monkeypatch):
+    """A fresh clone has no runs/ai/argon-1; the Try panel must use the committed port."""
+    monkeypatch.delenv("THESEUS_RUST_BIN", raising=False)
+    built = tmp_path / "committed"
+    built.write_text("#!/bin/sh\n")
+    built.chmod(0o755)
+    monkeypatch.setattr(try_input, "_live_best", {})
+    monkeypatch.setattr(harness, "candidate_binary", lambda name, build=True: None)
+    monkeypatch.setattr(harness, "build_rust", lambda path, build_id: {"ok": True, "binary": str(built)})
+    binary, label = try_input.rust_binary()
+    assert binary == built and "committed" in label
+
+
 @pytest.mark.skipif(
     not (os.access(harness.C_DRIVER, os.X_OK) and harness.candidate_binary("argon-1", build=False)),
     reason="real C driver or argon-1 build not present",
