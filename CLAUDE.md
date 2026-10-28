@@ -1,6 +1,6 @@
 # Theseus: agent rules
 
-Read `README.md` first. `docs/PLAN.md` is the original hackathon-day plan and is kept for history.
+Read `README.md` first. `docs/hackathon/PLAN.md` is the original hackathon-day plan and is kept for history.
 
 ## Working rules
 
@@ -21,4 +21,4 @@ Say "N tested behaviors preserved", never "proves", "equivalent", "secure" or "d
 
 ## Argon
 
-Argon API facts are in `docs/PLAN.md` section 6. Use the Interactions API only.
+Argon API facts are in `docs/hackathon/PLAN.md` section 6. Use the Interactions API only.
