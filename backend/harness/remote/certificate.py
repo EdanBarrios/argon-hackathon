@@ -112,7 +112,7 @@ def build_certificate(jd: Path, result: dict, approved_by: str, branch: str) -> 
         "claim": (f"agreement on {local.get('scored')} tested inputs (seed {seed}) and {held.get('scored')} "
                   f"held-out inputs; not a proof of equivalence") if local.get("scored") is not None else None,
         "source": {
-            "repo": "EdanBarrios/argon-hackathon",
+            "repo": "EdanBarrios/theseus",
             "harness_commit": _git("rev-parse", "HEAD"),
             "harness_dirty": bool(_git("status", "--porcelain", "--", "backend/harness", "scripts")),
             "c_library": "cJSON",

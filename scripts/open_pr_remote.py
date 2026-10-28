@@ -5,7 +5,7 @@ Usage:
   cd backend && uv run python ../scripts/open_pr_remote.py <job_dir> --approved-by "Edan"
 
 The real run needs GITHUB_TOKEN in the repo .env: a fine-grained token on
-EdanBarrios/argon-hackathon only, with Contents read/write and Pull requests
+EdanBarrios/theseus only, with Contents read/write and Pull requests
 read/write. It is registered through the Gemini Credentials API and injected by
 the sandbox's egress proxy; it never enters the prompt or the sandbox.
 """

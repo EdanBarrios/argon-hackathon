@@ -64,7 +64,7 @@ cJSON v1.7.17 has CVE-2023-53154: the 7 bytes `{"1":1,` cause a heap buffer over
 3. **Verify.** `verify.sh` feeds identical bytes to the C driver (ASan + UBSan) and the Rust driver and compares raw stdout and exit status. Every input lands in exactly one class: match, divergence, Rust crash, timeout, infra failure, or safety improvement (C crashed, Rust exited cleanly). Timeouts and infra failures stay in the denominator, so a broken run can never read as 100%.
 4. **Repair.** Divergences go back to Argon with the exact input and both outputs. Repeat until everything matches or the round budget runs out.
 5. **Held-out check.** The final build is verified again on inputs the repair loop never saw.
-6. **Approve and release.** A person approves, then a managed agent opens a pull request with the crate and an `EVIDENCE.md` built from verifier output. [Example](https://github.com/EdanBarrios/argon-hackathon/pull/3).
+6. **Approve and release.** A person approves, then a managed agent opens a pull request with the crate and an `EVIDENCE.md` built from verifier output. [Example](https://github.com/EdanBarrios/theseus/pull/3).
 
 **Is the verifier itself trustworthy?** Before any model call, preflight requires C against C to match on every input, a canary input with a known output to pass, and a reject-everything stub to score near zero. Nondeterminism is removed at the source (libexpat's hash salt is fixed to zero). `mutants.py` plants single-site bugs in cJSON to confirm the inputs catch them. Our first driver passed C-vs-C while broken, which is why the canary exists (`docs/FRICTION-LOG.md`).
 

@@ -76,7 +76,7 @@ sandbox's own `verify_<N>.json` and `cjson.rs`), `verify_local.json`, `verify_ho
 
 ## Token for the PR step
 
-Fine-grained personal access token, repository access **only EdanBarrios/argon-hackathon**,
+Fine-grained personal access token, repository access **only EdanBarrios/theseus**,
 permissions **Contents: Read and write** and **Pull requests: Read and write** (Metadata: Read is
 added automatically). Put it in `.env` as `GITHUB_TOKEN=...`.
 

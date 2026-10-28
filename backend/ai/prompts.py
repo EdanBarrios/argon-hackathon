@@ -132,7 +132,7 @@ def translate_input(c_source: str) -> str:
     return "\n".join(parts)
 
 
-REPO_URL = "https://github.com/EdanBarrios/argon-hackathon"
+REPO_URL = "https://github.com/EdanBarrios/theseus"
 
 SANDBOX_TASK = """\
 You are in a remote Linux sandbox with a shell. Translate cJSON as described below, \
