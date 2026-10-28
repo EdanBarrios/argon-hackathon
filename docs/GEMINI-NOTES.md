@@ -1,6 +1,6 @@
 # Gemini notes from the organizer guide (Oct 25)
 
-Complements docs/PLAN.md section 6. Interactions API only.
+Complements docs/hackathon/PLAN.md section 6. Interactions API only.
 
 ## Models and reasoning
 

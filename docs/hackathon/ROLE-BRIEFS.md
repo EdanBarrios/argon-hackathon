@@ -1,6 +1,6 @@
 # Role briefs (10:50)
 
-Read this after docs/PLAN.md. Each role: what to ship, what to read, what to decide, what to watch.
+Read this after docs/hackathon/PLAN.md. Each role: what to ship, what to read, what to decide, what to watch.
 Target is decided: **cJSON v1.7.19, core cJSON.c, parse + print first.** Stop researching the target; build.
 
 ---

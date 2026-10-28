@@ -37,7 +37,7 @@ Confirmed jobs on the run view: follow the run live; inspect any divergence (inp
 ## Brand Commitments
 
 - Name: Theseus (the Ship of Theseus: replace every plank, is it the same ship?).
-- Wording rules (docs/PITCH.md): say "N tested behaviors preserved" or "independently checks agreement on N tested inputs". Never "proves it behaves the same", "equivalent", "100% compatible", "secure", or "CVE fixed"; for the CVE input say "rejects this historical crashing input". Never call it a dashboard. Flash "hit its 64K output cap"; never say Flash "can't".
+- Wording rules (docs/hackathon/PITCH.md): say "N tested behaviors preserved" or "independently checks agreement on N tested inputs". Never "proves it behaves the same", "equivalent", "100% compatible", "secure", or "CVE fixed"; for the CVE input say "rejects this historical crashing input". Never call it a dashboard. Flash "hit its 64K output cap"; never say Flash "can't".
 
 ## Evidence on Hand
 
